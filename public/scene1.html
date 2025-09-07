@@ -59,9 +59,29 @@
       </a-assets>
 
       <a-entity id="scene">
-        <a-gltf-model src="assets/sekolah.glb" position="0 -11 0" scale="2 2 2" rotation="0 0 0"></a-gltf-model>
-        <!-- Collision box for the school building -->
-        <a-box class="collidable" position="0 -6 0" width="20" height="8" depth="20" visible="false"></a-box>
+        <!-- School building with collision -->
+        <a-entity id="school-group" position="0 -11 0">
+          <a-gltf-model src="assets/sekolah.glb" scale="2 2 2" rotation="0 0 0"></a-gltf-model>
+          <!-- Multiple collision boxes for better coverage -->
+          <a-box
+            class="collidable"
+            position="0 5 0"
+            width="20"
+            height="22"
+            depth="20"
+            visible="false"
+            static-body="mass: 0"
+          ></a-box>
+          <a-box
+            class="collidable"
+            position="0 5 0"
+            width="20"
+            height="22"
+            depth="20"
+            visible="false"
+            collision-filter="collideForces: false;"
+          ></a-box>
+        </a-entity>
         <a-plane class="ground" position="0 0 0" rotation="-90 0 0" width="100" height="100" visible="true"></a-plane>
         <a-entity light="type:ambient;intensity:0.5"></a-entity>
 
@@ -86,6 +106,22 @@
           <a-entity id="ferrari" gltf-model="url(assets/ferrari.glb)" position="0 0 0" scale="1 1 1" car-controls="carBody: #ferrari-body; wheels: wheel_fl, wheel_fr, wheel_rl, wheel_rr"></a-entity>
         </a-entity>
 
+        <!-- Sepeda model with collision -->
+        <a-entity id="sepeda-group" position="3 0.6 3" rotation="0 90 0">
+          <!-- Visual model for the bicycle -->
+          <a-entity gltf-model="url(assets/sepeda.glb)" scale="0.5 0.5 0.5"></a-entity>
+          <!-- Collision box for the bicycle -->
+          <a-box
+            class="collidable"
+            position="0 0.3 0"
+            width="1.0"
+            height="0.6"
+            depth="2.0"
+            visible="false"
+            pushable
+          ></a-box>
+        </a-entity>
+        
         <!-- Portal back to index.html -->
         <a-link
           change-room="on:obbcollisionstarted;room:lobby;url:index.html"
