@@ -1,0 +1,218 @@
+<html>
+  <head>
+    <title>VR Fisika - Tumbukan</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+    <script src="https://unpkg.com/aframe-event-set-component/dist/aframe-event-set-component.min.js"></script>
+  </head>
+  <body>
+    <a-scene background="color: #1a1a1a">
+      <!-- Kamera dengan gaze cursor -->
+      <a-entity camera look-controls position="0 1.6 0">
+        <a-entity
+          id="reticle"
+          position="0 0 -1"
+          geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+          material="shader: flat; color: #00FF00; opacity: 1"
+          cursor="fuse: true; fuseTimeout: 1200"
+          raycaster="objects: .clickable"
+          animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.2 0.2 0.2; dur: 1200; easing: linear"
+          animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120"
+        ></a-entity>
+      </a-entity>
+
+      <a-entity id="bab3" visible="true">
+        <a-sphere id="ball1" class="clickable" position="-2 1 -4" radius="0.25" color="#cc2f2f"></a-sphere>
+        <a-text id="label1" value="m1 = 1kg
+        v1 = 1m/s" position="-2 2 -4" align="center"></a-text>
+        <a-sphere id="ball2" class="clickable" position="2 1 -4" radius="0.25" color="#4545ff"></a-sphere>
+        <a-text id="label2" value="m2 = 1kg
+        v2 = -1m/s" position="2 2 -4" align="center"></a-text>
+        
+        <!-- UI Biru -->
+        <a-entity id="UIbiruWrapper">
+        <!-- UI massa biru -->
+        <a-text value="Massa Bola Biru" position="1.3 1.89 -1" scale="0.3 0.3 0.3" rotation="0 -55 0" align="center"></a-text>
+        <a-entity position="1.3 1.7 -1.2" rotation="0 -55 0">
+          <a-box id="btnM21" class="clickable"
+            depth="0.1" height="0.2" width="0.3" color="#2e88ff"
+            event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#7bdcff"
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff">
+          </a-box>
+          <a-text value="1Kg" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+        </a-entity>
+        <a-entity position="1.49 1.7 -0.93" rotation="0 -55 0">
+          <a-box id="btnM22" class="clickable"
+            depth="0.1" height="0.2" width="0.3" color="#2e88ff"
+            event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#7bdcff"
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff">
+          </a-box>
+          <a-text value="2Kg" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+        </a-entity>
+
+        <!-- UI Kecepatan biru -->
+        <a-text value="Kecepatan Bola Biru" position="1.3 1.5 -1" scale="0.3 0.3 0.3" rotation="0 -55 0" align="center"></a-text>
+        <a-entity position="1.3 1.3 -1.2" rotation="0 -55 0">
+          <a-box id="btnV21" class="clickable"
+            depth="0.1" height="0.2" width="0.3" color="#2e88ff"
+            event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#7bdcff"
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff">
+          </a-box>
+          <a-text value="-1m/s" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+        </a-entity>
+        <a-entity position="1.49 1.3 -0.93" rotation="0 -55 0">
+          <a-box id="btnV22" class="clickable"
+            depth="0.1" height="0.2" width="0.3" color="#2e88ff"
+            event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#7bdcff"
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff">
+          </a-box>
+          <a-text value="-2m/s" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+        </a-entity>
+        </a-entity>
+
+        <!-- UI Merah -->
+        <a-entity id="UImerahWrapper">
+        <!-- UI Massa Merah -->
+        <a-text value="Massa Bola Merah" position="-1.3 1.89 -1" scale="0.3 0.3 0.3" rotation="0 55 0" align="center"></a-text>
+        <a-entity position="-1.49 1.7 -0.93" rotation="0 55 0">
+          <a-box id="btnM11" class="clickable"
+            depth="0.1" height="0.2" width="0.3" color="#d82424"
+            event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#f4caca"
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#d82424">
+          </a-box>
+          <a-text value="1Kg" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+        </a-entity>
+        <a-entity position="-1.3 1.7 -1.2" rotation="0 55 0">
+          <a-box id="btnM12" class="clickable"
+            depth="0.1" height="0.2" width="0.3" color="#d82424"
+            event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#f4caca"
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#d82424">
+          </a-box>
+          <a-text value="2Kg" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+        </a-entity>
+
+        <!-- UI Kecepatan Merah -->
+        <a-text value="Kecepatan Bola Merah" position="-1.3 1.5 -1" scale="0.3 0.3 0.3" rotation="0 55 0" align="center"></a-text>
+        <a-entity position="-1.49 1.3 -0.93" rotation="0 55 0">
+          <a-box id="btnV11" class="clickable"
+            depth="0.1" height="0.2" width="0.3" color="#d82424"
+            event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#f4caca"
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#d82424">
+          </a-box>
+          <a-text value="1m/s" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+        </a-entity>
+        <a-entity position="-1.3 1.3 -1.2" rotation="0 55 0">
+          <a-box id="btnV12" class="clickable"
+            depth="0.1" height="0.2" width="0.3" color="#d82424"
+            event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#f4caca"
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#d82424">
+          </a-box>
+          <a-text value="2m/s" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+        </a-entity>
+      </a-entity>
+      
+      <a-entity position="0 0.8 -1" rotation="-30 0 0">
+        <a-box id="btnPlay" class="clickable"
+              depth="0.1" height="0.2" width="0.6" color="#008800"
+              event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#81db81"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#008800">
+        </a-box>
+        <a-text id="btnPlayText" value="Start" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+      </a-entity>
+      </a-entity>
+    </a-scene>
+
+    <script>
+      const ball1 = document.querySelector("#ball1");
+      const ball2 = document.querySelector("#ball2");
+      const label1 = document.querySelector("#label1");
+      const label2 = document.querySelector("#label2");
+
+      const btnPlay = document.querySelector("#btnPlay");
+      let m1 = 1, v1 = 1;
+      let m2 = 1, v2 = -1;
+      let animating = false;
+      let done = false;
+
+      document.querySelector('#btnM11').addEventListener('click', () => { m1 = 1; updateLabel(); });
+      document.querySelector('#btnM12').addEventListener('click', () => { m1 = 2; updateLabel(); });
+      document.querySelector('#btnV11').addEventListener('click', () => { v1 = 1; updateLabel(); });
+      document.querySelector('#btnV12').addEventListener('click', () => { v1 = 2; updateLabel(); });
+
+      document.querySelector('#btnM21').addEventListener('click', () => { m2 = 1; updateLabel(); });
+      document.querySelector('#btnM22').addEventListener('click', () => { m2 = 2; updateLabel(); });
+      document.querySelector('#btnV21').addEventListener('click', () => { v2 = -1; updateLabel(); });
+      document.querySelector('#btnV22').addEventListener('click', () => { v2 = -2; updateLabel(); });
+
+      // Rumus kecepatan tumbukan lenting sempurna
+      function hitungKecepatan(m1, v1, m2, v2) {
+        const v1p = ( (m1 - m2) * v1 + 2 * m2 * v2 ) / (m1 + m2);
+        const v2p = ( (m2 - m1) * v2 + 2 * m1 * v1 ) / (m1 + m2);
+        return [v1p, v2p];
+      }
+
+      function updateLabel() {
+        label1.setAttribute("value", `m1 = ${m1}kg\nv1 = ${v1}m/s`);
+        label2.setAttribute("value", `m2 = ${m2}kg\nv2 = ${v2}m/s`);
+      }
+
+      // Play
+      btnPlay.addEventListener("click", () => {
+        if (done) {
+          // Reset state
+          ball1.setAttribute("position", "-2 1 -4");
+          ball2.setAttribute("position", "2 1 -4");
+          updateLabel();
+          ball1.removeAttribute("animation__go");
+          ball2.removeAttribute("animation__go");
+          ball1.removeAttribute("animation__after");
+          ball2.removeAttribute("animation__after");
+          done = false;
+          document.querySelector("#UIbiruWrapper").setAttribute("visible", "true");
+          document.querySelector("#UImerahWrapper").setAttribute("visible", "true");
+          document.querySelector("#btnPlayText").setAttribute("value", "Start");
+        } else {
+          // Start animation
+          document.querySelector("#UIbiruWrapper").setAttribute("visible", "false");
+          document.querySelector("#UImerahWrapper").setAttribute("visible", "false");
+          if (animating) return;
+          animating = true;
+
+          const [v1p, v2p] = hitungKecepatan(m1, v1, m2, v2);
+
+          // Gerak mendekat
+          ball1.setAttribute("animation__go", {property:"position", to:"0 1 -4", dur:2000, easing:"linear"});
+          ball2.setAttribute("animation__go", {property:"position", to:"0 1 -4", dur:2000, easing:"linear"});
+
+          setTimeout(() => {
+            // Update label setelah tabrakan
+            label1.setAttribute("value", `m1 = ${m1}kg\nv1' = ${v1p.toFixed(2)}m/s`);
+            label2.setAttribute("value", `m2 = ${m2}kg\nv2' = ${v2p.toFixed(2)}m/s`);
+
+            // Gerak menjauh
+            if (Math.abs(v1p) > 0.01) {
+              ball1.setAttribute("animation__after", {
+                property:"position", to:`${-2 + v1p} 1 -4`, dur:2000, easing:"linear"
+              });
+            } else {
+              ball1.setAttribute("position", "0 1 -4");
+            }
+
+            if (Math.abs(v2p) > 0.01) {
+              ball2.setAttribute("animation__after", {
+                property:"position", to:`${2 + v2p} 1 -4`, dur:2000, easing:"linear"
+              });
+            } else {
+              ball2.setAttribute("position", "0 1 -4");
+            }
+
+            animating = false;
+            done = true;
+            document.querySelector("#btnPlayText").setAttribute("value", "Reset");
+          }, 2100);
+        }
+      });
+      updateLabel(); // Initial label setup
+    </script>
+  </body>
+</html>

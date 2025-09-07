@@ -1,0 +1,337 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>AR-Room</title>
+    <meta name="description" content="AR-Room" />
+
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js"></script>
+    <script src="/easyrtc/easyrtc.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/networked-aframe@0.14.0/dist/networked-aframe.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-environment-component@1.5.0/dist/aframe-environment-component.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fern-solutions/aframe-mirror@1.1.1/dist/mirror.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-cursor-teleport@1.6.0/dist/aframe-cursor-teleport-component.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-blink-controls@0.4.3/dist/aframe-blink-controls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AdaRoseCannon/aframe-xr-boilerplate@bca4792/simple-navmesh-constraint.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-gltf-model-plus@1.0.0/dist/gltf-model-plus.min.js"></script>
+    <script>
+      window.uiSettings = {
+        showRandomAvatarButton: true,
+        showDieButton: true,
+      };
+    </script>
+    <script src="/dist/components.js"></script>
+    <script defer src="/dist/ui.js"></script>
+  </head>
+
+  <body>
+    <a-scene
+      light="defaultLightsEnabled:false"
+      renderer="stencil:true"
+      networked-scene="
+        connectOnLoad: false;
+        room: forest;
+        debug: true;
+        adapter: wseasyrtc;
+        audio: false;
+        video: false;
+    "
+      shadow="type: pcfsoft"
+      gltf-model="meshoptDecoderPath:https://unpkg.com/meshoptimizer@0.19.0/meshopt_decoder.js"
+      raycaster="far: 100; objects: .clickable,[link];"
+      cursor="rayOrigin: mouse"
+    >
+      <a-assets>
+        <template id="avatar-template">
+          <a-entity player-info>
+            <a-entity class="model">
+              <a-text class="nametag" align="center" value="?" position="0 2.1 0" scale=".5 .5 .5"></a-text>
+            </a-entity>
+            <a-entity class="camera" position="0 1.6 0"></a-entity>
+          </a-entity>
+        </template>
+        <img id="thumbJapan" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/japan.png" />
+        <img id="thumbForest" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" />
+      </a-assets>
+
+      <a-entity id="scene">
+        <!-- School building with collision -->
+        <a-entity id="school-group" position="0 -11 0">
+          <a-gltf-model src="assets/sekolah.glb" scale="2 2 2" rotation="0 0 0"></a-gltf-model>
+          <!-- Multiple collision boxes for better coverage -->
+          <a-box
+            class="collidable"
+            position="0 5 0"
+            width="20"
+            height="22"
+            depth="20"
+            visible="false"
+            static-body="mass: 0"
+          ></a-box>
+          <a-box
+            class="collidable"
+            position="0 5 0"
+            width="20"
+            height="22"
+            depth="20"
+            visible="false"
+            collision-filter="collideForces: false;"
+          ></a-box>
+        </a-entity>
+        <a-plane class="ground" position="0 0 0" rotation="-90 0 0" width="100" height="100" visible="true"></a-plane>
+        <a-entity light="type:ambient;intensity:0.5"></a-entity>
+
+        <a-mirror id="mirror" class="collidable" position="0 1.8 -3" scale="5 3 1" layers="0,3">
+          <a-box color="black" position="0 0 -0.02" scale="1.02 1.02 0.01"></a-box>
+        </a-mirror>
+
+        <!-- Car collision system -->
+        <a-entity id="car-group" position="0 0 5">
+          <!-- Main collision body for the car -->
+          <a-box
+            id="ferrari-body"
+            class="collidable"
+            pushable
+            position="0 0.6 0"
+            width="1.8"
+            height="1.2"
+            depth="4.0"
+            visible="false"
+          ></a-box>
+          <!-- Visual model for the car -->
+          <a-entity id="ferrari" gltf-model="url(assets/ferrari.glb)" position="0 0 0" scale="1 1 1" car-controls="carBody: #ferrari-body; wheels: wheel_fl, wheel_fr, wheel_rl, wheel_rr"></a-entity>
+        </a-entity>
+
+        <!-- Sepeda model with collision -->
+        <a-entity id="sepeda-group" position="3 0.6 3" rotation="0 90 0">
+          <!-- Visual model for the bicycle -->
+          <a-entity gltf-model="url(assets/sepeda.glb)" scale="0.5 0.5 0.5"></a-entity>
+          <!-- Collision box for the bicycle -->
+          <a-box
+            class="collidable"
+            position="0 0.3 0"
+            width="1.0"
+            height="0.6"
+            depth="2.0"
+            visible="false"
+            pushable
+          ></a-box>
+        </a-entity>
+        
+        <!-- Portal back to index.html -->
+        <a-link
+          change-room="on:obbcollisionstarted;room:lobby;url:index.html"
+          link="on:click"
+          href="index.html"
+          title="Kembali ke Lobby"
+          image="#thumbForest"
+          position="0 1.6 10"
+          rotation="0 180 0"
+          class="clickable"
+          event-set__mouseenter="material.opacity: 0.8"
+          event-set__mouseleave="material.opacity: 0.6"
+        >
+          <a-box position="0 0 0.5" obb-collider visible="false"></a-box>
+        </a-link>
+      </a-entity>
+
+      <a-entity
+        id="rig"
+        collider
+        movement-controls="fly:false;"
+        spawn-in-circle="radius:1"
+        networked="template:#avatar-template;attachTemplateToLocal:false"
+        player-info
+      >
+        <a-entity id="player" class="camera" camera position="0 1.6 0" look-controls>
+          <a-box obb-collider visible="false" height="0.4" depth="0.4" width="0.4"></a-box>
+          <!-- Ring cursor for better interaction -->
+          <a-entity
+            position="0 0 -1"
+            geometry="primitive: ring; radiusInner: 0.018; radiusOuter: 0.025"
+            material="shader: flat; opacity: 0.9"
+            cursor="fuse: true; fuseTimeout: 1200"
+            raycaster="objects: .clickable; far: 20;"
+            animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.2 0.2 0.2; dur: 1200; easing: linear"
+            animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120">
+          </a-entity>
+        </a-entity>
+        <a-entity id="left-hand" networked-hand-controls="hand: left" laser-controls="hand: left"></a-entity>
+        <a-entity id="right-hand" networked-hand-controls="hand:right" laser-controls="hand: right"></a-entity>
+      </a-entity>
+    </a-scene>
+
+    <script>
+      // Component to make one entity follow another
+      AFRAME.registerComponent('follow', {
+        schema: { target: { type: 'selector' } },
+        tick: function () {
+          if (!this.data.target) return;
+          this.el.object3D.position.copy(this.data.target.object3D.position);
+          this.el.object3D.quaternion.copy(this.data.target.object3D.quaternion);
+        },
+      });
+
+      // Player collider: stops the player from penetrating any .collidable object
+      AFRAME.registerComponent('collider', {
+        schema: { distance: { default: 1.2 } },
+        init: function () {
+          this.raycaster = new THREE.Raycaster();
+          this.lastSafePosition = new THREE.Vector3();
+          this.directions = [
+            new THREE.Vector3(0, 0, -1), // forward
+            new THREE.Vector3(0, 0, 1), // backward
+            new THREE.Vector3(-1, 0, 0), // left
+            new THREE.Vector3(1, 0, 0), // right
+            new THREE.Vector3(-0.7, 0, -0.7), // diagonal front-left
+            new THREE.Vector3(0.7, 0, -0.7), // diagonal front-right
+            new THREE.Vector3(-0.7, 0, 0.7), // diagonal back-left
+            new THREE.Vector3(0.7, 0, 0.7), // diagonal back-right
+          ];
+          this.el.addEventListener('loaded', () => {
+            this.el.object3D.getWorldPosition(this.lastSafePosition);
+          });
+        },
+        tick: function (time, delta) {
+          const collidableEls = this.el.sceneEl.querySelectorAll('.collidable');
+          if (collidableEls.length === 0) return;
+
+          const collidables = [];
+          collidableEls.forEach((el) => {
+            if (el.object3D) {
+              collidables.push(el.object3D);
+            }
+          });
+
+          let collision = false;
+          for (const dir of this.directions) {
+            const worldDir = dir.clone().applyQuaternion(this.el.object3D.quaternion);
+            this.raycaster.set(this.el.object3D.position, worldDir);
+            this.raycaster.far = this.data.distance;
+            const intersects = this.raycaster.intersectObjects(collidables, true);
+
+            if (intersects.length > 0 && intersects[0].distance < this.data.distance) {
+              const hitEl = intersects[0].object.el;
+              if (hitEl && hitEl.components && hitEl.components.pushable) {
+                const pushStrength = 0.02; // Increased push strength
+                const pushVector = worldDir.clone().multiplyScalar(pushStrength * delta);
+                hitEl.components.pushable.push(pushVector);
+                console.log('Pushing object:', hitEl.id, 'with vector:', pushVector);
+              }
+              this.el.object3D.position.copy(this.lastSafePosition);
+              collision = true;
+              break;
+            }
+          }
+          if (!collision) {
+            this.el.object3D.getWorldPosition(this.lastSafePosition);
+          }
+        },
+      });
+
+      // Pushable component: handles its own gravity and can be pushed
+      AFRAME.registerComponent('pushable', {
+        init: function () {
+          this.raycaster = new THREE.Raycaster();
+          this.downVector = new THREE.Vector3(0, -1, 0);
+          this.velocity = new THREE.Vector3();
+          this.friction = 0.92;
+        },
+        push: function (vector) {
+          // Only allow pushing from front or back, not sides
+          if (Math.abs(vector.x) > Math.abs(vector.z)) {
+            return;
+          }
+          this.velocity.add(vector);
+
+          // If this element has a parent group, move the entire group
+          const parentGroup = this.el.parentNode;
+          if (parentGroup && parentGroup.id === 'car-group') {
+            parentGroup.object3D.position.add(vector);
+          } else {
+            this.el.object3D.position.add(vector);
+          }
+
+          // Update all connected objects (like the visual ferrari model)
+          const followingElements = this.el.sceneEl.querySelectorAll('[follow]');
+          followingElements.forEach((follower) => {
+            const followComponent = follower.components.follow;
+            if (followComponent && followComponent.data.target === this.el) {
+              follower.object3D.position.copy(this.el.object3D.position);
+            }
+          });
+        },
+        tick: function () {
+          // Apply friction
+          this.velocity.multiplyScalar(this.friction);
+
+          // Apply small remaining velocity
+          if (this.velocity.length() > 0.001) {
+            const parentGroup = this.el.parentNode;
+            if (parentGroup && parentGroup.id === 'car-group') {
+              parentGroup.object3D.position.add(this.velocity.clone().multiplyScalar(0.1));
+            } else {
+              this.el.object3D.position.add(this.velocity.clone().multiplyScalar(0.1));
+            }
+          }
+
+          // Apply gravity/ground constraint
+          const groundEls = this.el.sceneEl.querySelectorAll('.ground, .environmentGround');
+          if (groundEls.length === 0) return;
+          const grounds = [];
+          groundEls.forEach((el) => grounds.push(el.object3D));
+
+          this.raycaster.set(this.el.object3D.position, this.downVector);
+          const intersects = this.raycaster.intersectObjects(grounds, true);
+          if (intersects.length > 0) {
+            const height = this.el.getAttribute('height') || this.el.getAttribute('geometry')?.height || 0.1;
+            this.el.object3D.position.y = intersects[0].point.y + height / 2;
+          }
+        },
+      });
+
+      // Component to control the car's wheels
+      AFRAME.registerComponent('car-controls', {
+        schema: {
+          carBody: { type: 'selector' },
+          wheels: { type: 'array', default: [] }
+        },
+        init: function () {
+          this.wheelMeshes = [];
+          this.el.addEventListener('model-loaded', () => {
+            const model = this.el.getObject3D('mesh');
+            this.data.wheels.forEach(wheelName => {
+              const wheel = model.getObjectByName(wheelName);
+              if (wheel) {
+                this.wheelMeshes.push(wheel);
+              } else {
+                console.error(`Wheel mesh not found: ${wheelName}`);
+              }
+            });
+          });
+        },
+        tick: function () {
+          if (!this.data.carBody) return;
+          const pushableComponent = this.data.carBody.components.pushable;
+          if (!pushableComponent) return;
+
+          const velocity = pushableComponent.velocity;
+          const speed = velocity.length();
+
+          if (speed > 0.001) {
+            // Increased multiplier significantly. The direction might need to be flipped by removing the minus sign.
+            const rotationAmount = velocity.z * -500; 
+            console.log("Velocity Z:", velocity.z, "Rotation Amount:", rotationAmount); // DEBUGGING
+            this.wheelMeshes.forEach(wheel => {
+              wheel.rotation.x += rotationAmount;
+            });
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
