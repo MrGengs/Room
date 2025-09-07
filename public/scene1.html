@@ -32,7 +32,7 @@
     <a-scene
       light="defaultLightsEnabled:false"
       renderer="stencil:true"
-      networked-scene="
+      networked-scene="adapter: easyrtc; audio: false;
         connectOnLoad: false;
         room: forest;
         debug: true;
@@ -42,7 +42,7 @@
     "
       shadow="type: pcfsoft"
       gltf-model="meshoptDecoderPath:https://unpkg.com/meshoptimizer@0.19.0/meshopt_decoder.js"
-      raycaster="far: 100; objects: .clickable,[link];"
+      raycaster="far: 100; objects: .clickable,[link],a-link;"
       cursor="rayOrigin: mouse"
     >
       <a-assets>
@@ -56,6 +56,7 @@
         </template>
         <img id="thumbJapan" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/japan.png" />
         <img id="thumbForest" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" />
+        <img id="thumbScene1" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" />
       </a-assets>
 
       <a-entity id="scene">
@@ -103,31 +104,75 @@
             visible="false"
           ></a-box>
           <!-- Visual model for the car -->
-          <a-entity id="ferrari" gltf-model="url(assets/ferrari.glb)" position="0 0 0" scale="1 1 1" car-controls="carBody: #ferrari-body; wheels: wheel_fl, wheel_fr, wheel_rl, wheel_rr"></a-entity>
+          <a-entity
+            id="ferrari"
+            gltf-model="url(assets/ferrari.glb)"
+            position="0 0 0"
+            scale="1 1 1"
+            car-controls="carBody: #ferrari-body; wheels: wheel_fl, wheel_fr, wheel_rl, wheel_rr"
+          ></a-entity>
         </a-entity>
 
-        <!-- Sepeda model with collision -->
-        <a-entity id="sepeda-group" position="3 0.6 3" rotation="0 90 0">
+        <!-- Sepeda model with advanced 3D collision -->
+        <a-entity id="sepeda-group" position="3 0 3" rotation="0 90 0">
           <!-- Visual model for the bicycle -->
-          <a-entity gltf-model="url(assets/sepeda.glb)" scale="0.5 0.5 0.5"></a-entity>
-          <!-- Collision box for the bicycle -->
-          <a-box
+          <a-entity gltf-model="url(assets/sepeda.glb)" scale="1 1 1" position="0 0.9 0"></a-entity>
+
+          <!-- Main body collision (center) -->
+          <a-entity
+            geometry="primitive: box; width: 0.8; height: 0.7; depth: 1.2"
+            position="0 0.5 0"
+            static-body="shape: box; mass: 0"
+            collision-filter="collideForces: false"
             class="collidable"
-            position="0 0.3 0"
-            width="1.0"
-            height="0.6"
-            depth="2.0"
             visible="false"
+          ></a-entity>
+
+          <!-- Front wheel collision -->
+          <a-entity
+            geometry="primitive: box; width: 0.3; height: 0.6; depth: 1.2"
+            position="0 0.4 1.2"
+            static-body="shape: box; mass: 0"
+            collision-filter="collideForces: false"
+            class="collidable"
+            visible="false"
+          ></a-entity>
+
+          <!-- Back wheel collision -->
+          <a-entity
+            geometry="primitive: box; width: 0.3; height: 0.6; depth: 1.2"
+            position="0 0.4 -1.2"
+            static-body="shape: box; mass: 0"
+            collision-filter="collideForces: false"
+            class="collidable"
+            visible="false"
+          ></a-entity>
+
+          <!-- Front pushable area -->
+          <a-entity
+            geometry="primitive: box; width: 0.6; height: 0.6; depth: 0.4"
+            position="0 0.5 1.5"
             pushable
-          ></a-box>
+            class="collidable"
+            visible="false"
+          ></a-entity>
+
+          <!-- Back pushable area -->
+          <a-entity
+            geometry="primitive: box; width: 0.6; height: 0.6; depth: 0.4"
+            position="0 0.5 -1.5"
+            pushable
+            class="collidable"
+            visible="false"
+          ></a-entity>
         </a-entity>
-        
+
         <!-- Portal back to index.html -->
         <a-link
           change-room="on:obbcollisionstarted;room:lobby;url:index.html"
           link="on:click"
           href="index.html"
-          title="Kembali ke Lobby"
+          title="Kembali ke Lobi"
           image="#thumbForest"
           position="0 1.6 10"
           rotation="0 180 0"
@@ -139,25 +184,35 @@
         </a-link>
       </a-entity>
 
+      <!-- Player rig with improved collision -->
       <a-entity
         id="rig"
         collider
-        movement-controls="fly:false;"
-        spawn-in-circle="radius:1"
-        networked="template:#avatar-template;attachTemplateToLocal:false"
+        movement-controls="fly: false; speed: 0.5; acceleration: 10"
+        spawn-in-circle="radius: 1"
+        networked="template: #avatar-template; attachTemplateToLocal: false"
         player-info
       >
         <a-entity id="player" class="camera" camera position="0 1.6 0" look-controls>
-          <a-box obb-collider visible="false" height="0.4" depth="0.4" width="0.4"></a-box>
-          <!-- Ring cursor for better interaction -->
+          <!-- Player collision box -->
+          <a-entity
+            id="player-collider"
+            position="0 -0.8 0"
+            geometry="primitive: box; width: 0.6; height: 1.6; depth: 0.6"
+            material="visible: false"
+            static-body="mass: 0"
+          ></a-entity>
+
+          <!-- Ring cursor for interaction -->
           <a-entity
             position="0 0 -1"
             geometry="primitive: ring; radiusInner: 0.018; radiusOuter: 0.025"
             material="shader: flat; opacity: 0.9"
-            cursor="fuse: true; fuseTimeout: 1200"
-            raycaster="objects: .clickable; far: 20;"
+            cursor="fuse: true; fuseTimeout: 1500"
+            raycaster="objects: .clickable; far: 15;"
             animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.2 0.2 0.2; dur: 1200; easing: linear"
-            animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120">
+            animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120"
+          >
           </a-entity>
         </a-entity>
         <a-entity id="left-hand" networked-hand-controls="hand: left" laser-controls="hand: left"></a-entity>
@@ -298,13 +353,13 @@
       AFRAME.registerComponent('car-controls', {
         schema: {
           carBody: { type: 'selector' },
-          wheels: { type: 'array', default: [] }
+          wheels: { type: 'array', default: [] },
         },
         init: function () {
           this.wheelMeshes = [];
           this.el.addEventListener('model-loaded', () => {
             const model = this.el.getObject3D('mesh');
-            this.data.wheels.forEach(wheelName => {
+            this.data.wheels.forEach((wheelName) => {
               const wheel = model.getObjectByName(wheelName);
               if (wheel) {
                 this.wheelMeshes.push(wheel);
@@ -324,13 +379,13 @@
 
           if (speed > 0.001) {
             // Increased multiplier significantly. The direction might need to be flipped by removing the minus sign.
-            const rotationAmount = velocity.z * -500; 
-            console.log("Velocity Z:", velocity.z, "Rotation Amount:", rotationAmount); // DEBUGGING
-            this.wheelMeshes.forEach(wheel => {
+            const rotationAmount = velocity.z * -500;
+            console.log('Velocity Z:', velocity.z, 'Rotation Amount:', rotationAmount); // DEBUGGING
+            this.wheelMeshes.forEach((wheel) => {
               wheel.rotation.x += rotationAmount;
             });
           }
-        }
+        },
       });
     </script>
   </body>
