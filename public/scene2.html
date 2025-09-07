@@ -1,464 +1,843 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
+    <meta charset="utf-8">
     <title>VR Fisika</title>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
     <script src="https://unpkg.com/aframe-event-set-component/dist/aframe-event-set-component.min.js"></script>
   </head>
   <body>
-    <a-scene background="color: #1a1a1a">
-      <a-assets>
-        <img id="thumbScene1" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" crossorigin="anonymous">
+    <a-scene 
+      vr-mode-ui="enabled: false" 
+      embedded 
+      style="height: 100vh;"
+      renderer="physicallyCorrectLights: true">
+      
+      <!-- Assets - Conditional Loading -->
+      <a-assets timeout="10000">
+        <img id="thumbScene1" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" />
+        <!-- Fallback untuk jika GLB tidak tersedia -->
+        <a-mixin id="fallback-box" 
+                 geometry="primitive: box; width: 2; height: 1; depth: 1" 
+                 material="color: #8B4513"></a-mixin>
+        <a-mixin id="fallback-ground" 
+                 geometry="primitive: plane; width: 20; height: 20" 
+                 material="color: #228B22" 
+                 rotation="-90 0 0"></a-mixin>
       </a-assets>
-      <!-- Portal back to index.html -->
+
+      <!-- Environment - Placeholder jika model sekolah tidak tersedia -->
+      <a-entity id="environment">
+        <!-- Ground plane sebagai fallback -->
+        <a-plane 
+          position="0 0 0" 
+          rotation="-90 0 0" 
+          width="20" 
+          height="20" 
+          color="#228B22"
+          shadow="receive: true">
+        </a-plane>
+        
+        <!-- Simple room walls -->
+        <a-plane position="0 2 -10" width="20" height="4" color="#87CEEB"></a-plane>
+        <a-plane position="-10 2 0" rotation="0 90 0" width="20" height="4" color="#87CEEB"></a-plane>
+        <a-plane position="10 2 0" rotation="0 -90 0" width="20" height="4" color="#87CEEB"></a-plane>
+      </a-entity>
+
+      <!-- Portal Kembali ke Menu -->
       <a-link
-        position="0 1.6 3"
+        position="0 1.6 6"
         rotation="0 180 0"
+        link="on: click"
         href="index.html"
-        title="Kembali ke Lobi"
+        title="Kembali ke Menu"
         image="#thumbScene1"
         class="clickable"
         event-set__mouseenter="material.opacity: 0.8"
-        event-set__mouseleave="material.opacity: 0.6"
-      >
+        event-set__mouseleave="material.opacity: 0.6">
         <a-box position="0 0 0.5" obb-collider visible="false"></a-box>
       </a-link>
+
+      <!-- Sky dan pencahayaan -->
+      <a-sky color="#87CEEB"></a-sky>
+      <a-light type="ambient" color="#404040" intensity="0.4"></a-light>
+      <a-light type="directional" 
+               position="5 10 5" 
+               intensity="0.6"
+               shadow="cast: true; mapSize: 2048">
+      </a-light>
+
       <!-- Kamera dengan gaze cursor -->
-      <a-entity camera look-controls position="0 1.6 0">
+      <a-entity camera look-controls wasd-controls position="0 1.6 3">
         <a-entity
           id="reticle"
           position="0 0 -1"
           geometry="primitive: ring; radiusInner: 0.018; radiusOuter: 0.025"
-          material="shader: flat; opacity: 0.9"
+          material="shader: flat; opacity: 0.9; color: #fff; depthTest: false"
           cursor="fuse: true; fuseTimeout: 1200"
           raycaster="objects: .clickable"
           animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.2 0.2 0.2; dur: 1200; easing: linear"
-          animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120"
-        ></a-entity>
+          animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120">
+        </a-entity>
       </a-entity>
-
+      
+      <!-- Main Menu -->
       <a-entity id="mainmenu">
-        <a-text
-          value="PILIH SIMULASI FISIKA"
-          position="0 2.3 -3"
-          align="center"
-          color="white"
+        <a-text 
+          value="PILIH SIMULASI FISIKA" 
+          position="0 2.3 -0.5" 
+          align="center" 
+          color="white" 
           width="8"
           scale="1.5 1.5 1.5"
-        >
+          material="depthTest: false; transparent: true"
+          geometry="primitive: plane; width: auto; height: auto"
+          text="shader: msdf; font: roboto">
         </a-text>
-        <a-entity position="-0.8 1.4 -3" rotation="0 0 0">
-          <a-box
-            id="btnBab2"
+        
+        <a-entity position="-0.8 1.4 -0.5" rotation="0 0 0">
+          <a-box 
+            id="btnBab2" 
             class="clickable"
-            depth="0.1"
-            height="0.8"
-            width="1.2"
+            depth="0.1" 
+            height="0.8" 
+            width="1.2" 
             color="#2e88ff"
+            material="depthTest: true"
             event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#7bdcff"
-            event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff"
-          >
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff">
           </a-box>
-          <a-text value="Gaya Gesek" color="#fff" align="center" width="4" position="0 0 0.06"></a-text>
+          <a-text 
+            value="Gaya Gesek" 
+            color="#fff" 
+            align="center" 
+            width="4" 
+            position="0 0 0.06"
+            material="depthTest: false; transparent: true">
+          </a-text>
         </a-entity>
-        <a-entity position="0.8 1.4 -3" rotation="0 0 0">
-          <a-box
-            id="btnBab3"
+        
+        <a-entity position="0.8 1.4 -0.5" rotation="0 0 0">
+          <a-box 
+            id="btnBab3" 
             class="clickable"
-            depth="0.1"
-            height="0.8"
-            width="1.2"
+            depth="0.1" 
+            height="0.8" 
+            width="1.2" 
             color="#2e88ff"
+            material="depthTest: true"
             event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#7bdcff"
-            event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff"
-          >
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff">
           </a-box>
-          <a-text value="Tumbukan" color="#fff" align="center" width="4" position="0 0 0.06"></a-text>
+          <a-text 
+            value="Tumbukan" 
+            color="#fff" 
+            align="center" 
+            width="4" 
+            position="0 0 0.06"
+            material="depthTest: false; transparent: true">
+          </a-text>
         </a-entity>
       </a-entity>
 
-      <!-- Model GLB dengan animasi -->
+      <!-- Bab 2 - Gaya Gesek -->
       <a-entity id="bab2" visible="false">
-        <a-entity
-          id="myModel"
-          gltf-model="url(assets/bab2.glb)"
-          position="0 0.6 -3"
-          rotation="0 -90 0"
-          scale="0.5 0.5 0.5"
-          animation-mixer="clip: idle; loop: repeat"
-        >
+        <!-- Model placeholder - akan diganti dengan GLB jika tersedia -->
+        <a-entity id="myModel" position="0 0.6 -3" rotation="0 -90 0" scale="0.5 0.5 0.5">
+          <!-- Fallback model -->
+          <a-box 
+            id="blockModel"
+            width="2" 
+            height="1" 
+            depth="1" 
+            color="#8B4513"
+            material="depthTest: true"
+            shadow="cast: true">
+          </a-box>
+          <a-plane 
+            position="0 -0.6 0" 
+            rotation="-90 0 0" 
+            width="4" 
+            height="4" 
+            color="#696969"
+            material="depthTest: true">
+          </a-plane>
         </a-entity>
 
-        <a-text
+        <a-text 
           id="statusText"
           value="Ada sebuah balok di permukaan kasar"
           position="0 1.9 -3"
           align="center"
           color="white"
           width="4"
-        >
+          material="depthTest: false; transparent: true">
         </a-text>
 
+        <!-- Tombol Skema 1 -->
         <a-entity position="1.5 1.8 -1" rotation="0 -45 0" id="btnSkema1Wrapper">
-          <a-box
+          <a-box 
             id="btnSkema1"
-            depth="0.1"
-            height="0.2"
-            width="0.8"
+            class="clickable"
+            depth="0.1" 
+            height="0.2" 
+            width="0.8" 
             color="#2e88ff"
+            material="depthTest: true"
             event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#7bdcff"
-            event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff"
-          >
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff">
           </a-box>
-          <a-text value="Tarik Perlahan" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+          <a-text 
+            value="Tarik Perlahan" 
+            color="#fff" 
+            align="center" 
+            width="2" 
+            position="0 0 0.06"
+            material="depthTest: false; transparent: true">
+          </a-text>
         </a-entity>
 
+        <!-- Tombol Skema 2 -->
         <a-entity position="1.5 1.55 -1" visible="false" rotation="0 -45 0" id="btnSkema2Wrapper">
-          <a-box
+          <a-box 
             id="btnSkema2"
-            depth="0.1"
-            height="0.2"
-            width="0.8"
+            depth="0.1" 
+            height="0.2" 
+            width="0.8" 
             color="#ff9b2f"
+            material="depthTest: true"
             event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#ffd29b"
-            event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff9b2f"
-          >
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff9b2f">
           </a-box>
-          <a-text value="Tarik Lebih Kuat" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+          <a-text 
+            value="Tarik Lebih Kuat" 
+            color="#fff" 
+            align="center" 
+            width="2" 
+            position="0 0 0.06"
+            material="depthTest: false; transparent: true">
+          </a-text>
         </a-entity>
 
+        <!-- Tombol Skema 3 -->
         <a-entity position="1.5 1.3 -1" visible="false" rotation="0 -45 0" id="btnSkema3Wrapper">
-          <a-box
+          <a-box 
             id="btnSkema3"
-            depth="0.1"
-            height="0.2"
-            width="0.8"
+            depth="0.1" 
+            height="0.2" 
+            width="0.8" 
             color="#ff4d4d"
+            material="depthTest: true"
             event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#ff9b9b"
-            event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff4d4d"
-          >
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff4d4d">
           </a-box>
-          <a-text value="Tarik Sangat Kuat" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+          <a-text 
+            value="Tarik Sangat Kuat" 
+            color="#fff" 
+            align="center" 
+            width="2" 
+            position="0 0 0.06"
+            material="depthTest: false; transparent: true">
+          </a-text>
         </a-entity>
 
+        <!-- Tombol Kembali dan Reset -->
         <a-entity position="-0.5 0.8 -1" rotation="-30 0 0">
-          <a-box
+          <a-box 
             id="btnKembali2"
-            depth="0.1"
-            height="0.2"
-            width="0.6"
+            class="clickable"
+            depth="0.1" 
+            height="0.2" 
+            width="0.6" 
             color="#008800"
+            material="depthTest: true"
             event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#81db81"
-            event-set__leave="_event: mouseleave; scale:1 1 1; color:#008800"
-          >
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#008800">
           </a-box>
-          <a-text value="Kembali" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+          <a-text 
+            value="Kembali" 
+            color="#fff" 
+            align="center" 
+            width="2" 
+            position="0 0 0.06"
+            material="depthTest: false; transparent: true">
+          </a-text>
         </a-entity>
 
         <a-entity position="0.5 0.8 -1" rotation="-30 0 0">
-          <a-box
+          <a-box 
             id="btnReset2"
-            depth="0.1"
-            height="0.2"
-            width="0.6"
+            class="clickable"
+            depth="0.1" 
+            height="0.2" 
+            width="0.6" 
             color="#008800"
+            material="depthTest: true"
             event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#81db81"
-            event-set__leave="_event: mouseleave; scale:1 1 1; color:#008800"
-          >
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#008800">
           </a-box>
-          <a-text value="Reset" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+          <a-text 
+            value="Reset" 
+            color="#fff" 
+            align="center" 
+            width="2" 
+            position="0 0 0.06"
+            material="depthTest: false; transparent: true">
+          </a-text>
         </a-entity>
       </a-entity>
 
+      <!-- Bab 3 - Tumbukan -->
       <a-entity id="bab3" visible="false">
-        <a-sphere id="ball1" position="-2 1 -4" radius="0.25" color="#cc2f2f"></a-sphere>
-        <a-text
-          id="label1"
-          value="m1 = 1kg
-        v1 = 1m/s"
-          position="-2 2 -4"
+        <!-- Bola-bola untuk simulasi tumbukan -->
+        <a-sphere 
+          id="ball1" 
+          position="-2 1 -4" 
+          radius="0.25" 
+          color="#cc2f2f"
+          material="depthTest: true"
+          shadow="cast: true">
+        </a-sphere>
+        <a-text 
+          id="label1" 
+          value="m1 = 1kg&#10;v1 = 1m/s" 
+          position="-2 2 -4" 
           align="center"
-        ></a-text>
-        <a-sphere id="ball2" position="2 1 -4" radius="0.25" color="#4545ff"></a-sphere>
-        <a-text
-          id="label2"
-          value="m2 = 1kg
-        v2 = -1m/s"
-          position="2 2 -4"
+          color="white"
+          material="depthTest: false; transparent: true">
+        </a-text>
+        
+        <a-sphere 
+          id="ball2" 
+          position="2 1 -4" 
+          radius="0.25" 
+          color="#4545ff"
+          material="depthTest: true"
+          shadow="cast: true">
+        </a-sphere>
+        <a-text 
+          id="label2" 
+          value="m2 = 1kg&#10;v2 = -1m/s" 
+          position="2 2 -4" 
           align="center"
-        ></a-text>
-
-        <!-- UI Biru -->
+          color="white"
+          material="depthTest: false; transparent: true">
+        </a-text>
+        
+        <!-- UI Controls untuk Bola Biru -->
         <a-entity id="UIbiruWrapper">
-          <!-- UI massa biru -->
-          <a-text
-            value="Massa Bola Biru"
-            position="1.3 1.89 -1"
-            scale="0.3 0.3 0.3"
-            rotation="0 -55 0"
+          <a-text 
+            value="Massa Bola Biru" 
+            position="1.3 1.89 -1" 
+            scale="0.3 0.3 0.3" 
+            rotation="0 -55 0" 
             align="center"
-          ></a-text>
+            color="white"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
           <a-entity position="1.3 1.7 -1.2" rotation="0 -55 0">
-            <a-box
+            <a-box 
               id="btnM21"
-              depth="0.1"
-              height="0.2"
-              width="0.3"
+              class="clickable"
+              depth="0.1" 
+              height="0.2" 
+              width="0.3" 
               color="#2e88ff"
+              material="depthTest: true"
               event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#7bdcff"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff"
-            >
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff">
             </a-box>
-            <a-text value="1Kg" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+            <a-text 
+              value="1Kg" 
+              color="#fff" 
+              align="center" 
+              width="2" 
+              position="0 0 0.06"
+              material="depthTest: false; transparent: true">
+            </a-text>
           </a-entity>
+          
           <a-entity position="1.49 1.7 -0.93" rotation="0 -55 0">
-            <a-box
+            <a-box 
               id="btnM22"
-              depth="0.1"
-              height="0.2"
-              width="0.3"
+              class="clickable"
+              depth="0.1" 
+              height="0.2" 
+              width="0.3" 
               color="#2e88ff"
+              material="depthTest: true"
               event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#7bdcff"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff"
-            >
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff">
             </a-box>
-            <a-text value="2Kg" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+            <a-text 
+              value="2Kg" 
+              color="#fff" 
+              align="center" 
+              width="2" 
+              position="0 0 0.06"
+              material="depthTest: false; transparent: true">
+            </a-text>
           </a-entity>
 
-          <!-- UI Kecepatan biru -->
-          <a-text
-            value="Kecepatan Bola Biru"
-            position="1.3 1.5 -1"
-            scale="0.3 0.3 0.3"
-            rotation="0 -55 0"
+          <a-text 
+            value="Kecepatan Bola Biru" 
+            position="1.3 1.5 -1" 
+            scale="0.3 0.3 0.3" 
+            rotation="0 -55 0" 
             align="center"
-          ></a-text>
+            color="white"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
           <a-entity position="1.3 1.3 -1.2" rotation="0 -55 0">
-            <a-box
+            <a-box 
               id="btnV21"
-              depth="0.1"
-              height="0.2"
-              width="0.3"
+              class="clickable"
+              depth="0.1" 
+              height="0.2" 
+              width="0.3" 
               color="#2e88ff"
+              material="depthTest: true"
               event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#7bdcff"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff"
-            >
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff">
             </a-box>
-            <a-text value="1m/s" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+            <a-text 
+              value="1m/s" 
+              color="#fff" 
+              align="center" 
+              width="2" 
+              position="0 0 0.06"
+              material="depthTest: false; transparent: true">
+            </a-text>
           </a-entity>
+          
           <a-entity position="1.49 1.3 -0.93" rotation="0 -55 0">
-            <a-box
+            <a-box 
               id="btnV22"
-              depth="0.1"
-              height="0.2"
-              width="0.3"
+              class="clickable"
+              depth="0.1" 
+              height="0.2" 
+              width="0.3" 
               color="#2e88ff"
+              material="depthTest: true"
               event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#7bdcff"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff"
-            >
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff">
             </a-box>
-            <a-text value="2m/s" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+            <a-text 
+              value="2m/s" 
+              color="#fff" 
+              align="center" 
+              width="2" 
+              position="0 0 0.06"
+              material="depthTest: false; transparent: true">
+            </a-text>
           </a-entity>
         </a-entity>
 
-        <!-- UI Merah -->
+        <!-- UI Controls untuk Bola Merah -->
         <a-entity id="UImerahWrapper">
-          <!-- UI Massa Merah -->
-          <a-text
-            value="Massa Bola Merah"
-            position="-1.3 1.89 -1"
-            scale="0.3 0.3 0.3"
-            rotation="0 55 0"
+          <a-text 
+            value="Massa Bola Merah" 
+            position="-1.3 1.89 -1" 
+            scale="0.3 0.3 0.3" 
+            rotation="0 55 0" 
             align="center"
-          ></a-text>
+            color="white"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
           <a-entity position="-1.49 1.7 -0.93" rotation="0 55 0">
-            <a-box
+            <a-box 
               id="btnM11"
-              depth="0.1"
-              height="0.2"
-              width="0.3"
+              class="clickable"
+              depth="0.1" 
+              height="0.2" 
+              width="0.3" 
               color="#d82424"
+              material="depthTest: true"
               event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#f4caca"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#d82424"
-            >
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#d82424">
             </a-box>
-            <a-text value="1Kg" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+            <a-text 
+              value="1Kg" 
+              color="#fff" 
+              align="center" 
+              width="2" 
+              position="0 0 0.06"
+              material="depthTest: false; transparent: true">
+            </a-text>
           </a-entity>
+          
           <a-entity position="-1.3 1.7 -1.2" rotation="0 55 0">
-            <a-box
+            <a-box 
               id="btnM12"
-              depth="0.1"
-              height="0.2"
-              width="0.3"
+              class="clickable"
+              depth="0.1" 
+              height="0.2" 
+              width="0.3" 
               color="#d82424"
+              material="depthTest: true"
               event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#f4caca"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#d82424"
-            >
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#d82424">
             </a-box>
-            <a-text value="2Kg" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+            <a-text 
+              value="2Kg" 
+              color="#fff" 
+              align="center" 
+              width="2" 
+              position="0 0 0.06"
+              material="depthTest: false; transparent: true">
+            </a-text>
           </a-entity>
 
-          <!-- UI Kecepatan Merah -->
-          <a-text
-            value="Kecepatan Bola Merah"
-            position="-1.3 1.5 -1"
-            scale="0.3 0.3 0.3"
-            rotation="0 55 0"
+          <a-text 
+            value="Kecepatan Bola Merah" 
+            position="-1.3 1.5 -1" 
+            scale="0.3 0.3 0.3" 
+            rotation="0 55 0" 
             align="center"
-          ></a-text>
+            color="white"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
           <a-entity position="-1.49 1.3 -0.93" rotation="0 55 0">
-            <a-box
+            <a-box 
               id="btnV11"
-              depth="0.1"
-              height="0.2"
-              width="0.3"
+              class="clickable"
+              depth="0.1" 
+              height="0.2" 
+              width="0.3" 
               color="#d82424"
+              material="depthTest: true"
               event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#f4caca"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#d82424"
-            >
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#d82424">
             </a-box>
-            <a-text value="1m/s" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+            <a-text 
+              value="1m/s" 
+              color="#fff" 
+              align="center" 
+              width="2" 
+              position="0 0 0.06"
+              material="depthTest: false; transparent: true">
+            </a-text>
           </a-entity>
+          
           <a-entity position="-1.3 1.3 -1.2" rotation="0 55 0">
-            <a-box
+            <a-box 
               id="btnV12"
-              depth="0.1"
-              height="0.2"
-              width="0.3"
+              class="clickable"
+              depth="0.1" 
+              height="0.2" 
+              width="0.3" 
               color="#d82424"
+              material="depthTest: true"
               event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#f4caca"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#d82424"
-            >
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#d82424">
             </a-box>
-            <a-text value="2m/s" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+            <a-text 
+              value="2m/s" 
+              color="#fff" 
+              align="center" 
+              width="2" 
+              position="0 0 0.06"
+              material="depthTest: false; transparent: true">
+            </a-text>
           </a-entity>
         </a-entity>
-
+      
+        <!-- Tombol Play/Reset dan Kembali -->
         <a-entity position="0.5 0.8 -1" rotation="-30 0 0">
-          <a-box
+          <a-box 
             id="btnPlay"
-            depth="0.1"
-            height="0.2"
-            width="0.6"
+            class="clickable"
+            depth="0.1" 
+            height="0.2" 
+            width="0.6" 
             color="#008800"
+            material="depthTest: true"
             event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#81db81"
-            event-set__leave="_event: mouseleave; scale:1 1 1; color:#008800"
-          >
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#008800">
           </a-box>
-          <a-text id="btnPlayText" value="Start" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+          <a-text 
+            id="btnPlayText" 
+            value="Start" 
+            color="#fff" 
+            align="center" 
+            width="2" 
+            position="0 0 0.06"
+            material="depthTest: false; transparent: true">
+          </a-text>
         </a-entity>
+        
         <a-entity position="-0.5 0.8 -1" rotation="-30 0 0">
-          <a-box
+          <a-box 
             id="btnKembali3"
-            depth="0.1"
-            height="0.2"
-            width="0.6"
+            class="clickable"
+            depth="0.1" 
+            height="0.2" 
+            width="0.6" 
             color="#008800"
+            material="depthTest: true"
             event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#81db81"
-            event-set__leave="_event: mouseleave; scale:1 1 1; color:#008800"
-          >
+            event-set__leave="_event: mouseleave; scale:1 1 1; color:#008800">
           </a-box>
-          <a-text value="Kembali" color="#fff" align="center" width="2" position="0 0 0.06"></a-text>
+          <a-text 
+            value="Kembali" 
+            color="#fff" 
+            align="center" 
+            width="2" 
+            position="0 0 0.06"
+            material="depthTest: false; transparent: true">
+          </a-text>
         </a-entity>
       </a-entity>
     </a-scene>
 
     <script>
-      const model = document.querySelector('#myModel');
+      // Flag untuk cek apakah model berhasil dimuat
+      let modelsLoaded = false;
+      let blockAnimationState = 'idle';
+      
+      // Variabel global
       const statusText = document.querySelector('#statusText');
-
-      // Add event listeners for menu buttons
-      document.querySelector('#btnBab2').addEventListener('click', () => {
-        document.querySelector('#bab2').setAttribute('visible', 'true');
-        document.querySelector('#mainmenu').setAttribute('visible', 'false');
-        document.querySelector('#btnReset2').classList.add('clickable');
-        document.querySelector('#btnKembali2').classList.add('clickable');
-        document.querySelector('#btnSkema1').classList.add('clickable');
-        document.querySelector('#btnBab2').classList.remove('clickable');
-        document.querySelector('#btnBab3').classList.remove('clickable');
-      });
-
-      document.querySelector('#btnBab3').addEventListener('click', () => {
-        document.querySelector('#bab3').setAttribute('visible', 'true');
-        document.querySelector('#mainmenu').setAttribute('visible', 'false');
-        document.querySelector('#btnBab2').classList.remove('clickable');
-        document.querySelector('#btnBab3').classList.remove('clickable');
-        document.querySelector('#btnKembali3').classList.add('clickable');
-        document.querySelector('#btnPlay').classList.add('clickable');
-        document.querySelector('#btnM11').classList.add('clickable');
-        document.querySelector('#btnM12').classList.add('clickable');
-        document.querySelector('#btnV11').classList.add('clickable');
-        document.querySelector('#btnV12').classList.add('clickable');
-        document.querySelector('#btnM21').classList.add('clickable');
-        document.querySelector('#btnM22').classList.add('clickable');
-        document.querySelector('#btnV21').classList.add('clickable');
-        document.querySelector('#btnV22').classList.add('clickable');
-        updateLabel();
-      });
-
-      // Gaya Gesek functionality
-      document.querySelector('#btnSkema1').addEventListener('click', () => {
-        model.setAttribute('animation-mixer', 'clip: Skema1; loop: repeat');
-        statusText.setAttribute('value', 'Kamu tarik perlahan. tetapi balok masih diam karena ada Fs yang menahan');
-        document.querySelector('#btnSkema2Wrapper').setAttribute('visible', 'true');
-        document.querySelector('#btnSkema2').classList.add('clickable');
-      });
-
-      document.querySelector('#btnSkema2').addEventListener('click', () => {
-        model.setAttribute('animation-mixer', 'clip: Skema2; loop: repeat');
-        statusText.setAttribute('value', 'Semakin kamu tarik. Fs yang menahan akan semakin besar');
-        document.querySelector('#btnSkema3Wrapper').setAttribute('visible', 'true');
-        document.querySelector('#btnSkema3').classList.add('clickable');
-      });
-
-      document.querySelector('#btnSkema3').addEventListener('click', () => {
-        model.setAttribute('animation-mixer', 'clip: Skema3; loop: repeat');
-        statusText.setAttribute(
-          'value',
-          'Kamu menarik sangat kuat. Balok akan ikut tertarik karena Fs sudah berubah menjadi Fk karena sudah mencapai maksimum',
-        );
-      });
-
-      document.querySelector('#btnReset2').addEventListener('click', () => {
-        model.setAttribute('animation-mixer', 'clip: Idle; loop: repeat');
-        statusText.setAttribute('value', 'Ada sebuah balok di permukaan kasar');
-        document.querySelector('#btnSkema2Wrapper').setAttribute('visible', 'false');
-        document.querySelector('#btnSkema2').classList.remove('clickable');
-        document.querySelector('#btnSkema3Wrapper').setAttribute('visible', 'false');
-        document.querySelector('#btnSkema3').classList.remove('clickable');
-      });
-
-      document.querySelector('#btnKembali2').addEventListener('click', () => {
-        model.setAttribute('animation-mixer', 'clip: Idle; loop: repeat');
-        statusText.setAttribute('value', 'Ada sebuah balok di permukaan kasar');
-        document.querySelector('#btnSkema2Wrapper').setAttribute('visible', 'false');
-        document.querySelector('#btnSkema2').classList.remove('clickable');
-        document.querySelector('#btnSkema3Wrapper').setAttribute('visible', 'false');
-        document.querySelector('#btnSkema3').classList.remove('clickable');
-        document.querySelector('#bab2').setAttribute('visible', 'false');
-        document.querySelector('#mainmenu').setAttribute('visible', 'true');
-        document.querySelector('#btnReset2').classList.remove('clickable');
-        document.querySelector('#btnKembali2').classList.remove('clickable');
-        document.querySelector('#btnSkema1').classList.remove('clickable');
-        document.querySelector('#btnBab2').classList.add('clickable');
-        document.querySelector('#btnBab3').classList.add('clickable');
-      });
-
-      // Tumbukan functionality
-      const ball1 = document.querySelector('#ball1');
-      const ball2 = document.querySelector('#ball2');
-      const label1 = document.querySelector('#label1');
-      const label2 = document.querySelector('#label2');
-      const btnPlay = document.querySelector('#btnPlay');
-      let m1 = 1,
-        v1 = 1;
-      let m2 = 1,
-        v2 = -1;
+      const ball1 = document.querySelector("#ball1");
+      const ball2 = document.querySelector("#ball2");
+      const label1 = document.querySelector("#label1");
+      const label2 = document.querySelector("#label2");
+      const btnPlay = document.querySelector("#btnPlay");
+      
+      let m1 = 1, v1 = 1;
+      let m2 = 1, v2 = -1;
       let animating = false;
       let done = false;
 
-      // Massa Bola Merah
+      // Coba load model GLB secara opsional
+      function loadGLBModels() {
+        const myModelEntity = document.querySelector('#myModel');
+        
+        // Coba load model bab2.glb
+        const bab2Model = document.createElement('a-entity');
+        bab2Model.setAttribute('gltf-model', 'assets/bab2.glb');
+        bab2Model.setAttribute('position', '0 0 0');
+        bab2Model.setAttribute('scale', '1 1 1');
+        bab2Model.setAttribute('material', 'depthTest: true');
+        
+        bab2Model.addEventListener('model-loaded', () => {
+          console.log('Bab2 model loaded successfully');
+          // Sembunyikan fallback model
+          document.querySelector('#blockModel').setAttribute('visible', 'false');
+          modelsLoaded = true;
+        });
+        
+        bab2Model.addEventListener('model-error', (e) => {
+          console.log('Bab2 model failed to load, using fallback');
+          // Tetap gunakan fallback model
+        });
+        
+        myModelEntity.appendChild(bab2Model);
+        
+        // Coba load environment model
+        const environment = document.querySelector('#environment');
+        const sekolahModel = document.createElement('a-entity');
+        sekolahModel.setAttribute('gltf-model', 'assets/sekolah.glb');
+        sekolahModel.setAttribute('position', '0 -10 -5');
+        sekolahModel.setAttribute('scale', '2 2 2');
+        sekolahModel.setAttribute('rotation', '0 0 0');
+        sekolahModel.setAttribute('material', 'depthTest: true');
+        
+        sekolahModel.addEventListener('model-loaded', () => {
+          console.log('Sekolah model loaded successfully');
+        });
+        
+        sekolahModel.addEventListener('model-error', (e) => {
+          console.log('Sekolah model failed to load, using fallback environment');
+        });
+        
+        environment.appendChild(sekolahModel);
+      }
+
+      // Load models setelah DOM ready
+      document.addEventListener('DOMContentLoaded', () => {
+        loadGLBModels();
+      });
+
+      // Simulasi animasi untuk fallback model
+      function animateBlock(state) {
+        const block = document.querySelector('#blockModel');
+        blockAnimationState = state;
+        
+        switch(state) {
+          case 'skema1':
+            // Sedikit bergetar
+            block.setAttribute('animation', {
+              property: 'position',
+              to: '0.05 0 0',
+              dur: 200,
+              dir: 'alternate',
+              loop: true
+            });
+            break;
+          case 'skema2':
+            // Bergetar lebih kuat
+            block.setAttribute('animation', {
+              property: 'position',
+              to: '0.1 0 0',
+              dur: 150,
+              dir: 'alternate',
+              loop: true
+            });
+            break;
+          case 'skema3':
+            // Bergerak sliding
+            block.setAttribute('animation', {
+              property: 'position',
+              to: '1 0 0',
+              dur: 1000,
+              easing: 'easeInOutQuad',
+              loop: true,
+              dir: 'alternate'
+            });
+            break;
+          default:
+            // Reset ke posisi normal
+            block.removeAttribute('animation');
+            block.setAttribute('position', '0 0 0');
+            break;
+        }
+      }
+
+      // Event listeners untuk Bab 2 - Gaya Gesek
+      document.querySelector('#btnSkema1').addEventListener('click', () => {
+        if (modelsLoaded) {
+          // Gunakan animasi GLB jika tersedia
+          const modelEntity = document.querySelector('#myModel a-entity[gltf-model]');
+          if (modelEntity) {
+            modelEntity.setAttribute('animation-mixer', 'clip: Skema1; loop: repeat');
+          }
+        } else {
+          // Gunakan animasi fallback
+          animateBlock('skema1');
+        }
+        
+        statusText.setAttribute('value', 'Kamu tarik perlahan. tetapi balok masih diam karena ada Fs yang menahan');
+        document.querySelector("#btnSkema2Wrapper").setAttribute("visible", "true");
+        document.querySelector("#btnSkema2").classList.add("clickable"); 
+      });
+
+      document.querySelector('#btnSkema2').addEventListener('click', () => {
+        if (modelsLoaded) {
+          const modelEntity = document.querySelector('#myModel a-entity[gltf-model]');
+          if (modelEntity) {
+            modelEntity.setAttribute('animation-mixer', 'clip: Skema2; loop: repeat');
+          }
+        } else {
+          animateBlock('skema2');
+        }
+        
+        statusText.setAttribute('value', 'Semakin kamu tarik. Fs yang menahan akan semakin besar');
+        document.querySelector("#btnSkema3Wrapper").setAttribute("visible", "true");
+        document.querySelector("#btnSkema3").classList.add("clickable"); 
+      });
+
+      document.querySelector('#btnSkema3').addEventListener('click', () => {
+        if (modelsLoaded) {
+          const modelEntity = document.querySelector('#myModel a-entity[gltf-model]');
+          if (modelEntity) {
+            modelEntity.setAttribute('animation-mixer', 'clip: Skema3; loop: repeat');
+          }
+        } else {
+          animateBlock('skema3');
+        }
+        
+        statusText.setAttribute('value', 'Kamu menarik sangat kuat. Balok akan ikut tertarik karena Fs sudah berubah menjadi Fk karena sudah mencapai maksimum');
+      });
+
+      document.querySelector('#btnReset2').addEventListener('click', () => {
+        if (modelsLoaded) {
+          const modelEntity = document.querySelector('#myModel a-entity[gltf-model]');
+          if (modelEntity) {
+            modelEntity.setAttribute('animation-mixer', 'clip: Idle; loop: repeat');
+          }
+        } else {
+          animateBlock('idle');
+        }
+        
+        statusText.setAttribute('value', 'Ada sebuah balok di permukaan kasar');
+        document.querySelector("#btnSkema2Wrapper").setAttribute("visible", "false");
+        document.querySelector("#btnSkema2").classList.remove("clickable"); 
+        document.querySelector("#btnSkema3Wrapper").setAttribute("visible", "false");
+        document.querySelector("#btnSkema3").classList.remove("clickable"); 
+      });
+
+      // Navigation - Main Menu
+      document.querySelector('#btnBab2').addEventListener('click', () => {
+        document.querySelector("#bab2").setAttribute("visible", true);
+        document.querySelector("#mainmenu").setAttribute("visible", false);
+        document.querySelector("#btnReset2").classList.add("clickable"); 
+        document.querySelector("#btnKembali2").classList.add("clickable"); 
+        document.querySelector("#btnSkema1").classList.add("clickable"); 
+        document.querySelector("#btnBab2").classList.remove("clickable"); 
+        document.querySelector("#btnBab3").classList.remove("clickable"); 
+      });
+
+      document.querySelector('#btnBab3').addEventListener('click', () => {
+        document.querySelector("#bab3").setAttribute("visible", true);
+        document.querySelector("#mainmenu").setAttribute("visible", false);
+        document.querySelector("#btnBab2").classList.remove("clickable"); 
+        document.querySelector("#btnBab3").classList.remove("clickable"); 
+        document.querySelector("#btnKembali3").classList.add("clickable"); 
+        document.querySelector("#btnPlay").classList.add("clickable"); 
+        
+        // Aktifkan semua tombol kontrol
+        document.querySelector("#btnM11").classList.add("clickable"); 
+        document.querySelector("#btnM12").classList.add("clickable"); 
+        document.querySelector("#btnV11").classList.add("clickable"); 
+        document.querySelector("#btnV12").classList.add("clickable"); 
+        document.querySelector("#btnM21").classList.add("clickable"); 
+        document.querySelector("#btnM22").classList.add("clickable"); 
+        document.querySelector("#btnV21").classList.add("clickable"); 
+        document.querySelector("#btnV22").classList.add("clickable"); 
+        updateLabel();
+      });
+
+      // Navigation - Kembali dari Bab 2
+      document.querySelector('#btnKembali2').addEventListener('click', () => {
+        if (modelsLoaded) {
+          const modelEntity = document.querySelector('#myModel a-entity[gltf-model]');
+          if (modelEntity) {
+            modelEntity.setAttribute('animation-mixer', 'clip: Idle; loop: repeat');
+          }
+        } else {
+          animateBlock('idle');
+        }
+        
+        statusText.setAttribute('value', 'Ada sebuah balok di permukaan kasar');
+        document.querySelector("#btnSkema2Wrapper").setAttribute("visible", "false");
+        document.querySelector("#btnSkema2").classList.remove("clickable"); 
+        document.querySelector("#btnSkema3Wrapper").setAttribute("visible", "false");
+        document.querySelector("#btnSkema3").classList.remove("clickable"); 
+        document.querySelector("#bab2").setAttribute("visible", false);
+        document.querySelector("#mainmenu").setAttribute("visible", true);
+        document.querySelector("#btnReset2").classList.remove("clickable"); 
+        document.querySelector("#btnKembali2").classList.remove("clickable"); 
+        document.querySelector("#btnSkema1").classList.remove("clickable"); 
+        document.querySelector("#btnBab2").classList.add("clickable"); 
+        document.querySelector("#btnBab3").classList.add("clickable"); 
+      });
+
+      // Navigation - Kembali dari Bab 3
+      document.querySelector('#btnKembali3').addEventListener('click', () => {
+        resetBab3();
+        document.querySelector("#bab3").setAttribute("visible", false);
+        document.querySelector("#mainmenu").setAttribute("visible", true);
+        document.querySelector("#btnBab2").classList.add("clickable"); 
+        document.querySelector("#btnBab3").classList.add("clickable"); 
+        removeAllBab3Clickables();
+      });
+
+      // Event listeners untuk kontrol massa dan kecepatan
       document.querySelector('#btnM11').addEventListener('click', () => {
         m1 = 1;
         updateLabel();
@@ -469,7 +848,6 @@
         updateLabel();
       });
 
-      // Kecepatan Bola Merah
       document.querySelector('#btnV11').addEventListener('click', () => {
         v1 = 1;
         updateLabel();
@@ -480,7 +858,6 @@
         updateLabel();
       });
 
-      // Massa Bola Biru
       document.querySelector('#btnM21').addEventListener('click', () => {
         m2 = 1;
         updateLabel();
@@ -491,7 +868,6 @@
         updateLabel();
       });
 
-      // Kecepatan Bola Biru
       document.querySelector('#btnV21').addEventListener('click', () => {
         v2 = -1;
         updateLabel();
@@ -502,7 +878,7 @@
         updateLabel();
       });
 
-      // Rumus kecepatan tumbukan lenting sempurna
+      // Fungsi helper
       function hitungKecepatan(m1, v1, m2, v2) {
         const v1p = ((m1 - m2) * v1 + 2 * m2 * v2) / (m1 + m2);
         const v2p = ((m2 - m1) * v2 + 2 * m1 * v1) / (m1 + m2);
@@ -510,137 +886,127 @@
       }
 
       function updateLabel() {
-        label1.setAttribute('value', `m1 = ${m1}kg\nv1 = ${v1}m/s`);
-        label2.setAttribute('value', `m2 = ${m2}kg\nv2 = ${v2}m/s`);
+        label1.setAttribute("value", `m1 = ${m1}kg\nv1 = ${v1}m/s`);
+        label2.setAttribute("value", `m2 = ${m2}kg\nv2 = ${v2}m/s`);
       }
 
-      // Play/Reset button
-      btnPlay.addEventListener('click', () => {
-        if (done) {
-          // Reset state
-          ball1.setAttribute('position', '-2 1 -4');
-          ball2.setAttribute('position', '2 1 -4');
-          label1.setAttribute('value', `m1 = ${m1}kg\nv1 = ${v1}m/s`);
-          label2.setAttribute('value', `m2 = ${m2}kg\nv2 = ${v2}m/s`);
-          ball1.removeAttribute('animation__go');
-          ball2.removeAttribute('animation__go');
-          ball1.removeAttribute('animation__after');
-          ball2.removeAttribute('animation__after');
-          done = false;
-          document.querySelector('#btnM11').classList.add('clickable');
-          document.querySelector('#btnM12').classList.add('clickable');
-          document.querySelector('#btnV11').classList.add('clickable');
-          document.querySelector('#btnV12').classList.add('clickable');
-          document.querySelector('#btnM21').classList.add('clickable');
-          document.querySelector('#btnM22').classList.add('clickable');
-          document.querySelector('#btnV21').classList.add('clickable');
-          document.querySelector('#btnV22').classList.add('clickable');
-          document.querySelector('#UIbiruWrapper').setAttribute('visible', 'true');
-          document.querySelector('#UImerahWrapper').setAttribute('visible', 'true');
-          document.querySelector('#btnPlayText').setAttribute('value', 'Start');
-        } else {
-          // Disable UI controls during animation
-          document.querySelector('#btnM11').classList.remove('clickable');
-          document.querySelector('#btnM12').classList.remove('clickable');
-          document.querySelector('#btnV11').classList.remove('clickable');
-          document.querySelector('#btnV12').classList.remove('clickable');
-          document.querySelector('#btnM21').classList.remove('clickable');
-          document.querySelector('#btnM22').classList.remove('clickable');
-          document.querySelector('#btnV21').classList.remove('clickable');
-          document.querySelector('#btnV22').classList.remove('clickable');
-          document.querySelector('#UIbiruWrapper').setAttribute('visible', 'false');
-          document.querySelector('#UImerahWrapper').setAttribute('visible', 'false');
+      function resetBab3() {
+        animating = false;
+        ball1.setAttribute("position", "-2 1 -4");
+        ball2.setAttribute("position", "2 1 -4");
+        ball1.removeAttribute("animation__go");
+        ball2.removeAttribute("animation__go");
+        ball1.removeAttribute("animation__after");
+        ball2.removeAttribute("animation__after");
+        done = false;
+        m1 = 1, v1 = 1;
+        m2 = 1, v2 = -1;
+        document.querySelector("#UImerahWrapper").setAttribute("visible", "true");
+        document.querySelector("#UIbiruWrapper").setAttribute("visible", "true");
+        document.querySelector("#btnPlayText").setAttribute("value", "Start");
+        updateLabel();
+      }
 
+      function removeAllBab3Clickables() {
+        document.querySelector("#btnKembali3").classList.remove("clickable"); 
+        document.querySelector("#btnPlay").classList.remove("clickable"); 
+        document.querySelector("#btnM11").classList.remove("clickable"); 
+        document.querySelector("#btnM12").classList.remove("clickable"); 
+        document.querySelector("#btnV11").classList.remove("clickable"); 
+        document.querySelector("#btnV12").classList.remove("clickable"); 
+        document.querySelector("#btnM21").classList.remove("clickable"); 
+        document.querySelector("#btnM22").classList.remove("clickable"); 
+        document.querySelector("#btnV21").classList.remove("clickable"); 
+        document.querySelector("#btnV22").classList.remove("clickable"); 
+      }
+
+      // Event listener untuk tombol Play/Reset
+      btnPlay.addEventListener("click", () => {
+        if (done) {
+          resetBab3();
+          // Aktifkan kembali semua kontrol
+          document.querySelector("#btnM11").classList.add("clickable"); 
+          document.querySelector("#btnM12").classList.add("clickable"); 
+          document.querySelector("#btnV11").classList.add("clickable"); 
+          document.querySelector("#btnV12").classList.add("clickable"); 
+          document.querySelector("#btnM21").classList.add("clickable"); 
+          document.querySelector("#btnM22").classList.add("clickable"); 
+          document.querySelector("#btnV21").classList.add("clickable"); 
+          document.querySelector("#btnV22").classList.add("clickable"); 
+        } else {
+          // Nonaktifkan kontrol saat animasi berjalan
+          document.querySelector("#btnM11").classList.remove("clickable"); 
+          document.querySelector("#btnM12").classList.remove("clickable"); 
+          document.querySelector("#btnV11").classList.remove("clickable"); 
+          document.querySelector("#btnV12").classList.remove("clickable"); 
+          document.querySelector("#btnM21").classList.remove("clickable"); 
+          document.querySelector("#btnM22").classList.remove("clickable"); 
+          document.querySelector("#btnV21").classList.remove("clickable"); 
+          document.querySelector("#btnV22").classList.remove("clickable"); 
+          document.querySelector("#UIbiruWrapper").setAttribute("visible", "false");
+          document.querySelector("#UImerahWrapper").setAttribute("visible", "false");
+          
           if (animating) return;
           animating = true;
 
           const [v1p, v2p] = hitungKecepatan(m1, v1, m2, v2);
 
-          // Animate balls moving towards each other
-          ball1.setAttribute('animation__go', {
-            property: 'position',
-            to: '0 1 -4',
-            dur: 2000,
-            easing: 'linear',
+          // Gerak mendekat
+          ball1.setAttribute("animation__go", {
+            property: "position", 
+            to: "0 1 -4", 
+            dur: 2000, 
+            easing: "linear"
           });
-
-          ball2.setAttribute('animation__go', {
-            property: 'position',
-            to: '0 1 -4',
-            dur: 2000,
-            easing: 'linear',
+          ball2.setAttribute("animation__go", {
+            property: "position", 
+            to: "0 1 -4", 
+            dur: 2000, 
+            easing: "linear"
           });
 
           setTimeout(() => {
-            // Update labels after collision
-            label1.setAttribute('value', `m1 = ${m1}kg\nv1' = ${v1p.toFixed(2)}m/s`);
-            label2.setAttribute('value', `m2 = ${m2}kg\nv2' = ${v2p.toFixed(2)}m/s`);
+            // Update label setelah tabrakan
+            label1.setAttribute("value", `m1 = ${m1}kg\nv1' = ${v1p.toFixed(2)}m/s`);
+            label2.setAttribute("value", `m2 = ${m2}kg\nv2' = ${v2p.toFixed(2)}m/s`);
 
-            // Animate balls moving apart after collision
+            // Gerak menjauh
             if (Math.abs(v1p) > 0.01) {
-              ball1.setAttribute('animation__after', {
-                property: 'position',
-                to: `${-2 + v1p} 1 -4`,
-                dur: 2000,
-                easing: 'linear',
+              ball1.setAttribute("animation__after", {
+                property: "position", 
+                to: `${-2 + v1p} 1 -4`, 
+                dur: 2000, 
+                easing: "linear"
               });
             } else {
-              ball1.setAttribute('position', '0 1 -4');
+              ball1.setAttribute("position", "0 1 -4");
             }
 
             if (Math.abs(v2p) > 0.01) {
-              ball2.setAttribute('animation__after', {
-                property: 'position',
-                to: `${2 + v2p} 1 -4`,
-                dur: 2000,
-                easing: 'linear',
+              ball2.setAttribute("animation__after", {
+                property: "position", 
+                to: `${2 + v2p} 1 -4`, 
+                dur: 2000, 
+                easing: "linear"
               });
             } else {
-              ball2.setAttribute('position', '0 1 -4');
+              ball2.setAttribute("position", "0 1 -4");
             }
 
             animating = false;
             done = true;
-            document.querySelector('#btnPlayText').setAttribute('value', 'Reset');
+            document.querySelector("#btnPlayText").setAttribute("value", "Reset");
           }, 2100);
         }
       });
 
-      // Back button for Tumbukan
-      document.querySelector('#btnKembali3').addEventListener('click', () => {
-        animating = false;
-        ball1.setAttribute('position', '-2 1 -4');
-        ball2.setAttribute('position', '2 1 -4');
-        label1.setAttribute('value', `m1 = ${m1}kg\nv1 = ${v1}m/s`);
-        label2.setAttribute('value', `m2 = ${m2}kg\nv2 = ${v2}m/s`);
-        ball1.removeAttribute('animation__go');
-        ball2.removeAttribute('animation__go');
-        ball1.removeAttribute('animation__after');
-        ball2.removeAttribute('animation__after');
-        done = false;
-        ((m1 = 1), (v1 = 1));
-        ((m2 = 1), (v2 = -1));
-        document.querySelector('#UImerahWrapper').setAttribute('visible', 'true');
-        document.querySelector('#UIbiruWrapper').setAttribute('visible', 'true');
-        document.querySelector('#bab3').setAttribute('visible', 'false');
-        document.querySelector('#mainmenu').setAttribute('visible', 'true');
-        document.querySelector('#btnBab2').classList.add('clickable');
-        document.querySelector('#btnBab3').classList.add('clickable');
-        document.querySelector('#btnKembali3').classList.remove('clickable');
-        document.querySelector('#btnPlay').classList.remove('clickable');
-        document.querySelector('#btnM11').classList.remove('clickable');
-        document.querySelector('#btnM12').classList.remove('clickable');
-        document.querySelector('#btnV11').classList.remove('clickable');
-        document.querySelector('#btnV12').classList.remove('clickable');
-        document.querySelector('#btnM21').classList.remove('clickable');
-        document.querySelector('#btnM22').classList.remove('clickable');
-        document.querySelector('#btnV21').classList.remove('clickable');
-        document.querySelector('#btnV22').classList.remove('clickable');
-        document.querySelector('#btnPlayText').setAttribute('value', 'Start');
-      });
-
-      // Initialize
+      // Inisialisasi
       updateLabel();
+
+      // Info untuk pengguna
+      console.log('VR Fisika loaded successfully!');
+      console.log('If GLB models fail to load due to CORS, fallback models will be used.');
+      console.log('To use GLB models properly, serve this file from a local server (e.g., Live Server extension)');
     </script>
   </body>
 </html>
