@@ -69,7 +69,7 @@
       </a-light>
 
       <!-- Kamera dengan gaze cursor -->
-      <a-entity camera look-controls wasd-controls position="0 1.6 3">
+      <a-entity id="player" camera look-controls wasd-controls position="0 1.6 3">
         <a-entity
           id="reticle"
           position="0 0 -1"
@@ -660,6 +660,20 @@
 
       // Load models setelah DOM ready
       document.addEventListener('DOMContentLoaded', () => {
+        const selectedCharacter = localStorage.getItem('selectedCharacter');
+        if (selectedCharacter) {
+          const player = document.getElementById('player');
+          const modelUrl = selectedCharacter === 'male' 
+            ? 'https://cdn.glitch.global/c2231c1a-2935-4332-8715-032588334f99/Asian_M_1_Busi.glb?v=16813662' 
+            : 'https://cdn.jsdelivr.net/gh/c-frame/valid-avatars-glb@c539a28/avatars/Asian/Asian_F_1_Busi.glb';
+          
+          // In scene2, there is no player-info, so we create a simple gltf-model entity
+          const avatar = document.createElement('a-gltf-model');
+          avatar.setAttribute('src', modelUrl);
+          avatar.setAttribute('position', '0 -1.6 0'); // Adjust position relative to camera
+          player.appendChild(avatar);
+        }
+
         loadGLBModels();
       });
 

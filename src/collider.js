@@ -19,22 +19,51 @@ AFRAME.registerComponent('simple-collider', {
       new THREE.Vector3(0, 0, 1),  // Backward
       new THREE.Vector3(-1, 0, 0), // Left
       new THREE.Vector3(1, 0, 0),   // Right
-      new THREE.Vector3(-0.7, 0, -0.7), // Forward-Left
-      new THREE.Vector3(0.7, 0, -0.7),  // Forward-Right
-      new THREE.Vector3(-0.7, 0, 0.7),  // Backward-Left
-      new THREE.Vector3(0.7, 0, 0.7)   // Backward-Right
+      new THREE.Vector3(-0.7, 0, -0.7).normalize(), // Forward-Left
+      new THREE.Vector3(0.7, 0, -0.7).normalize(),  // Forward-Right
+      new THREE.Vector3(-0.7, 0, 0.7).normalize(),  // Backward-Left
+      new THREE.Vector3(0.7, 0, 0.7).normalize()   // Backward-Right
     ];
+
+    // Cache collidable meshes for better performance
+    this.collidableMeshes = [];
+    this.needsUpdate = true;
 
     if (this.data.debug) {
       this.lines = {};
       for (let i = 0; i < this.directions.length; i++) {
         const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
-        const geometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(6); // 2 points * 3 coordinates
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
         const line = new THREE.Line(geometry, material);
         this.el.sceneEl.object3D.add(line);
         this.lines[i] = line;
       }
     }
+
+    // Listen for scene changes to update collidable meshes
+    this.el.sceneEl.addEventListener('child-attached', () => {
+      this.needsUpdate = true;
+    });
+    this.el.sceneEl.addEventListener('child-detached', () => {
+      this.needsUpdate = true;
+    });
+  },
+
+  updateCollidableMeshes: function () {
+    const collidableEls = this.el.sceneEl.querySelectorAll('.collidable');
+    this.collidableMeshes = [];
+    collidableEls.forEach(collidableEl => {
+      // Skip self collision
+      if (collidableEl === this.el) return;
+      
+      const mesh = collidableEl.getObject3D('mesh');
+      if (mesh) {
+        this.collidableMeshes.push(mesh);
+      }
+    });
+    this.needsUpdate = false;
   },
 
   tick: function () {
@@ -42,17 +71,12 @@ AFRAME.registerComponent('simple-collider', {
     const center = new THREE.Vector3();
     el.object3D.getWorldPosition(center);
 
-    // Find all collidable meshes in the scene
-    const collidableEls = el.sceneEl.querySelectorAll('.collidable');
-    const collidableMeshes = [];
-    collidableEls.forEach(collidableEl => {
-      const mesh = collidableEl.getObject3D('mesh');
-      if (mesh) {
-        collidableMeshes.push(mesh);
-      }
-    });
+    // Update collidable meshes cache if needed
+    if (this.needsUpdate) {
+      this.updateCollidableMeshes();
+    }
 
-    if (collidableMeshes.length === 0) return;
+    if (this.collidableMeshes.length === 0) return;
 
     // Cast rays in all directions
     for (let i = 0; i < this.directions.length; i++) {
@@ -60,7 +84,7 @@ AFRAME.registerComponent('simple-collider', {
       this.raycaster.set(center, direction);
       this.raycaster.far = this.data.distance;
 
-      const intersects = this.raycaster.intersectObjects(collidableMeshes, true);
+      const intersects = this.raycaster.intersectObjects(this.collidableMeshes, true);
 
       if (intersects.length > 0) {
         const distance = intersects[0].distance;
@@ -76,8 +100,10 @@ AFRAME.registerComponent('simple-collider', {
       if (this.data.debug) {
         const start = center.clone();
         const end = center.clone().add(direction.multiplyScalar(this.data.distance));
-        this.lines[i].geometry.setFromPoints([start, end]);
-        this.lines[i].geometry.verticesNeedUpdate = true;
+        const positions = this.lines[i].geometry.attributes.position.array;
+        positions[0] = start.x; positions[1] = start.y; positions[2] = start.z;
+        positions[3] = end.x; positions[4] = end.y; positions[5] = end.z;
+        this.lines[i].geometry.attributes.position.needsUpdate = true;
       }
     }
   }

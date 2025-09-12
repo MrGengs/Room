@@ -26,6 +26,7 @@
     <script src="https://cdn.jsdelivr.net/gh/AdaRoseCannon/aframe-xr-boilerplate@bca4792/simple-navmesh-constraint.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-gltf-model-plus@1.0.0/dist/gltf-model-plus.min.js"></script>
     <script src="/dist/components.js"></script>
+    <script defer src="/dist/ui.js"></script>
   </head>
 
   <body>
@@ -48,7 +49,7 @@
       <a-assets>
         <template id="avatar-template">
           <a-entity player-info>
-            <a-entity class="model">
+            <a-entity class="model" animation-mixer>
               <a-text class="nametag" align="center" value="?" position="0 2.1 0" scale=".5 .5 .5"></a-text>
             </a-entity>
             <a-entity class="camera" position="0 1.6 0"></a-entity>
@@ -61,25 +62,15 @@
       <a-entity id="scene">
         <!-- School building with collision -->
         <a-entity id="school-group" position="0 -11 0">
-          <a-gltf-model src="assets/sekolah.glb" scale="2 2 2" rotation="0 0 0"></a-gltf-model>
-          <!-- Multiple collision boxes for better coverage -->
+          <a-gltf-model src="assets/sekolah.glb" scale="2 2 2" rotation="0 0 0" class="collidable"></a-gltf-model>
+          <!-- Smaller collision box closer to actual building -->
           <a-box
             class="collidable"
-            position="0 5 0"
-            width="20"
-            height="22"
-            depth="20"
+            position="0 8 0"
+            width="6"
+            height="12"
+            depth="6"
             visible="false"
-            static-body="mass: 0"
-          ></a-box>
-          <a-box
-            class="collidable"
-            position="0 5 0"
-            width="20"
-            height="22"
-            depth="20"
-            visible="false"
-            collision-filter="collideForces: false;"
           ></a-box>
         </a-entity>
         <a-plane class="ground" position="0 0 0" rotation="-90 0 0" width="100" height="100" visible="true"></a-plane>
@@ -143,24 +134,22 @@
         
         <!-- Portal back to index.html -->
         <a-link
-          change-room="on:obbcollisionstarted;room:lobby;url:index.html"
           link="on:click"
           href="index.html"
           title="Kembali ke Lobby"
           image="#thumbForest"
-          position="-8 1.6 -2"
+          position="-8 1.6 2"
           rotation="0 90 0"
           class="clickable"
           event-set__mouseenter="material.opacity: 0.8"
           event-set__mouseleave="material.opacity: 0.6"
         >
-          <a-box position="0 0 0.5" obb-collider visible="false"></a-box>
         </a-link>
       </a-entity>
 
       <a-entity
         id="rig"
-        collider
+        collider="distance: 0.3"
         movement-controls="fly:false;"
         spawn-in-circle="radius:1"
         networked="template:#avatar-template;attachTemplateToLocal:false"
@@ -235,7 +224,10 @@
 
       // Player collider: stops the player from penetrating any .collidable object
       AFRAME.registerComponent('collider', {
-        schema: { distance: { default: 1.2 } },
+        schema: { 
+          distance: { default: 1.2 },
+          debug: { default: false }
+        },
         init: function () {
           this.raycaster = new THREE.Raycaster();
           this.lastSafePosition = new THREE.Vector3();
@@ -265,25 +257,39 @@
           });
 
           let collision = false;
+          const currentPosition = new THREE.Vector3();
+          this.el.object3D.getWorldPosition(currentPosition);
+
           for (const dir of this.directions) {
             const worldDir = dir.clone().applyQuaternion(this.el.object3D.quaternion);
-            this.raycaster.set(this.el.object3D.position, worldDir);
+            this.raycaster.set(currentPosition, worldDir);
             this.raycaster.far = this.data.distance;
             const intersects = this.raycaster.intersectObjects(collidables, true);
 
             if (intersects.length > 0 && intersects[0].distance < this.data.distance) {
               const hitEl = intersects[0].object.el;
+              
+              if (this.data.debug) {
+                console.log('Collision detected with:', hitEl ? hitEl.id : 'unknown', 'distance:', intersects[0].distance);
+              }
+              
+              // Handle pushable objects
               if (hitEl && hitEl.components && hitEl.components.pushable) {
-                const pushStrength = 0.02; // Increased push strength
+                const pushStrength = 0.02;
                 const pushVector = worldDir.clone().multiplyScalar(pushStrength * delta);
                 hitEl.components.pushable.push(pushVector);
-                console.log('Pushing object:', hitEl.id, 'with vector:', pushVector);
+                if (this.data.debug) {
+                  console.log('Pushing object:', hitEl.id, 'with vector:', pushVector);
+                }
               }
+              
+              // Prevent penetration
               this.el.object3D.position.copy(this.lastSafePosition);
               collision = true;
               break;
             }
           }
+          
           if (!collision) {
             this.el.object3D.getWorldPosition(this.lastSafePosition);
           }
@@ -641,6 +647,16 @@
 
       // Initialize physics simulation when scene and DOM are loaded
       document.addEventListener('DOMContentLoaded', () => {
+        const selectedCharacter = localStorage.getItem('selectedCharacter');
+        if (selectedCharacter) {
+          const rig = document.getElementById('rig');
+          const modelUrl = selectedCharacter === 'male' 
+            ? 'https://cdn.glitch.global/c2231c1a-2935-4332-8715-032588334f99/Asian_M_1_Busi.glb?v=16813662' 
+            : 'https://cdn.jsdelivr.net/gh/c-frame/valid-avatars-glb@c539a28/avatars/Asian/Asian_F_1_Busi.glb';
+          
+          rig.setAttribute('player-info', 'avatarSrc', modelUrl);
+        }
+
         // Wait a bit more for A-Frame to fully initialize
         setTimeout(() => {
           console.log('Initializing Physics Simulation...');
