@@ -21,23 +21,23 @@
       <a-assets timeout="10000">
         <img id="thumbScene1" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" />
         <!-- Fallback untuk jika GLB tidak tersedia -->
-        <a-mixin id="fallback-box" 
-                 geometry="primitive: box; width: 2; height: 1; depth: 1" 
+        <a-mixin id="fallback-box"
+                 geometry="primitive: box; width: 2; height: 1; depth: 1"
                  material="color: #8B4513"></a-mixin>
         <a-mixin id="fallback-ground" 
-                 geometry="primitive: plane; width: 20; height: 20" 
-                 material="color: #228B22" 
+                 geometry="primitive: plane; width: 20; height: 20"
+                 material="color: #228B22"
                  rotation="-90 0 0"></a-mixin>
       </a-assets>
-a
+      
       <a-entity id="environment"></a-entity>
 
       <a-entity id="fallback-environment">
-        <a-plane 
-          position="0 0 0" 
-          rotation="-90 0 0" 
-          width="20" 
-          height="20" 
+        <a-plane
+          position="0 0 0"
+          rotation="-90 0 0"
+          width="20"
+          height="20"
           color="#228B22"
           shadow="receive: true">
         </a-plane>
