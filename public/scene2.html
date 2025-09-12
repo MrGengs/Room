@@ -29,7 +29,7 @@
                  material="color: #228B22"
                  rotation="-90 0 0"></a-mixin>
       </a-assets>
-      
+
       <a-entity id="environment"></a-entity>
 
       <a-entity id="fallback-environment">
@@ -42,9 +42,9 @@
           shadow="receive: true">
         </a-plane>
         
-        <a-plane position="0 2 -10" width="20" height="4" color="#87CEEB"></a-plane>
-        <a-plane position="-10 2 0" rotation="0 90 0" width="20" height="4" color="#87CEEB"></a-plane>
-        <a-plane position="10 2 0" rotation="0 -90 0" width="20" height="4" color="#87CEEB"></a-plane>
+        <a-plane class="collidable" position="0 2 -10" width="20" height="4" color="#87CEEB"></a-plane>
+        <a-plane class="collidable" position="-10 2 0" rotation="0 90 0" width="20" height="4" color="#87CEEB"></a-plane>
+        <a-plane class="collidable" position="10 2 0" rotation="0 -90 0" width="20" height="4" color="#87CEEB"></a-plane>
       </a-entity>
 
       <!-- Portal Kembali ke Menu -->
@@ -58,7 +58,6 @@
         class="clickable"
         event-set__mouseenter="material.opacity: 0.8"
         event-set__mouseleave="material.opacity: 0.6">
-        <a-box position="0 0 0.5" obb-collider visible="false"></a-box>
       </a-link>
 
       <!-- Sky dan pencahayaan -->
@@ -71,18 +70,25 @@
       </a-light>
 
       <!-- Kamera dengan gaze cursor -->
-      <a-entity camera look-controls wasd-controls position="0 1.2 3" kinematic-body="radius: 0.3; height: 1.6;"
-      sphere-collider="radius: 0.3"> >
-        <a-entity
-          id="reticle"
-          position="0 0 -1"
-          geometry="primitive: ring; radiusInner: 0.018; radiusOuter: 0.025"
-          material="shader: flat; opacity: 0.9; color: #fff; depthTest: false"
-          cursor="fuse: true; fuseTimeout: 1200"
-          raycaster="objects: .clickable"
-          animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.2 0.2 0.2; dur: 1200; easing: linear"
-          animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120">
-        </a-entity>
+      <a-entity 
+        id="rig"
+        collider="distance: 0.3"
+        camera 
+        look-controls 
+        wasd-controls 
+        position="0 1.2 3" 
+        kinematic-body="radius: 0.3; height: 1.6;"
+        sphere-collider="radius: 0.3">
+          <a-entity
+            id="reticle"
+            position="0 0 -1"
+            geometry="primitive: ring; radiusInner: 0.018; radiusOuter: 0.025"
+            material="shader: flat; opacity: 0.9; color: #fff; depthTest: false"
+            cursor="fuse: true; fuseTimeout: 1200"
+            raycaster="objects: .clickable"
+            animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.2 0.2 0.2; dur: 1200; easing: linear"
+            animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120">
+          </a-entity>
       </a-entity>
       
       <!-- Main Menu -->
@@ -151,6 +157,7 @@
           <!-- Fallback model -->
           <a-box 
             id="blockModel"
+            class="collidable"
             width="2" 
             height="1" 
             depth="1" 
@@ -159,6 +166,7 @@
             shadow="cast: true">
           </a-box>
           <a-plane 
+            class="collidable"
             position="0 -0.6 0" 
             rotation="-90 0 0" 
             width="4" 
@@ -296,6 +304,7 @@
         <!-- Bola-bola untuk simulasi tumbukan -->
         <a-sphere 
           id="ball1" 
+          class="collidable"
           position="-2 1 -3" 
           radius="0.25" 
           color="#cc2f2f"
@@ -313,6 +322,7 @@
         
         <a-sphere 
           id="ball2" 
+          class="collidable"
           position="2 1 -3" 
           radius="0.25" 
           color="#4545ff"
@@ -661,6 +671,7 @@
         bab2Model.setAttribute('position', '0 0 0');
         bab2Model.setAttribute('scale', '1 1 1');
         bab2Model.setAttribute('material', 'depthTest: true');
+        bab2Model.setAttribute('class', 'collidable');
         
         bab2Model.addEventListener('model-loaded', () => {
           console.log('Bab2 model loaded successfully');
@@ -684,18 +695,147 @@
         classModel.setAttribute('scale', '1 1 1');
         classModel.setAttribute('rotation', '0 180 0');
         classModel.setAttribute('material', 'depthTest: true');
+        classModel.setAttribute('class', 'collidable');
         
         classModel.addEventListener('model-loaded', () => {
           console.log('Sekolah model loaded successfully');
+          document.querySelector('#fallback-environment').setAttribute('visible', 'false');
         });
-
-        classModel.addEventListener('model-loaded', () => {
-        console.log('Sekolah model loaded successfully');
-
-        document.querySelector('#fallback-environment').setAttribute('visible', 'false');
-      });
-      
+        
         environment.appendChild(classModel);
+        
+        // Add collision boxes for classroom furniture
+        
+        // Main classroom walls
+        const classWalls = document.createElement('a-box');
+        classWalls.setAttribute('class', 'collidable');
+        classWalls.setAttribute('position', '-2.5 2 15');
+        classWalls.setAttribute('width', '8');
+        classWalls.setAttribute('height', '6');
+        classWalls.setAttribute('depth', '8');
+        classWalls.setAttribute('visible', 'false');
+        environment.appendChild(classWalls);
+        
+        // Teacher's desk (front center)
+        const teacherDesk = document.createElement('a-box');
+        teacherDesk.setAttribute('class', 'collidable');
+        teacherDesk.setAttribute('position', '-2.5 0.4 11');
+        teacherDesk.setAttribute('width', '2');
+        teacherDesk.setAttribute('height', '0.8');
+        teacherDesk.setAttribute('depth', '1');
+        teacherDesk.setAttribute('visible', 'false');
+        environment.appendChild(teacherDesk);
+        
+        // Student desks and chairs - Row 1 (front)
+        const desk1 = document.createElement('a-box');
+        desk1.setAttribute('class', 'collidable');
+        desk1.setAttribute('position', '-4 0.4 13');
+        desk1.setAttribute('width', '1.2');
+        desk1.setAttribute('height', '0.8');
+        desk1.setAttribute('depth', '0.6');
+        desk1.setAttribute('visible', 'false');
+        environment.appendChild(desk1);
+        
+        const chair1 = document.createElement('a-box');
+        chair1.setAttribute('class', 'collidable');
+        chair1.setAttribute('position', '-4 0.4 13.8');
+        chair1.setAttribute('width', '0.5');
+        chair1.setAttribute('height', '0.8');
+        chair1.setAttribute('depth', '0.5');
+        chair1.setAttribute('visible', 'false');
+        environment.appendChild(chair1);
+        
+        const desk2 = document.createElement('a-box');
+        desk2.setAttribute('class', 'collidable');
+        desk2.setAttribute('position', '-1 0.4 13');
+        desk2.setAttribute('width', '1.2');
+        desk2.setAttribute('height', '0.8');
+        desk2.setAttribute('depth', '0.6');
+        desk2.setAttribute('visible', 'false');
+        environment.appendChild(desk2);
+        
+        const chair2 = document.createElement('a-box');
+        chair2.setAttribute('class', 'collidable');
+        chair2.setAttribute('position', '-1 0.4 13.8');
+        chair2.setAttribute('width', '0.5');
+        chair2.setAttribute('height', '0.8');
+        chair2.setAttribute('depth', '0.5');
+        chair2.setAttribute('visible', 'false');
+        environment.appendChild(chair2);
+        
+        // Student desks and chairs - Row 2 (middle)
+        const desk3 = document.createElement('a-box');
+        desk3.setAttribute('class', 'collidable');
+        desk3.setAttribute('position', '-4 0.4 15');
+        desk3.setAttribute('width', '1.2');
+        desk3.setAttribute('height', '0.8');
+        desk3.setAttribute('depth', '0.6');
+        desk3.setAttribute('visible', 'false');
+        environment.appendChild(desk3);
+        
+        const chair3 = document.createElement('a-box');
+        chair3.setAttribute('class', 'collidable');
+        chair3.setAttribute('position', '-4 0.4 15.8');
+        chair3.setAttribute('width', '0.5');
+        chair3.setAttribute('height', '0.8');
+        chair3.setAttribute('depth', '0.5');
+        chair3.setAttribute('visible', 'false');
+        environment.appendChild(chair3);
+        
+        const desk4 = document.createElement('a-box');
+        desk4.setAttribute('class', 'collidable');
+        desk4.setAttribute('position', '-1 0.4 15');
+        desk4.setAttribute('width', '1.2');
+        desk4.setAttribute('height', '0.8');
+        desk4.setAttribute('depth', '0.6');
+        desk4.setAttribute('visible', 'false');
+        environment.appendChild(desk4);
+        
+        const chair4 = document.createElement('a-box');
+        chair4.setAttribute('class', 'collidable');
+        chair4.setAttribute('position', '-1 0.4 15.8');
+        chair4.setAttribute('width', '0.5');
+        chair4.setAttribute('height', '0.8');
+        chair4.setAttribute('depth', '0.5');
+        chair4.setAttribute('visible', 'false');
+        environment.appendChild(chair4);
+        
+        // Student desks and chairs - Row 3 (back)
+        const desk5 = document.createElement('a-box');
+        desk5.setAttribute('class', 'collidable');
+        desk5.setAttribute('position', '-4 0.4 17');
+        desk5.setAttribute('width', '1.2');
+        desk5.setAttribute('height', '0.8');
+        desk5.setAttribute('depth', '0.6');
+        desk5.setAttribute('visible', 'false');
+        environment.appendChild(desk5);
+        
+        const chair5 = document.createElement('a-box');
+        chair5.setAttribute('class', 'collidable');
+        chair5.setAttribute('position', '-4 0.4 17.8');
+        chair5.setAttribute('width', '0.5');
+        chair5.setAttribute('height', '0.8');
+        chair5.setAttribute('depth', '0.5');
+        chair5.setAttribute('visible', 'false');
+        environment.appendChild(chair5);
+        
+        const desk6 = document.createElement('a-box');
+        desk6.setAttribute('class', 'collidable');
+        desk6.setAttribute('position', '-1 0.4 17');
+        desk6.setAttribute('width', '1.2');
+        desk6.setAttribute('height', '0.8');
+        desk6.setAttribute('depth', '0.6');
+        desk6.setAttribute('visible', 'false');
+        environment.appendChild(desk6);
+        
+        const chair6 = document.createElement('a-box');
+        chair6.setAttribute('class', 'collidable');
+        chair6.setAttribute('position', '-1 0.4 17.8');
+        chair6.setAttribute('width', '0.5');
+        chair6.setAttribute('height', '0.8');
+        chair6.setAttribute('depth', '0.5');
+        chair6.setAttribute('visible', 'false');
+        environment.appendChild(chair6);
       }
 
       // Load models setelah DOM ready
@@ -1042,6 +1182,70 @@
 
       // Inisialisasi
       updateLabel();
+
+      // Player collider: stops the player from penetrating any .collidable object
+      AFRAME.registerComponent('collider', {
+        schema: { 
+          distance: { default: 1.2 },
+          debug: { default: false }
+        },
+        init: function () {
+          this.raycaster = new THREE.Raycaster();
+          this.lastSafePosition = new THREE.Vector3();
+          this.directions = [
+            new THREE.Vector3(0, 0, -1), // forward
+            new THREE.Vector3(0, 0, 1), // backward
+            new THREE.Vector3(-1, 0, 0), // left
+            new THREE.Vector3(1, 0, 0), // right
+            new THREE.Vector3(-0.7, 0, -0.7), // diagonal front-left
+            new THREE.Vector3(0.7, 0, -0.7), // diagonal front-right
+            new THREE.Vector3(-0.7, 0, 0.7), // diagonal back-left
+            new THREE.Vector3(0.7, 0, 0.7), // diagonal back-right
+          ];
+          this.el.addEventListener('loaded', () => {
+            this.el.object3D.getWorldPosition(this.lastSafePosition);
+          });
+        },
+        tick: function (time, delta) {
+          const collidableEls = this.el.sceneEl.querySelectorAll('.collidable');
+          if (collidableEls.length === 0) return;
+
+          const collidables = [];
+          collidableEls.forEach((el) => {
+            if (el.object3D) {
+              collidables.push(el.object3D);
+            }
+          });
+
+          let collision = false;
+          const currentPosition = new THREE.Vector3();
+          this.el.object3D.getWorldPosition(currentPosition);
+
+          for (const dir of this.directions) {
+            const worldDir = dir.clone().applyQuaternion(this.el.object3D.quaternion);
+            this.raycaster.set(currentPosition, worldDir);
+            this.raycaster.far = this.data.distance;
+            const intersects = this.raycaster.intersectObjects(collidables, true);
+
+            if (intersects.length > 0 && intersects[0].distance < this.data.distance) {
+              const hitEl = intersects[0].object.el;
+              
+              if (this.data.debug) {
+                console.log('Collision detected with:', hitEl ? hitEl.id : 'unknown', 'distance:', intersects[0].distance);
+              }
+              
+              // Prevent penetration
+              this.el.object3D.position.copy(this.lastSafePosition);
+              collision = true;
+              break;
+            }
+          }
+          
+          if (!collision) {
+            this.el.object3D.getWorldPosition(this.lastSafePosition);
+          }
+        },
+      });
 
       // Info untuk pengguna
       console.log('VR Fisika loaded successfully!');
