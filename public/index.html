@@ -18,76 +18,8 @@
     </script>
     <script src="/dist/components.js"></script>
     <script defer src="/dist/ui.js"></script>
-    <style>
-      .character-selection {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-      }
-      .character-option {
-        width: 200px;
-        height: 250px;
-        margin: 20px;
-        background: #333;
-        border-radius: 10px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: transform 0.3s, box-shadow 0.3s;
-      }
-      .character-option:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-      }
-      .character-option img {
-        width: 150px;
-        height: 150px;
-        object-fit: contain;
-      }
-      .character-option h3 {
-        color: white;
-        margin: 10px 0;
-      }
-      .characters-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        max-width: 800px;
-      }
-      .title {
-        color: white;
-        font-size: 2.5em;
-        margin-bottom: 30px;
-        text-align: center;
-      }
-    </style>
   </head>
   <body>
-    <!-- Character Selection Overlay -->
-    <div id="character-selection" class="character-selection">
-      <h1 class="title">PILIH KARAKTER ANDA</h1>
-      <div class="characters-container">
-        <div class="character-option" onclick="selectCharacter('male')">
-          <img src="https://cdn.glitch.global/3e6e78f9-b796-4cf3-8451-2fcba6103a3c/avatar-male.png?v=1711641103935" alt="Male Character">
-          <h3>Laki-laki</h3>
-        </div>
-        <div class="character-option" onclick="selectCharacter('female')">
-          <img src="https://cdn.glitch.global/3e6e78f9-b796-4cf3-8451-2fcba6103a3c/avatar-female.png?v=1711641103935" alt="Female Character">
-          <h3>Perempuan</h3>
-        </div>
-      </div>
-    </div>
-
     <a-scene
       light="defaultLightsEnabled:false"
       renderer="stencil:true"
@@ -106,9 +38,11 @@
       <!-- Assets -->
       <a-assets>
         <img id="thumbScene1" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" />
+        <a-asset-item id="avatar-male-model" src="SittingIdle_man.fbx"></a-asset-item>
+        <a-asset-item id="avatar-female-model" src="SittingIdle_woman.fbx"></a-asset-item>
         <template id="avatar-template">
           <a-entity player-info>
-            <a-entity class="model">
+            <a-entity class="model" animation-mixer>
               <a-text class="nametag" align="center" value="?" position="0 2.1 0" scale=".5 .5 .5"></a-text>
             </a-entity>
             <a-entity class="camera" position="0 1.6 0"></a-entity>
@@ -192,38 +126,6 @@
       </a-entity>
     </a-scene>
 
-    <script>
-      // Function to handle character selection
-      function selectCharacter(character) {
-        // Store the selected character
-        localStorage.setItem('selectedCharacter', character);
-        
-        // Hide character selection
-        document.getElementById('character-selection').style.display = 'none';
-        
-        // Show the main scene
-        const scene = document.getElementById('main-scene');
-        scene.style.display = 'block';
-        
-        // If using A-Frame, we need to initialize the scene
-        if (scene.hasLoaded) {
-          scene.emit('loaded');
-        } else {
-          scene.addEventListener('loaded', function onLoad() {
-            scene.emit('loaded');
-            scene.removeEventListener('loaded', onLoad);
-          });
-        }
-      }
-
-      // Check if character is already selected
-      document.addEventListener('DOMContentLoaded', function() {
-        const selectedCharacter = localStorage.getItem('selectedCharacter');
-        if (selectedCharacter) {
-          document.getElementById('character-selection').style.display = 'none';
-          document.getElementById('main-scene').style.display = 'block';
-        }
-      });
     </script>
   </body>
 </html>
