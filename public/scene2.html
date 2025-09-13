@@ -1093,7 +1093,7 @@
         </a-entity>
 
         <!-- Tombol Play/Reset dan Kembali -->
-        <a-entity position="1 1 1.5" rotation="-10 -30 0">
+        <a-entity position="1 1 1.5" rotation="-10 -30 0" visible="false">
           <a-box 
             id="btnPlay"
             class="clickable"
@@ -1116,7 +1116,7 @@
           </a-text>
         </a-entity>
         
-        <a-entity position="-1 1 1.5" rotation="-10 30 0">
+        <a-entity position="-1 1 1.5" rotation="-10 30 0" visible="false">
           <a-box 
             id="btnKembali3"
             class="clickable"
@@ -1453,14 +1453,14 @@
           // Set animasi menuju collision point dengan smooth easing
           ball1.setAttribute("animation__go", {
             property: "position", 
-            to: "0 1 -3", 
+            to: "-0.15 1 -3", // Collision point sedikit ke kiri
             dur: 2000, 
             easing: "easeInCubic" // Accelerating towards collision
           });
           
           ball2.setAttribute("animation__go", {
             property: "position", 
-            to: "0 1 -3", 
+            to: "0.15 1 -3", // Collision point sedikit ke kanan
             dur: 2000, 
             easing: "easeInCubic" // Accelerating towards collision
           });
@@ -1476,7 +1476,7 @@
             // Animasi berdasarkan kecepatan akhir dengan skala yang lebih realistic
             // Jarak yang ditempuh = kecepatan * waktu, dengan faktor skala untuk tampilan
             const timeScale = 1.5; // Faktor skala untuk durasi animasi
-            const distanceScale = 0.8; // Faktor skala untuk jarak
+            const distanceScale = 1.2; // Skala jarak diperbesar agar lebih terlihat
             
             // Hitung posisi akhir dengan anti-overlap logic
             let finalPos1 = v1p * distanceScale;
@@ -1745,6 +1745,10 @@
           document.querySelector("#UImerahWrapper").setAttribute("visible", "true");
           document.querySelector("#UIbiruWrapper").setAttribute("visible", "true");
           
+          // Tampilkan tombol-tombol Tumbukan (btnPlay dan btnKembali3)
+          document.querySelector("#btnPlay").parentElement.setAttribute("visible", "true");
+          document.querySelector("#btnKembali3").parentElement.setAttribute("visible", "true");
+          
           document.querySelector("#btnBab2").classList.remove("clickable"); 
           document.querySelector("#btnBab3").classList.remove("clickable"); 
           document.querySelector("#btnKembali3").classList.add("clickable"); 
@@ -1785,6 +1789,11 @@
         document.querySelector('#btnKembali3').addEventListener('click', () => {
           document.querySelector("#bab3").setAttribute("visible", false);
           document.querySelector("#mainmenu").setAttribute("visible", true);
+          
+          // Sembunyikan tombol-tombol Tumbukan saat kembali ke menu utama
+          document.querySelector("#btnPlay").parentElement.setAttribute("visible", "false");
+          document.querySelector("#btnKembali3").parentElement.setAttribute("visible", "false");
+          
           document.querySelector("#btnBab2").classList.add("clickable"); 
           document.querySelector("#btnBab3").classList.add("clickable"); 
           removeAllBab3Clickables();
@@ -2724,25 +2733,24 @@ VERIFIKASI:
         updateInputDisplays();
         updateLabel();
         
-        // Tampilkan kembali kontrol UI
+        // Pastikan kontrol UI tetap terlihat setelah reset (jangan disembunyikan)
         document.querySelector("#UImerahWrapper").setAttribute("visible", "true");
         document.querySelector("#UIbiruWrapper").setAttribute("visible", "true");
         
-        // Reset tombol text dan aktifkan kembali
+        // Aktifkan kembali semua tombol kontrol massa dan kecepatan
+        document.querySelector("#btnM1Plus").classList.add("clickable");
+        document.querySelector("#btnM1Minus").classList.add("clickable");
+        document.querySelector("#btnV1Plus").classList.add("clickable");
+        document.querySelector("#btnV1Minus").classList.add("clickable");
+        document.querySelector("#btnM2Plus").classList.add("clickable");
+        document.querySelector("#btnM2Minus").classList.add("clickable");
+        document.querySelector("#btnV2Plus").classList.add("clickable");
+        document.querySelector("#btnV2Minus").classList.add("clickable");
+        
+        // Reset tombol text
         document.querySelector("#btnPlayText").setAttribute("value", "Start");
-        document.querySelector("#btnPlay").classList.add("clickable");
         
-        // Aktifkan kembali semua kontrol
-        document.querySelector("#btnM1Plus").classList.add("clickable"); 
-        document.querySelector("#btnM1Minus").classList.add("clickable"); 
-        document.querySelector("#btnM1Plus5").classList.add("clickable"); 
-        document.querySelector("#btnM1Minus5").classList.add("clickable"); 
-        document.querySelector("#btnV1Plus").classList.add("clickable"); 
-        document.querySelector("#btnV1Minus").classList.add("clickable"); 
-        document.querySelector("#btnV1Plus5").classList.add("clickable"); 
-        document.querySelector("#btnV1Minus5").classList.add("clickable"); 
-        
-        console.log('Reset complete - all controls reactivated');
+        console.log('Reset complete - returned to main menu');
       }
 
       function hideTrailEffects() {
