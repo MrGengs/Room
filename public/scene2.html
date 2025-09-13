@@ -167,153 +167,166 @@
       </a-entity>
 
       <!-- Bab 2 - Gaya Gesek -->
+      <style>
+        #ui-container {
+          position: absolute;
+          top: 20px;
+          left: 20px;
+          z-index: 10;
+          background-color: rgba(0, 0, 0, 0.7);
+          color: white;
+          padding: 15px;
+          border-radius: 10px;
+          font-family: sans-serif;
+          width: 320px;
+          display: none; /* Awalnya disembunyikan */
+        }
+        .input-group {
+          margin-bottom: 10px;
+        }
+        .input-group label {
+          display: inline-block;
+          width: 150px;
+        }
+        .input-group input {
+          width: 100px;
+          padding: 5px;
+          border-radius: 5px;
+          border: none;
+        }
+        #result-container {
+          margin-top: 15px;
+          padding-top: 10px;
+          border-top: 1px solid #555;
+          font-family: 'Courier New', Courier, monospace;
+        }
+        #result-container h3 {
+          margin-top: 0;
+        }
+        button {
+          padding: 8px 15px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          font-weight: bold;
+          margin-top: 10px;
+        }
+        #btnCalculate {
+          background-color: #2e88ff;
+          color: white;
+        }
+        #btnCalculate:hover {
+          background-color: #7bdcff;
+        }
+      </style>
+
       <a-entity id="bab2" visible="false">
-        <!-- Model placeholder - akan diganti dengan GLB jika tersedia -->
         <a-entity id="myModel" position="0 0.6 -3" rotation="0 -90 0" scale="0.5 0.5 0.5">
-          <!-- Fallback model -->
-          <a-box 
+          <a-box
             id="blockModel"
             class="collidable"
-            width="2" 
-            height="1" 
-            depth="1" 
+            position="0 0 0" width="2"
+            height="1"
+            depth="1"
             color="#8B4513"
             material="depthTest: true"
             shadow="cast: true">
           </a-box>
-          <a-plane 
+          <a-plane
             class="collidable"
-            position="0 -0.6 0" 
-            rotation="-90 0 0" 
-            width="4" 
-            height="4" 
+            position="0 -0.6 0"
+            rotation="-90 0 0"
+            width="8"  height="4"
             color="#696969"
             material="depthTest: true">
           </a-plane>
         </a-entity>
 
-        <a-text 
+        <a-text
           id="statusText"
-          value="Ada sebuah balok di permukaan kasar"
-          position="0 1.9 -3"
+          value="Masukkan nilai pada panel di kiri untuk memulai simulasi."
+          position="0 2.2 -3"
           align="center"
           color="white"
           width="4"
           material="depthTest: false; transparent: true">
         </a-text>
 
-        <!-- Tombol Skema 1 -->
-        <a-entity position="1.5 1.8 -1" rotation="0 -45 0" id="btnSkema1Wrapper">
-          <a-box 
-            id="btnSkema1"
-            class="clickable"
-            depth="0.1" 
-            height="0.2" 
-            width="0.8" 
-            color="#2e88ff"
-            material="depthTest: true"
-            event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#7bdcff"
-            event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff">
-          </a-box>
-          <a-text 
-            value="Tarik Perlahan"
-            color="#fff"
-            align="center"
-            width="2" 
-            position="0 0 0.06"
-            material="depthTest: false; transparent: true">
-          </a-text>
-        </a-entity>
-
-        <!-- Tombol Skema 2 -->
-        <a-entity position="1.5 1.55 -1" visible="false" rotation="0 -45 0" id="btnSkema2Wrapper">
-          <a-box 
-            id="btnSkema2"
-            depth="0.1" 
-            height="0.2" 
-            width="0.8" 
-            color="#ff9b2f"
-            material="depthTest: true"
-            event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#ffd29b"
-            event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff9b2f">
-          </a-box>
-          <a-text 
-            value="Tarik Lebih Kuat" 
-            color="#fff" 
-            align="center" 
-            width="2" 
-            position="0 0 0.06"
-            material="depthTest: false; transparent: true">
-          </a-text>
-        </a-entity>
-
-        <!-- Tombol Skema 3 -->
-        <a-entity position="1.5 1.3 -1" visible="false" rotation="0 -45 0" id="btnSkema3Wrapper">
-          <a-box 
-            id="btnSkema3"
-            depth="0.1" 
-            height="0.2" 
-            width="0.8" 
-            color="#ff4d4d"
-            material="depthTest: true"
-            event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#ff9b9b"
-            event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff4d4d">
-          </a-box>
-          <a-text 
-            value="Tarik Sangat Kuat" 
-            color="#fff" 
-            align="center" 
-            width="2" 
-            position="0 0 0.06"
-            material="depthTest: false; transparent: true">
-          </a-text>
-        </a-entity>
-
-        <!-- Tombol Kembali dan Reset -->
         <a-entity position="-0.5 0.8 -1" rotation="-30 0 0">
-          <a-box 
+          <a-box
             id="btnKembali2"
             class="clickable"
-            depth="0.1" 
-            height="0.2" 
-            width="0.6" 
+            depth="0.1"
+            height="0.2"
+            width="0.6"
             color="#008800"
             material="depthTest: true"
             event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#81db81"
             event-set__leave="_event: mouseleave; scale:1 1 1; color:#008800">
           </a-box>
-          <a-text 
-            value="Kembali" 
-            color="#fff" 
-            align="center" 
-            width="2" 
+          <a-text
+            value="Kembali"
+            color="#fff"
+            align="center"
+            width="2"
             position="0 0 0.06"
             material="depthTest: false; transparent: true">
           </a-text>
         </a-entity>
 
         <a-entity position="0.5 0.8 -1" rotation="-30 0 0">
-          <a-box 
+          <a-box
             id="btnReset2"
             class="clickable"
-            depth="0.1" 
-            height="0.2" 
-            width="0.6" 
+            depth="0.1"
+            height="0.2"
+            width="0.6"
             color="#008800"
             material="depthTest: true"
             event-set__enter="_event: mouseenter; scale:1.06 1.06 1.06; color:#81db81"
             event-set__leave="_event: mouseleave; scale:1 1 1; color:#008800">
           </a-box>
-          <a-text 
-            value="Reset" 
-            color="#fff" 
-            align="center" 
-            width="2" 
+          <a-text
+            value="Reset"
+            color="#fff"
+            align="center"
+            width="2"
             position="0 0 0.06"
             material="depthTest: false; transparent: true">
           </a-text>
         </a-entity>
       </a-entity>
+
+      <div id="ui-container">
+        <h3>Input Simulasi Gaya Gesek</h3>
+        <div class="input-group">
+          <label for="massa">Massa Balok (kg):</label>
+          <input type="number" id="massa" value="10">
+        </div>
+        <div class="input-group">
+          <label for="gaya-tarik">Gaya Tarik (N):</label>
+          <input type="number" id="gaya-tarik" value="20">
+        </div>
+        <div class="input-group">
+          <label for="koef-statis">Koefisien Statis (μs):</label>
+          <input type="number" id="koef-statis" value="0.5" step="0.1">
+        </div>
+        <div class="input-group">
+          <label for="koef-kinetis">Koefisien Kinetis (μk):</label>
+          <input type="number" id="koef-kinetis" value="0.3" step="0.1">
+        </div>
+
+        <button id="btnCalculate">Kalkulasi & Animasikan</button>
+
+        <div id="result-container" style="display: none;">
+          <h3>Hasil Kalkulasi:</h3>
+          <p id="result-normal"></p>
+          <p id="result-fsmax"></p>
+          <p id="result-fk"></p>
+          <p id="result-kesimpulan"></p>
+          <p id="result-percepatan"></p>
+        </div>
+      </div>
 
       <!-- Bab 3 - Tumbukan -->
       <a-entity id="bab3" visible="false">
@@ -458,28 +471,6 @@
             </a-text>
           </a-entity>
           
-          <!-- Physics Guide Button -->
-          <a-entity position="0 -0.2 0">
-            <a-box 
-              id="btnPhysicsGuide"
-              class="clickable"
-              depth="0.1" 
-              height="0.25" 
-              width="2" 
-              color="#4444ff"
-              material="depthTest: true"
-              event-set__enter="_event: mouseenter; scale:1.05 1.05 1.05; color:#6666ff"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#4444ff">
-            </a-box>
-            <a-text 
-              value="PANDUAN FISIKA" 
-              color="#fff" 
-              align="center" 
-              width="4" 
-              position="0 0 0.06"
-              material="depthTest: false; transparent: true">
-            </a-text>
-          </a-entity>
 
           <!-- Mass Demo Buttons -->
           <a-entity position="0 -0.8 0">
@@ -1167,49 +1158,6 @@
           </a-text>
         </a-entity>
 
-        <!-- AR Physics Guide Panel -->
-        <a-entity position="-4 2.5 -5" rotation="-10 30 0" id="physicsGuidePanel" visible="false">
-          <a-box 
-            depth="0.05" 
-            height="5" 
-            width="7" 
-            color="#0a0a2a"
-            material="depthTest: true; opacity: 0.98; transparent: true">
-          </a-box>
-          <a-text 
-            id="physicsGuideText"
-            value="AR Physics Collision Solver Guide" 
-            position="0 0 0.03" 
-            align="center" 
-            color="#ffffff" 
-            width="1.5"
-            wrap-count="80"
-            material="depthTest: false; transparent: true">
-          </a-text>
-          
-          <!-- Close Guide Button -->
-          <a-entity position="3 2.2 0.1">
-            <a-box 
-              id="btnCloseGuide"
-              class="clickable"
-              depth="0.05" 
-              height="0.3" 
-              width="0.6" 
-              color="#ff4444"
-              material="depthTest: true"
-              event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff6666"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff4444">
-            </a-box>
-            <a-text 
-              value="✕" 
-              color="#fff" 
-              align="center" 
-              width="8" 
-              position="0 0 0.03"
-              material="depthTest: false; transparent: true">
-            </a-text>
-          </a-entity>
-        </a-entity>
       </a-entity>
     </a-scene>
 
@@ -1228,7 +1176,6 @@
       // Physics collision solver variables
       let collisionType = 'elastic'; // 'elastic' or 'inelastic'
       let coefficientOfRestitution = 1.0; // e = 1 for elastic, e = 0 for inelastic
-      let physicsGuideVisible = false;
 
       // Inisialisasi setelah DOM loaded
       document.addEventListener('DOMContentLoaded', () => {
@@ -1814,14 +1761,6 @@
           console.log('Collision type set to inelastic');
         });
 
-        // Event listener for physics guide
-        document.querySelector('#btnPhysicsGuide').addEventListener('click', () => {
-          showPhysicsGuide();
-        });
-
-        document.querySelector('#btnCloseGuide').addEventListener('click', () => {
-          hidePhysicsGuide();
-        });
 
         // Mass demo event listeners
         document.querySelector('#btnHeavyLight').addEventListener('click', () => {
@@ -2203,7 +2142,7 @@
       }
 
       // Simulasi animasi untuk fallback model
-      function animateBlock(state) {
+      function animateBlock(state, acceleration = 0) {
         const block = document.querySelector('#blockModel');
         blockAnimationState = state;
         
@@ -2248,6 +2187,152 @@
       }
 
       // Event listeners untuk Bab 2 - Gaya Gesek
+
+      // Ambil semua elemen UI dan 3D yang diperlukan
+    const uiContainer = document.querySelector('#ui-container');
+    const statusText2 = document.querySelector('#statusText');
+    const blockModel = document.querySelector('#blockModel');
+    const resultContainer = document.querySelector('#result-container');
+
+    // Fungsi untuk animasi fallback (jika GLB tidak ada)
+    // Modifikasi: Buat fungsi ini lebih fleksibel
+    function animateBlock(state, acceleration = 0) {
+      // Hapus animasi sebelumnya jika ada
+      blockModel.removeAttribute('animation');
+
+      // Reset posisi
+      blockModel.setAttribute('position', '0 0 0');
+
+      if (state === 'move') {
+        // Durasi animasi berbanding terbalik dengan percepatan
+        // Semakin besar percepatan, semakin cepat animasinya
+        const duration = Math.max(1000, 5000 / (1 + acceleration));
+        // Jarak tempuh bisa dibuat proporsional dengan percepatan
+        const distance = 1 + acceleration * 0.5;
+
+        const animationString = `property: position; to: 0 0 ${distance}; dur: ${duration}; easing: easeInOutQuad; startEvents: start-animation`;
+
+         blockModel.setAttribute('animation', animationString);
+         blockModel.emit('start-animation');
+      }
+      // Jika state 'idle', tidak perlu melakukan apa-apa karena posisi sudah direset
+    }
+
+    // Event listener untuk tombol Kalkulasi
+    document.querySelector('#btnCalculate').addEventListener('click', () => {
+      // 1. Ambil nilai input dari user
+      const massa = parseFloat(document.querySelector('#massa').value);
+      const F_tarik = parseFloat(document.querySelector('#gaya-tarik').value);
+      const mu_s = parseFloat(document.querySelector('#koef-statis').value);
+      const mu_k = parseFloat(document.querySelector('#koef-kinetis').value);
+      const g = 9.8; // Konstanta gravitasi (m/s^2)
+
+      // Validasi input
+      if (isNaN(massa) || isNaN(F_tarik) || isNaN(mu_s) || isNaN(mu_k)) {
+        alert("Pastikan semua input terisi dengan angka yang valid.");
+        return;
+      }
+      if (mu_k > mu_s) {
+          alert("Koefisien Kinetis (μk) tidak boleh lebih besar dari Koefisien Statis (μs).");
+          return;
+      }
+
+      // 2. Lakukan kalkulasi fisika
+      const N = massa * g; // Gaya Normal (N)
+      const Fs_max = mu_s * N; // Gaya Gesek Statis Maksimum (N)
+      const Fk = mu_k * N; // Gaya Gesek Kinetis (N)
+
+      let kesimpulan = "";
+      let percepatan = 0;
+      let statusInfo = "";
+
+      // 3. Tentukan kondisi balok (diam atau bergerak)
+      if (F_tarik <= Fs_max) {
+        // Balok tetap diam
+        percepatan = 0;
+        kesimpulan = `Gaya tarik (${F_tarik.toFixed(2)} N) <= Fs,max (${Fs_max.toFixed(2)} N).`;
+        statusInfo = "BALOK TETAP DIAM! Gaya tarik tidak cukup untuk mengatasi gaya gesek statis.";
+        
+        // Animasikan model 3D
+        animateBlock('idle');
+
+      } else {
+        // Balok bergerak
+        percepatan = (F_tarik - Fk) / massa; // a = (F_tarik - Fk) / m
+        kesimpulan = `Gaya tarik (${F_tarik.toFixed(2)} N) > Fs,max (${Fs_max.toFixed(2)} N).`;
+        statusInfo = `BALOK BERGERAK! Dengan percepatan ${percepatan.toFixed(2)} m/s².`;
+        
+        // Animasikan model 3D
+        animateBlock('move', percepatan);
+      }
+
+      // 4. Tampilkan hasil di panel UI dan di scene
+      statusText2.setAttribute('value', statusInfo);
+      resultContainer.style.display = 'block';
+
+      document.querySelector('#result-normal').innerText = `Gaya Normal (N) = m * g = ${N.toFixed(2)} N`;
+      document.querySelector('#result-fsmax').innerText = `Fs,max = μs * N = ${Fs_max.toFixed(2)} N`;
+      document.querySelector('#result-fk').innerText = `Fk = μk * N = ${Fk.toFixed(2)} N`;
+      document.querySelector('#result-kesimpulan').innerHTML = `<b>Kesimpulan: ${kesimpulan}</b>`;
+      document.querySelector('#result-percepatan').innerHTML = `<b>Percepatan (a) = ${percepatan.toFixed(2)} m/s²</b>`;
+    });
+
+
+    // Event listener untuk tombol Reset
+    document.querySelector('#btnReset2').addEventListener('click', () => {
+      // Reset animasi model
+      animateBlock('idle');
+
+      // Reset teks status
+      statusText2.setAttribute('value', 'Masukkan nilai pada panel di kiri untuk memulai simulasi.');
+
+      // Sembunyikan dan kosongkan hasil kalkulasi
+      resultContainer.style.display = 'none';
+      document.querySelector('#result-normal').innerText = "";
+      document.querySelector('#result-fsmax').innerText = "";
+      document.querySelector('#result-fk').innerText = "";
+      document.querySelector('#result-kesimpulan').innerText = "";
+      document.querySelector('#result-percepatan').innerText = "";
+
+      // Reset nilai input ke default
+      document.querySelector('#massa').value = "10";
+      document.querySelector('#gaya-tarik').value = "20";
+      document.querySelector('#koef-statis').value = "0.5";
+      document.querySelector('#koef-kinetis').value = "0.3";
+    });
+
+
+    // --- Navigasi ---
+    // Modifikasi navigasi untuk menampilkan/menyembunyikan panel UI
+
+    // Navigation - Main Menu
+    document.querySelector('#btnBab2').addEventListener('click', () => {
+      document.querySelector("#bab2").setAttribute("visible", true);
+      uiContainer.style.display = 'block'; // Tampilkan panel UI
+      document.querySelector("#mainmenu").setAttribute("visible", false);
+
+      // Atur ulang kelas 'clickable'
+      document.querySelector("#btnReset2").classList.add("clickable");
+      document.querySelector("#btnKembali2").classList.add("clickable");
+      document.querySelector("#btnBab2").classList.remove("clickable");
+      document.querySelector("#btnBab3").classList.remove("clickable");
+    });
+
+    // Navigation - Kembali dari Bab 2
+    document.querySelector('#btnKembali2').addEventListener('click', () => {
+      // Panggil fungsi reset untuk membersihkan scene Bab 2
+      document.querySelector('#btnReset2').click();
+
+      document.querySelector("#bab2").setAttribute("visible", false);
+      uiContainer.style.display = 'none'; // Sembunyikan panel UI
+      document.querySelector("#mainmenu").setAttribute("visible", true);
+
+      // Atur ulang kelas 'clickable'
+      document.querySelector("#btnReset2").classList.remove("clickable");
+      document.querySelector("#btnKembali2").classList.remove("clickable");
+      document.querySelector("#btnBab2").classList.add("clickable");
+      document.querySelector("#btnBab3").classList.add("clickable");
+    });
       document.querySelector('#btnSkema1').addEventListener('click', () => {
         if (modelsLoaded) {
           // Gunakan animasi GLB jika tersedia
@@ -2697,6 +2782,7 @@ VERIFIKASI:
       }
 
       function resetBab3() {
+        console.log('resetBab3() called from:', new Error().stack);
         animating = false;
         done = false;
         
@@ -3107,70 +3193,6 @@ VERIFIKASI:
         }
       }
 
-      function showPhysicsGuide() {
-        const guidePanel = document.querySelector('#physicsGuidePanel');
-        const guideText = document.querySelector('#physicsGuideText');
-        
-        const physicsContent = generatePhysicsGuideContent();
-        guideText.setAttribute('value', physicsContent);
-        guidePanel.setAttribute('visible', 'true');
-        physicsGuideVisible = true;
-      }
-
-      function hidePhysicsGuide() {
-        const guidePanel = document.querySelector('#physicsGuidePanel');
-        guidePanel.setAttribute('visible', 'false');
-        physicsGuideVisible = false;
-      }
-
-      function generatePhysicsGuideContent() {
-        // Add mass effect examples
-        const heavyVsLight = calculateMassEffect(10, 1, 1, -1); // Heavy vs Light
-        const equalMass = calculateMassEffect(5, 5, 1, -1);    // Equal masses
-        const lightVsHeavy = calculateMassEffect(1, 10, 1, -1); // Light vs Heavy
-        
-        return `AR Physics Collision Solver Guide
-
-ELASTIC COLLISIONS:
-• Kinetic energy is conserved
-• Objects bounce apart completely
-• Formula: v1' = ((m1-m2)v1 + 2m2v2)/(m1+m2)
-          v2' = ((m2-m1)v2 + 2m1v1)/(m1+m2)
-
-INELASTIC COLLISIONS:
-• Kinetic energy is not conserved
-• Objects may stick together
-• Formula: v' = (m1v1 + m2v2)/(m1+m2)
-
-MASS EFFECT DEMONSTRATIONS:
-Heavy (10kg) hits Light (1kg):
-  Before: v1=1m/s, v2=-1m/s
-  After: v1'=${heavyVsLight[0].toFixed(2)}m/s, v2'=${heavyVsLight[1].toFixed(2)}m/s
-  
-Equal Mass (5kg each):
-  Before: v1=1m/s, v2=-1m/s  
-  After: v1'=${equalMass[0].toFixed(2)}m/s, v2'=${equalMass[1].toFixed(2)}m/s
-  
-Light (1kg) hits Heavy (10kg):
-  Before: v1=1m/s, v2=-1m/s
-  After: v1'=${lightVsHeavy[0].toFixed(2)}m/s, v2'=${lightVsHeavy[1].toFixed(2)}m/s
-
-MOMENTUM CONSERVATION:
-• Always applies: p_initial = p_final
-• p = mv (momentum = mass × velocity)
-
-ENERGY CALCULATIONS:
-• KE = ½mv² (kinetic energy)
-• Elastic: KE_initial = KE_final
-• Inelastic: KE_initial > KE_final
-
-Current Type: ${collisionType.toUpperCase()}
-Coefficient of Restitution: ${coefficientOfRestitution}
-
-Notice how mass dramatically affects outcomes!
-Heavy objects barely change velocity.
-Light objects experience huge velocity changes.`;
-      }
 
       function calculateMassEffect(m1, m2, v1, v2) {
         if (collisionType === 'elastic') {
@@ -3201,10 +3223,8 @@ Light objects experience huge velocity changes.`;
         console.log(`After: v1'=${predictedV1.toFixed(2)}m/s, v2'=${predictedV2.toFixed(2)}m/s`);
         console.log(`Mass Effect: ${m1 > m2 ? 'Heavy ball 1 barely moves' : m1 < m2 ? 'Light ball 1 bounces hard' : 'Equal masses exchange velocities'}`);
         
-        // Reset simulation state
-        if (done) {
-          resetBab3();
-        }
+        // Tidak auto-reset, biarkan user mengklik tombol reset manual
+        console.log('Demo values set. Click Reset button to clear animation if needed.');
       }
 
       // Info untuk pengguna
