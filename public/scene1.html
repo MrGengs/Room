@@ -95,13 +95,13 @@
             visible="false"
           ></a-box>
           <!-- Visual model for the car -->
-          <a-entity id="ferrari" gltf-model="url(assets/ferrari.glb)" position="0 0 0" scale="1 1 1"></a-entity>
+          <a-entity id="ferrari" gltf-model="url(assets/ferrari.glb)" position="0 0 0" scale="1.3 1.3 1.3"></a-entity>
           <!-- Arrow indicator for car -->
           <a-entity id="car-arrow" 
             gltf-model="url(assets/arrow.glb)"
             position="0 2.5 0" 
             rotation="0 0 0"
-            scale="0.5 0.5 0.5"
+            scale="0.7 0.7 0.7"
             visible="false">
           </a-entity>
           
@@ -128,17 +128,16 @@
             width="8"
             visible="false">
           </a-text>
-
-          <!-- NPC for punching animation, child of car-group -->
-          <a-entity 
-            id="npc-puncher" 
-            gltf-model="url(assets/third_person_animations.glb)" 
-            position="0 0 2.5" 
-            rotation="0 180 0" 
-            scale="1 1 1" 
-            visible="false"
-            animation-mixer>
-          </a-entity>
+        <!-- NPC Pusher -->
+        <a-entity
+          id="npc-pusher"
+          gltf-model="url(assets/push.glb)"
+          position="0 0 3.1"
+          rotation="0 180 0"
+          scale="0.01 0.01 0.01"
+          animation-mixer="clip: mixamo.com; loop: repeat"
+          visible="false"
+        ></a-entity>
         </a-entity>
 
         <!-- Sepeda model with collision -->
@@ -952,6 +951,13 @@
             acceleration: this.acceleration,
             targetDistance: targetDistance
           });
+
+          if (this.el.id === 'ferrari-body') {
+            const npc = document.getElementById('npc-pusher');
+            if (npc) {
+              npc.setAttribute('visible', true);
+            }
+          }
           
           // Show force and acceleration indicators immediately
           this.updateIndicators();
@@ -1033,6 +1039,13 @@
             // Keep acceleration and distance data for display until manual reset
             console.log(`${this.el.id} stopped. Distance traveled: ${this.distanceTraveled}`);
             console.log(`Final acceleration was: ${this.acceleration.length()}`);
+
+            if (this.el.id === 'ferrari-body') {
+              const npc = document.getElementById('npc-pusher');
+              if (npc) {
+                npc.setAttribute('visible', false);
+              }
+            }
           }
 
           // Update maximum values achieved during movement
@@ -1243,6 +1256,11 @@
 
         reset() {
           console.log('Resetting 3D simulation...');
+
+          const npc = document.getElementById('npc-pusher');
+          if (npc) {
+            npc.setAttribute('visible', false);
+          }
           
           // Reset car position
           const carGroup = document.getElementById('car-group');
