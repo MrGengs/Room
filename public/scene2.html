@@ -458,28 +458,6 @@
             </a-text>
           </a-entity>
           
-          <!-- Physics Guide Button -->
-          <a-entity position="0 -0.2 0">
-            <a-box 
-              id="btnPhysicsGuide"
-              class="clickable"
-              depth="0.1" 
-              height="0.25" 
-              width="2" 
-              color="#4444ff"
-              material="depthTest: true"
-              event-set__enter="_event: mouseenter; scale:1.05 1.05 1.05; color:#6666ff"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#4444ff">
-            </a-box>
-            <a-text 
-              value="PANDUAN FISIKA" 
-              color="#fff" 
-              align="center" 
-              width="4" 
-              position="0 0 0.06"
-              material="depthTest: false; transparent: true">
-            </a-text>
-          </a-entity>
 
           <!-- Mass Demo Buttons -->
           <a-entity position="0 -0.8 0">
@@ -1167,49 +1145,6 @@
           </a-text>
         </a-entity>
 
-        <!-- AR Physics Guide Panel -->
-        <a-entity position="-4 2.5 -5" rotation="-10 30 0" id="physicsGuidePanel" visible="false">
-          <a-box 
-            depth="0.05" 
-            height="5" 
-            width="7" 
-            color="#0a0a2a"
-            material="depthTest: true; opacity: 0.98; transparent: true">
-          </a-box>
-          <a-text 
-            id="physicsGuideText"
-            value="AR Physics Collision Solver Guide" 
-            position="0 0 0.03" 
-            align="center" 
-            color="#ffffff" 
-            width="1.5"
-            wrap-count="80"
-            material="depthTest: false; transparent: true">
-          </a-text>
-          
-          <!-- Close Guide Button -->
-          <a-entity position="3 2.2 0.1">
-            <a-box 
-              id="btnCloseGuide"
-              class="clickable"
-              depth="0.05" 
-              height="0.3" 
-              width="0.6" 
-              color="#ff4444"
-              material="depthTest: true"
-              event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff6666"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff4444">
-            </a-box>
-            <a-text 
-              value="✕" 
-              color="#fff" 
-              align="center" 
-              width="8" 
-              position="0 0 0.03"
-              material="depthTest: false; transparent: true">
-            </a-text>
-          </a-entity>
-        </a-entity>
       </a-entity>
     </a-scene>
 
@@ -1228,7 +1163,6 @@
       // Physics collision solver variables
       let collisionType = 'elastic'; // 'elastic' or 'inelastic'
       let coefficientOfRestitution = 1.0; // e = 1 for elastic, e = 0 for inelastic
-      let physicsGuideVisible = false;
 
       // Inisialisasi setelah DOM loaded
       document.addEventListener('DOMContentLoaded', () => {
@@ -1814,14 +1748,6 @@
           console.log('Collision type set to inelastic');
         });
 
-        // Event listener for physics guide
-        document.querySelector('#btnPhysicsGuide').addEventListener('click', () => {
-          showPhysicsGuide();
-        });
-
-        document.querySelector('#btnCloseGuide').addEventListener('click', () => {
-          hidePhysicsGuide();
-        });
 
         // Mass demo event listeners
         document.querySelector('#btnHeavyLight').addEventListener('click', () => {
@@ -2697,6 +2623,7 @@ VERIFIKASI:
       }
 
       function resetBab3() {
+        console.log('resetBab3() called from:', new Error().stack);
         animating = false;
         done = false;
         
@@ -3107,70 +3034,6 @@ VERIFIKASI:
         }
       }
 
-      function showPhysicsGuide() {
-        const guidePanel = document.querySelector('#physicsGuidePanel');
-        const guideText = document.querySelector('#physicsGuideText');
-        
-        const physicsContent = generatePhysicsGuideContent();
-        guideText.setAttribute('value', physicsContent);
-        guidePanel.setAttribute('visible', 'true');
-        physicsGuideVisible = true;
-      }
-
-      function hidePhysicsGuide() {
-        const guidePanel = document.querySelector('#physicsGuidePanel');
-        guidePanel.setAttribute('visible', 'false');
-        physicsGuideVisible = false;
-      }
-
-      function generatePhysicsGuideContent() {
-        // Add mass effect examples
-        const heavyVsLight = calculateMassEffect(10, 1, 1, -1); // Heavy vs Light
-        const equalMass = calculateMassEffect(5, 5, 1, -1);    // Equal masses
-        const lightVsHeavy = calculateMassEffect(1, 10, 1, -1); // Light vs Heavy
-        
-        return `AR Physics Collision Solver Guide
-
-ELASTIC COLLISIONS:
-• Kinetic energy is conserved
-• Objects bounce apart completely
-• Formula: v1' = ((m1-m2)v1 + 2m2v2)/(m1+m2)
-          v2' = ((m2-m1)v2 + 2m1v1)/(m1+m2)
-
-INELASTIC COLLISIONS:
-• Kinetic energy is not conserved
-• Objects may stick together
-• Formula: v' = (m1v1 + m2v2)/(m1+m2)
-
-MASS EFFECT DEMONSTRATIONS:
-Heavy (10kg) hits Light (1kg):
-  Before: v1=1m/s, v2=-1m/s
-  After: v1'=${heavyVsLight[0].toFixed(2)}m/s, v2'=${heavyVsLight[1].toFixed(2)}m/s
-  
-Equal Mass (5kg each):
-  Before: v1=1m/s, v2=-1m/s  
-  After: v1'=${equalMass[0].toFixed(2)}m/s, v2'=${equalMass[1].toFixed(2)}m/s
-  
-Light (1kg) hits Heavy (10kg):
-  Before: v1=1m/s, v2=-1m/s
-  After: v1'=${lightVsHeavy[0].toFixed(2)}m/s, v2'=${lightVsHeavy[1].toFixed(2)}m/s
-
-MOMENTUM CONSERVATION:
-• Always applies: p_initial = p_final
-• p = mv (momentum = mass × velocity)
-
-ENERGY CALCULATIONS:
-• KE = ½mv² (kinetic energy)
-• Elastic: KE_initial = KE_final
-• Inelastic: KE_initial > KE_final
-
-Current Type: ${collisionType.toUpperCase()}
-Coefficient of Restitution: ${coefficientOfRestitution}
-
-Notice how mass dramatically affects outcomes!
-Heavy objects barely change velocity.
-Light objects experience huge velocity changes.`;
-      }
 
       function calculateMassEffect(m1, m2, v1, v2) {
         if (collisionType === 'elastic') {
@@ -3201,10 +3064,8 @@ Light objects experience huge velocity changes.`;
         console.log(`After: v1'=${predictedV1.toFixed(2)}m/s, v2'=${predictedV2.toFixed(2)}m/s`);
         console.log(`Mass Effect: ${m1 > m2 ? 'Heavy ball 1 barely moves' : m1 < m2 ? 'Light ball 1 bounces hard' : 'Equal masses exchange velocities'}`);
         
-        // Reset simulation state
-        if (done) {
-          resetBab3();
-        }
+        // Tidak auto-reset, biarkan user mengklik tombol reset manual
+        console.log('Demo values set. Click Reset button to clear animation if needed.');
       }
 
       // Info untuk pengguna
