@@ -140,11 +140,11 @@
         ></a-entity>
         </a-entity>
 
-        <!-- Sepeda model with collision -->
-        <a-entity id="sepeda-group" position="3 0.6 3" rotation="0 180 0">
-          <!-- Main collision body for the bicycle -->
+        <!-- Cart model with collision -->
+        <a-entity id="cart-group" position="3 0 3" rotation="0 180 0">
+          <!-- Main collision body for the cart -->
           <a-box
-            id="sepeda-body"
+            id="cart-body"
             class="collidable"
             pushable
             physics-object="mass: 50"
@@ -154,16 +154,16 @@
             depth="2.0"
             visible="false"
           ></a-box>
-          <!-- Visual model for the bicycle -->
+          <!-- Visual model for the cart -->
           <a-entity 
-            id="sepeda" 
-            gltf-model="url(assets/sepeda.glb)" 
-            scale="0.5 0.5 0.5"
+            id="cart" 
+            gltf-model="url(assets/cart.glb)" 
+            scale="0.01 0.01 0.01"
             rotation="0 180 0"
             animation-mixer="clip: Static Pose; loop: infinite">
           </a-entity>
-          <!-- Arrow indicator for sepeda -->
-          <a-entity id="sepeda-arrow" 
+          <!-- Arrow indicator for cart -->
+          <a-entity id="cart-arrow" 
             gltf-model="url(assets/arrow.glb)"
             position="0 1.5 0" 
             rotation="0 180 0"
@@ -171,9 +171,9 @@
             visible="false">
           </a-entity>
           
-          <!-- Force indicator for bicycle -->
+          <!-- Force indicator for cart -->
           <a-text 
-            id="bicycle-force-indicator"
+            id="cart-force-indicator"
             value="F: 0N"
             position="0 2.2 0"
             align="center"
@@ -183,9 +183,9 @@
             visible="false">
           </a-text>
           
-          <!-- Acceleration indicator for bicycle -->
+          <!-- Acceleration indicator for cart -->
           <a-text 
-            id="bicycle-acceleration-indicator"
+            id="cart-acceleration-indicator"
             value="A: 0 m/s²"
             position="0 1.8 0"
             align="center"
@@ -194,14 +194,24 @@
             width="8"
             visible="false">
           </a-text>
+        <!-- NPC Pusher Cart -->
+        <a-entity
+          id="npc-pusher-cart"
+          gltf-model="url(assets/push.glb)"
+          position="0 0 2.2"
+          rotation="0 180 0"
+          scale="0.01 0.01 0.01"
+          animation-mixer="clip: mixamo.com; loop: repeat"
+          visible="false"
+        ></a-entity>
         </a-entity>
         
         <!-- 3D Physics Control Panel -->
-        <a-entity id="physics-panel-3d" position="8 2.8 3" rotation="0 -90 0">
+        <a-entity id="physics-panel-3d" position="-2 5.5 6" rotation="0 90 0">
           <!-- Main Panel Background -->
           <a-plane 
             id="panel-bg"
-            width="4.5" 
+            width="5.5" 
             height="9.0" 
             color="#1a1a1a" 
             opacity="0.95"
@@ -220,7 +230,7 @@
           
           <!-- Control Section Background -->
           <a-plane 
-            width="3.6" 
+            width="4.6" 
             height="2.0" 
             color="#2a2a2a" 
             opacity="0.9"
@@ -243,7 +253,7 @@
             height="0.35" 
             depth="0.06" 
             color="#FF5722" 
-            position="-1.0 2.4 0.03"
+            position="-1.5 2.4 0.03"
             class="clickable"
             cursor-listener
             event-set__mouseenter="color: #FF7043"
@@ -274,7 +284,7 @@
             height="0.35" 
             depth="0.06" 
             color="#4CAF50" 
-            position="1.0 2.4 0.03"
+            position="1.5 2.4 0.03"
             class="clickable"
             cursor-listener
             event-set__mouseenter="color: #66BB6A"
@@ -305,7 +315,7 @@
             height="0.35" 
             depth="0.06" 
             color="#FF5722" 
-            position="-1.0 1.5 0.03"
+            position="-1.5 1.5 0.03"
             class="clickable"
             cursor-listener
             event-set__mouseenter="color: #FF7043"
@@ -336,7 +346,7 @@
             height="0.35" 
             depth="0.06" 
             color="#4CAF50" 
-            position="1.0 1.5 0.03"
+            position="1.5 1.5 0.03"
             class="clickable"
             cursor-listener
             event-set__mouseenter="color: #66BB6A"
@@ -358,7 +368,7 @@
             height="0.45" 
             depth="0.06" 
             color="#4CAF50" 
-            position="-0.9 1.0 0.03"
+            position="-1.4 1.0 0.03"
             class="clickable"
             cursor-listener
             event-set__mouseenter="color: #66BB6A"
@@ -379,7 +389,7 @@
             height="0.45" 
             depth="0.06" 
             color="#f44336" 
-            position="0.9 1.0 0.03"
+            position="1.4 1.0 0.03"
             class="clickable"
             cursor-listener
             event-set__mouseenter="color: #EF5350"
@@ -396,7 +406,7 @@
           
           <!-- Separator Line -->
           <a-plane 
-            width="3.2" 
+            width="4.2" 
             height="0.03" 
             color="#555" 
             position="0 0.7 0.01">
@@ -404,7 +414,7 @@
           
           <!-- Data Display Section Background -->
           <a-plane 
-            width="4.2" 
+            width="5.2" 
             height="4.5" 
             color="#1e1e1e" 
             opacity="0.9"
@@ -424,7 +434,7 @@
           <!-- Car Data Row 1 -->
           <a-text 
             value="Mass: 1200 kg" 
-            position="-1.8 -0.1 0.02" 
+            position="-2.3 -0.1 0.02" 
             align="left" 
             color="#E0E0E0" 
             font="kelsonsans" 
@@ -432,7 +442,7 @@
           </a-text>
           <a-text 
             value="Accel:" 
-            position="0.2 -0.1 0.02" 
+            position="0.7 -0.1 0.02" 
             align="left" 
             color="#E0E0E0" 
             font="kelsonsans" 
@@ -441,7 +451,7 @@
           <a-text 
             id="car-acceleration-3d" 
             value="0 m/s²" 
-            position="1.8 -0.1 0.02" 
+            position="2.3 -0.1 0.02" 
             align="right" 
             color="#4CAF50" 
             font="kelsonsans" 
@@ -451,7 +461,7 @@
           <!-- Car Data Row 2 -->
           <a-text 
             value="Velocity:" 
-            position="-1.8 -0.5 0.02" 
+            position="-2.3 -0.5 0.02" 
             align="left" 
             color="#E0E0E0" 
             font="kelsonsans" 
@@ -460,7 +470,7 @@
           <a-text 
             id="car-velocity-3d" 
             value="0 m/s" 
-            position="-0.3 -0.5 0.02" 
+            position="-1.0 -0.5 0.02" 
             align="left" 
             color="#4CAF50" 
             font="kelsonsans" 
@@ -468,7 +478,7 @@
           </a-text>
           <a-text 
             value="Distance:" 
-            position="0.2 -0.5 0.02" 
+            position="0.7 -0.5 0.02" 
             align="left" 
             color="#E0E0E0" 
             font="kelsonsans" 
@@ -477,16 +487,16 @@
           <a-text 
             id="car-distance-3d" 
             value="0 m" 
-            position="1.8 -0.5 0.02" 
+            position="2.5 -0.5 0.02" 
             align="right" 
             color="#4CAF50" 
             font="kelsonsans" 
             width="5">
           </a-text>
           
-          <!-- Bicycle Data Section -->
+          <!-- Cart Data Section -->
           <a-text 
-            value="BICYCLE DATA" 
+            value="CART DATA" 
             position="0 -1.2 0.02" 
             align="center" 
             color="#FF9800" 
@@ -494,10 +504,10 @@
             width="7">
           </a-text>
           
-          <!-- Bicycle Data Row 1 -->
+          <!-- Cart Data Row 1 -->
           <a-text 
             value="Mass: 50 kg" 
-            position="-1.8 -1.6 0.02" 
+            position="-2.3 -1.6 0.02" 
             align="left" 
             color="#E0E0E0" 
             font="kelsonsans" 
@@ -505,35 +515,35 @@
           </a-text>
           <a-text 
             value="Accel:" 
-            position="0.2 -1.6 0.02" 
+            position="0.7 -1.6 0.02" 
             align="left" 
             color="#E0E0E0" 
             font="kelsonsans" 
             width="5">
           </a-text>
           <a-text 
-            id="bicycle-acceleration-3d" 
+            id="cart-acceleration-3d" 
             value="0 m/s²" 
-            position="1.8 -1.6 0.02" 
+            position="2.3 -1.6 0.02" 
             align="right" 
             color="#4CAF50" 
             font="kelsonsans" 
             width="5">
           </a-text>
           
-          <!-- Bicycle Data Row 2 -->
+          <!-- Cart Data Row 2 -->
           <a-text 
             value="Velocity:" 
-            position="-1.8 -2.0 0.02" 
+            position="-2.3 -2.0 0.02" 
             align="left" 
             color="#E0E0E0" 
             font="kelsonsans" 
             width="5">
           </a-text>
           <a-text 
-            id="bicycle-velocity-3d" 
+            id="cart-velocity-3d" 
             value="0 m/s" 
-            position="-0.3 -2.0 0.02" 
+            position="-1.0 -2.0 0.02" 
             align="left" 
             color="#4CAF50" 
             font="kelsonsans" 
@@ -541,16 +551,16 @@
           </a-text>
           <a-text 
             value="Distance:" 
-            position="0.2 -2.0 0.02" 
+            position="0.7 -2.0 0.02" 
             align="left" 
             color="#E0E0E0" 
             font="kelsonsans" 
             width="5">
           </a-text>
           <a-text 
-            id="bicycle-distance-3d" 
+            id="cart-distance-3d" 
             value="0 m" 
-            position="1.8 -2.0 0.02" 
+            position="2.5 -2.0 0.02" 
             align="right" 
             color="#4CAF50" 
             font="kelsonsans" 
@@ -559,12 +569,21 @@
         </a-entity>
 
         <!-- Portal back to index.html -->
+                <a-text
+          value="Kembali ke Beranda"
+          position="-8 2.0 2"
+          align="center"
+          color="#FFFFFF"
+          font="kelsonsans"
+          width="5"
+          look-at="#player"
+        ></a-text>
         <a-link
           link="on:click"
           href="index.html"
           title="Kembali ke Lobby"
           image="#thumbForest"
-          position="-8 1.6 2"
+          position="8 1.6 2"
           rotation="0 90 0"
           class="clickable"
           event-set__mouseenter="material.opacity: 0.8"
@@ -575,9 +594,10 @@
 
       <a-entity
         id="rig"
+        position="6 0 3"
+        rotation="0 90 0"
         collider="distance: 0.3"
         movement-controls="fly:false;"
-        spawn-in-circle="radius:1"
         networked="template:#avatar-template;attachTemplateToLocal:false"
         player-info
       >
@@ -917,7 +937,7 @@
         captureStartPosition: function() {
           // Get position from parent group if it exists
           const parentGroup = this.el.parentNode;
-          if (parentGroup && (parentGroup.id === 'car-group' || parentGroup.id === 'sepeda-group')) {
+          if (parentGroup && (parentGroup.id === 'car-group' || parentGroup.id === 'cart-group')) {
             const pos = parentGroup.getAttribute('position');
             this.startPosition.set(pos.x, pos.y, pos.z);
           } else {
@@ -957,6 +977,11 @@
             if (npc) {
               npc.setAttribute('visible', true);
             }
+          } else if (this.el.id === 'cart-body') {
+            const npc = document.getElementById('npc-pusher-cart');
+            if (npc) {
+              npc.setAttribute('visible', true);
+            }
           }
           
           // Show force and acceleration indicators immediately
@@ -978,7 +1003,7 @@
           const parentGroup = this.el.parentNode;
           
           let currentPos;
-          if (parentGroup && (parentGroup.id === 'car-group' || parentGroup.id === 'sepeda-group')) {
+          if (parentGroup && (parentGroup.id === 'car-group' || parentGroup.id === 'cart-group')) {
             currentPos = parentGroup.getAttribute('position');
             const newPos = {
               x: currentPos.x + movement.x,
@@ -1028,10 +1053,10 @@
             // --- END HIDE NPC ---
 
             // --- RESET BICYCLE ANIMATION WHEN IT STOPS ---
-            if (this.el.id === 'sepeda-body') {
-              const sepeda = document.getElementById('sepeda');
-              if (sepeda) {
-                sepeda.setAttribute('animation-mixer', 'clip', 'Static Pose');
+            if (this.el.id === 'cart-body') {
+              const cart = document.getElementById('cart');
+              if (cart) {
+                cart.setAttribute('animation-mixer', 'clip', 'Static Pose');
               }
             }
             // --- END RESET BICYCLE ANIMATION ---
@@ -1042,6 +1067,11 @@
 
             if (this.el.id === 'ferrari-body') {
               const npc = document.getElementById('npc-pusher');
+              if (npc) {
+                npc.setAttribute('visible', false);
+              }
+            } else if (this.el.id === 'cart-body') {
+              const npc = document.getElementById('npc-pusher-cart');
               if (npc) {
                 npc.setAttribute('visible', false);
               }
@@ -1069,7 +1099,7 @@
           this.updateIndicators();
         },
         updateIndicators: function () {
-          const objectType = this.el.id.includes('ferrari') ? 'car' : 'bicycle';
+          const objectType = this.el.id.includes('ferrari') ? 'car' : 'cart';
           
           // Get force and acceleration indicators
           const forceIndicator = document.getElementById(`${objectType}-force-indicator`);
@@ -1095,7 +1125,7 @@
           }
         },
         updateUI: function () {
-          const objectType = this.el.id.includes('ferrari') ? 'car' : 'bicycle';
+          const objectType = this.el.id.includes('ferrari') ? 'car' : 'cart';
           
           // Update 3D UI elements instead of HTML elements
           requestAnimationFrame(() => {
@@ -1130,7 +1160,7 @@
           });
         },
         updateArrow: function () {
-          const objectType = this.el.id.includes('ferrari') ? 'car' : 'sepeda';
+          const objectType = this.el.id.includes('ferrari') ? 'car' : 'cart';
           const arrow = document.getElementById(`${objectType}-arrow`);
           
           console.log(`updateArrow called for ${this.el.id}, objectType: ${objectType}, arrow found: ${!!arrow}`);
@@ -1235,31 +1265,35 @@
             console.error('Car physics object not found');
           }
 
-          // Apply force to bicycle (backward direction)
-          const bicycleBody = document.getElementById('sepeda-body');
-          if (bicycleBody && bicycleBody.components && bicycleBody.components['physics-object']) {
-            const bicycleForce = new THREE.Vector3(0, 0, this.forceValue * 50);
-            bicycleBody.components['physics-object'].applyForce(bicycleForce, this.distanceValue);
-            console.log('3D Force applied to bicycle');
+          // Apply force to cart (backward direction)
+          const cartBody = document.getElementById('cart-body');
+          if (cartBody && cartBody.components && cartBody.components['physics-object']) {
+            const cartForce = new THREE.Vector3(0, 0, this.forceValue * 50);
+            cartBody.components['physics-object'].applyForce(cartForce, this.distanceValue);
+            console.log('3D Force applied to cart');
 
-            // --- CHANGE BICYCLE ANIMATION ---
-            const sepeda = document.getElementById('sepeda');
-            if (sepeda) {
-              sepeda.setAttribute('animation-mixer', 'clip', 'M_rig_Action_S');
+            // --- CHANGE CART ANIMATION ---
+            const cart = document.getElementById('cart');
+            if (cart) {
+              cart.setAttribute('animation-mixer', 'clip', 'M_rig_Action_S');
             }
-            // --- END CHANGE BICYCLE ANIMATION ---
+            // --- END CHANGE CART ANIMATION ---
 
           } else {
-            console.error('Bicycle physics object not found');
+            console.error('Cart physics object not found');
           }
         }
 
         reset() {
           console.log('Resetting 3D simulation...');
 
-          const npc = document.getElementById('npc-pusher');
-          if (npc) {
-            npc.setAttribute('visible', false);
+          const npcC = document.getElementById('npc-pusher');
+          if (npcC) {
+            npcC.setAttribute('visible', false);
+          }
+          const npcCart = document.getElementById('npc-pusher-cart');
+          if (npcCart) {
+            npcCart.setAttribute('visible', false);
           }
           
           // Reset car position
@@ -1268,10 +1302,10 @@
             carGroup.setAttribute('position', '0 0 2');
           }
           
-          // Reset bicycle position
-          const bicycleGroup = document.getElementById('sepeda-group');
-          if (bicycleGroup) {
-            bicycleGroup.setAttribute('position', '3 0.6 3');
+          // Reset cart position
+          const cartGroup = document.getElementById('cart-group');
+          if (cartGroup) {
+            cartGroup.setAttribute('position', '3 0 3');
           }
 
           // Reset physics components
@@ -1290,9 +1324,9 @@
               physics.updateIndicators(); // Hide indicators
             }
 
-            const bicycleBody = document.getElementById('sepeda-body');
-            if (bicycleBody && bicycleBody.components && bicycleBody.components['physics-object']) {
-              const physics = bicycleBody.components['physics-object'];
+            const cartBody = document.getElementById('cart-body');
+            if (cartBody && cartBody.components && cartBody.components['physics-object']) {
+              const physics = cartBody.components['physics-object'];
               physics.velocity.set(0, 0, 0);
               physics.acceleration.set(0, 0, 0);
               physics.isMoving = false;
@@ -1306,9 +1340,9 @@
 
             // Hide arrows
             const carArrow = document.getElementById('car-arrow');
-            const sepedaArrow = document.getElementById('sepeda-arrow');
+            const cartArrow = document.getElementById('cart-arrow');
             if (carArrow) carArrow.setAttribute('visible', false);
-            if (sepedaArrow) sepedaArrow.setAttribute('visible', false);
+            if (cartArrow) cartArrow.setAttribute('visible', false);
 
             // Reset 3D UI displays
             this.resetUI();
@@ -1321,9 +1355,9 @@
               { id: 'car-acceleration-3d', value: '0 m/s²' },
               { id: 'car-velocity-3d', value: '0 m/s' },
               { id: 'car-distance-3d', value: '0 m' },
-              { id: 'bicycle-acceleration-3d', value: '0 m/s²' },
-              { id: 'bicycle-velocity-3d', value: '0 m/s' },
-              { id: 'bicycle-distance-3d', value: '0 m' }
+              { id: 'cart-acceleration-3d', value: '0 m/s²' },
+              { id: 'cart-velocity-3d', value: '0 m/s' },
+              { id: 'cart-distance-3d', value: '0 m' }
             ];
             
             elements.forEach(item => {
@@ -1384,7 +1418,7 @@
           
           // Test if elements are available
           const carBody = document.getElementById('ferrari-body');
-          const bicycleBody = document.getElementById('sepeda-body');
+          const cartBody = document.getElementById('cart-body');
           const panel3D = document.getElementById('physics-panel-3d');
           console.log('Car body element:', carBody);
           console.log('Bicycle body element:', bicycleBody);
