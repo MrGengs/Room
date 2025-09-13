@@ -270,7 +270,7 @@
         </a-entity>
 
         <!-- Tombol Kembali dan Reset -->
-        <a-entity position="-0.5 0.8 -1" rotation="-30 0 0" visible="false">
+        <a-entity position="-0.5 0.8 -1" rotation="-30 0 0">
           <a-box 
             id="btnKembali2"
             class="clickable"
@@ -292,7 +292,7 @@
           </a-text>
         </a-entity>
 
-        <a-entity position="0.5 0.8 -1" rotation="-30 0 0" visible="false">
+        <a-entity position="0.5 0.8 -1" rotation="-30 0 0">
           <a-box 
             id="btnReset2"
             class="clickable"
@@ -323,7 +323,7 @@
           class="collidable"
           position="-4 1 -3" 
           radius="0.25" 
-          color="#ffdd44"
+          color="#cc2f2f"
           material="depthTest: true"
           shadow="cast: true"
           ball-deformation="intensity: 0.2; duration: 300">
@@ -342,7 +342,7 @@
           class="collidable"
           position="4 1 -3" 
           radius="0.25" 
-          color="#44ff88"
+          color="#4545ff"
           material="depthTest: true"
           shadow="cast: true"
           ball-deformation="intensity: 0.2; duration: 300">
@@ -564,7 +564,7 @@
         </a-entity>
 
         <!-- Kontrol untuk Bola 1 (Merah) - Input Ketik -->
-        <a-entity id="UImerahWrapper" position="-3 0.5 0" rotation="-15 20 0" visible="false">
+        <a-entity id="UImerahWrapper" position="-3 0.5 0" rotation="-15 20 0">
           <a-text 
             value="BOLA MERAH" 
             position="0 0.8 0" 
@@ -923,7 +923,7 @@
         </a-entity>
 
         <!-- Kontrol untuk Bola 2 (Biru) -->
-        <a-entity id="UIbiruWrapper" position="3 0.5 0" rotation="-15 -20 0" visible="false">
+        <a-entity id="UIbiruWrapper" position="3 0.5 0" rotation="-15 -20 0">
           <a-text 
             value="BOLA BIRU" 
             position="0 0.8 0" 
@@ -1482,38 +1482,16 @@
             let finalPos1 = v1p * distanceScale;
             let finalPos2 = v2p * distanceScale;
             
-            // Untuk tumbukan tidak elastis, bola bergerak dengan kecepatan sama
-            // tetapi mereka harus tetap terpisah secara visual
-            if (collisionType === 'inelastic') {
-              // Untuk tumbukan tidak elastis, kedua bola harus bergerak bersama 
-              // tetapi dengan jarak visual yang aman (0.6m minimum)
-              const averagePosition = (finalPos1 + finalPos2) / 2;
-              
-              // Tentukan arah pemisahan berdasarkan posisi awal
-              if (finalPos1 >= 0) {
-                // Ball1 di kanan, Ball2 di kiri  
-                finalPos1 = averagePosition + 0.3;
-                finalPos2 = averagePosition - 0.3;
+            // Cegah overlap jika posisi akhir terlalu dekat
+            if (Math.abs(finalPos1 - finalPos2) < 0.4) {
+              if (finalPos1 >= finalPos2) {
+                finalPos1 += 0.2;
+                finalPos2 -= 0.2;
               } else {
-                // Ball1 di kiri, Ball2 di kanan
-                finalPos1 = averagePosition - 0.3;
-                finalPos2 = averagePosition + 0.3;
+                finalPos1 -= 0.2;
+                finalPos2 += 0.2;
               }
-              
-              console.log(`Inelastic collision: Both balls move together (v=${v1p.toFixed(2)}m/s) but stay visually separated`);
-              console.log(`Ball1 final position: ${finalPos1.toFixed(2)}, Ball2 final position: ${finalPos2.toFixed(2)}`);
-            } else {
-              // Untuk tumbukan elastis, cegah overlap jika posisi akhir terlalu dekat
-              if (Math.abs(finalPos1 - finalPos2) < 0.4) {
-                if (finalPos1 >= finalPos2) {
-                  finalPos1 += 0.2;
-                  finalPos2 -= 0.2;
-                } else {
-                  finalPos1 -= 0.2;
-                  finalPos2 += 0.2;
-                }
-                console.log(`Anti-overlap correction applied: Ball1=${finalPos1.toFixed(2)}, Ball2=${finalPos2.toFixed(2)}`);
-              }
+              console.log(`Anti-overlap correction applied: Ball1=${finalPos1.toFixed(2)}, Ball2=${finalPos2.toFixed(2)}`);
             }
             
             // Ball 1 post-collision animation dengan easing yang smooth
@@ -1705,11 +1683,6 @@
           document.querySelector("#mainmenu").setAttribute("visible", false);
           document.querySelector("#btnBab2").classList.remove("clickable"); 
           document.querySelector("#btnBab3").classList.remove("clickable"); 
-          
-          // Tampilkan parent entity dari tombol-tombol bab2
-          document.querySelector("#btnKembali2").parentElement.setAttribute("visible", "true");
-          document.querySelector("#btnReset2").parentElement.setAttribute("visible", "true");
-          
           document.querySelector("#btnKembali2").classList.add("clickable"); 
           document.querySelector("#btnPlay2").classList.add("clickable"); 
           document.querySelector("#btnReset2").classList.add("clickable"); 
@@ -1755,11 +1728,6 @@
           document.querySelector("#mainmenu").setAttribute("visible", false);
           document.querySelector("#btnBab2").classList.remove("clickable"); 
           document.querySelector("#btnBab3").classList.remove("clickable"); 
-          
-          // Tampilkan parent entity dari tombol-tombol bab2
-          document.querySelector("#btnKembali2").parentElement.setAttribute("visible", "true");
-          document.querySelector("#btnReset2").parentElement.setAttribute("visible", "true");
-          
           document.querySelector("#btnKembali2").classList.add("clickable"); 
           document.querySelector("#btnPlay2").classList.add("clickable"); 
           document.querySelector("#btnReset2").classList.add("clickable"); 
@@ -1811,11 +1779,6 @@
           document.querySelector("#mainmenu").setAttribute("visible", true);
           document.querySelector("#btnBab2").classList.add("clickable"); 
           document.querySelector("#btnBab3").classList.add("clickable"); 
-          
-          // Sembunyikan parent entity dari tombol-tombol bab2
-          document.querySelector("#btnKembali2").parentElement.setAttribute("visible", "false");
-          document.querySelector("#btnReset2").parentElement.setAttribute("visible", "false");
-          
           document.querySelector("#btnKembali2").classList.remove("clickable"); 
           document.querySelector("#btnPlay2").classList.remove("clickable"); 
           document.querySelector("#btnReset2").classList.remove("clickable"); 
@@ -2351,11 +2314,6 @@
       document.querySelector('#btnBab2').addEventListener('click', () => {
         document.querySelector("#bab2").setAttribute("visible", true);
         document.querySelector("#mainmenu").setAttribute("visible", false);
-        
-        // Tampilkan parent entity dari tombol-tombol bab2
-        document.querySelector("#btnKembali2").parentElement.setAttribute("visible", "true");
-        document.querySelector("#btnReset2").parentElement.setAttribute("visible", "true");
-        
         document.querySelector("#btnReset2").classList.add("clickable"); 
         document.querySelector("#btnKembali2").classList.add("clickable"); 
         document.querySelector("#btnSkema1").classList.add("clickable"); 
@@ -2381,11 +2339,6 @@
         document.querySelector("#btnSkema3").classList.remove("clickable"); 
         document.querySelector("#bab2").setAttribute("visible", false);
         document.querySelector("#mainmenu").setAttribute("visible", true);
-        
-        // Sembunyikan parent entity dari tombol-tombol bab2
-        document.querySelector("#btnKembali2").parentElement.setAttribute("visible", "false");
-        document.querySelector("#btnReset2").parentElement.setAttribute("visible", "false");
-        
         document.querySelector("#btnReset2").classList.remove("clickable"); 
         document.querySelector("#btnKembali2").classList.remove("clickable"); 
         document.querySelector("#btnSkema1").classList.remove("clickable"); 
@@ -2438,19 +2391,22 @@
       function hitungKecepatan(m1, v1, m2, v2) {
         let v1p, v2p;
         
-        // Menggunakan rumus umum dengan coefficient of restitution (e)
-        // e = 1 untuk elastis sempurna, e = 0 untuk inelastis sempurna
-        const e = coefficientOfRestitution;
-        
-        // Rumus umum tumbukan dengan coefficient of restitution
-        v1p = ((m1 - e * m2) * v1 + (1 + e) * m2 * v2) / (m1 + m2);
-        v2p = ((m2 - e * m1) * v2 + (1 + e) * m1 * v1) / (m1 + m2);
+        if (collisionType === 'elastic') {
+          // Rumus tumbukan elastis
+          v1p = ((m1 - m2) * v1 + 2 * m2 * v2) / (m1 + m2);
+          v2p = ((m2 - m1) * v2 + 2 * m1 * v1) / (m1 + m2);
+        } else {
+          // Rumus tumbukan inelastis (perfectly inelastic)
+          const vFinal = (m1 * v1 + m2 * v2) / (m1 + m2);
+          v1p = vFinal;
+          v2p = vFinal;
+        }
         
         // Debug: Verifikasi kekekalan momentum
         const momentumBefore = m1 * v1 + m2 * v2;
         const momentumAfter = m1 * v1p + m2 * v2p;
-        console.log(`\n=== COLLISION ANALYSIS ===`);
-        console.log(`Collision Type: ${collisionType} (e = ${coefficientOfRestitution})`);
+        console.log(`\n=== MASS EFFECT ANALYSIS ===`);
+        console.log(`Collision Type: ${collisionType}`);
         console.log(`Input: m1=${m1}kg@${v1}m/s, m2=${m2}kg@${v2}m/s`);
         console.log(`Output: v1'=${v1p.toFixed(3)}m/s, v2'=${v2p.toFixed(3)}m/s`);
         
@@ -2679,7 +2635,7 @@
           
           let text;
           if (collisionType === 'elastic') {
-            text = `HASIL PERHITUNGAN TUMBUKAN ELASTIS (e = 1)
+            text = `HASIL PERHITUNGAN TUMBUKAN ELASTIS
 
 SEBELUM TUMBUKAN:
 • Bola 1: m₁ = ${m1}kg, v₁ = ${v1}m/s
@@ -2687,17 +2643,16 @@ SEBELUM TUMBUKAN:
 • Momentum total: ${momentumBefore.toFixed(2)} kg⋅m/s
 • Energi kinetik: ${ekBefore.toFixed(2)} J
 
-RUMUS TUMBUKAN DENGAN COEFFICIENT OF RESTITUTION:
-e = ${coefficientOfRestitution} (elastis sempurna)
-v₁' = ((m₁-e⋅m₂)v₁ + (1+e)m₂v₂)/(m₁+m₂)
-v₂' = ((m₂-e⋅m₁)v₂ + (1+e)m₁v₁)/(m₁+m₂)
+RUMUS TUMBUKAN ELASTIS:
+v₁' = ((m₁-m₂)v₁ + 2m₂v₂)/(m₁+m₂)
+v₂' = ((m₂-m₁)v₂ + 2m₁v₁)/(m₁+m₂)
 
 PERHITUNGAN:
-v₁' = ((${m1}-${coefficientOfRestitution}×${m2})×${v1} + (1+${coefficientOfRestitution})×${m2}×${v2})/(${m1}+${m2})
-    = ${((m1-coefficientOfRestitution*m2)*v1 + (1+coefficientOfRestitution)*m2*v2).toFixed(2)}/${(m1+m2).toFixed(2)} = ${v1p.toFixed(2)} m/s
+v₁' = ((${m1}-${m2})×${v1} + 2×${m2}×${v2})/(${m1}+${m2})
+    = ${((m1-m2)*v1 + 2*m2*v2).toFixed(2)}/${(m1+m2).toFixed(2)} = ${v1p.toFixed(2)} m/s
 
-v₂' = ((${m2}-${coefficientOfRestitution}×${m1})×${v2} + (1+${coefficientOfRestitution})×${m1}×${v1})/(${m1}+${m2})
-    = ${((m2-coefficientOfRestitution*m1)*v2 + (1+coefficientOfRestitution)*m1*v1).toFixed(2)}/${(m1+m2).toFixed(2)} = ${v2p.toFixed(2)} m/s
+v₂' = ((${m2}-${m1})×${v2} + 2×${m1}×${v1})/(${m1}+${m2})
+    = ${((m2-m1)*v2 + 2*m1*v1).toFixed(2)}/${(m1+m2).toFixed(2)} = ${v2p.toFixed(2)} m/s
 
 SETELAH TUMBUKAN:
 • Bola 1: v₁' = ${v1p.toFixed(2)} m/s
@@ -2709,7 +2664,7 @@ VERIFIKASI:
 ✓ Momentum kekal: ${Math.abs(momentumAfter - momentumBefore) < 0.001 ? 'YA' : 'TIDAK'}
 ✓ Energi kekal: ${Math.abs(ekAfter - ekBefore) < 0.001 ? 'YA' : 'TIDAK'}`;
           } else {
-            text = `HASIL PERHITUNGAN TUMBUKAN INELASTIS (e = 0)
+            text = `HASIL PERHITUNGAN TUMBUKAN INELASTIS
 
 SEBELUM TUMBUKAN:
 • Bola 1: m₁ = ${m1}kg, v₁ = ${v1}m/s
@@ -2717,9 +2672,8 @@ SEBELUM TUMBUKAN:
 • Momentum total: ${momentumBefore.toFixed(2)} kg⋅m/s
 • Energi kinetik: ${ekBefore.toFixed(2)} J
 
-RUMUS TUMBUKAN DENGAN COEFFICIENT OF RESTITUTION:
-e = ${coefficientOfRestitution} (inelastis sempurna)
-v₁' = v₂' = (m₁v₁ + m₂v₂)/(m₁ + m₂)
+RUMUS TUMBUKAN INELASTIS:
+v' = (m₁v₁ + m₂v₂)/(m₁ + m₂)
 
 PERHITUNGAN:
 v' = (${m1}×${v1} + ${m2}×${v2})/(${m1}+${m2})
@@ -2795,9 +2749,6 @@ VERIFIKASI:
         
         // Reset tombol text
         document.querySelector("#btnPlayText").setAttribute("value", "Start");
-        
-        // Update collision type display untuk mempertahankan pilihan tumbukan
-        updateCollisionTypeDisplay();
         
         console.log('Reset complete - returned to main menu');
       }
