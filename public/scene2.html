@@ -110,10 +110,10 @@
       <!-- Main Menu -->
       <a-entity id="mainmenu">
         <a-text 
-          value="PILIH SIMULASI FISIKA" 
-          position="0 2.3 -0.5" 
-          align="center" 
-          color="white" 
+          value="PILIH SIMULASI FISIKA"
+          position="0 2.3 -0.5"
+          align="center"
+          color="white"
           width="8"
           scale="1.5 1.5 1.5"
           material="depthTest: false; transparent: true"
@@ -202,7 +202,6 @@
           material="depthTest: false; transparent: true">
         </a-text>
 
-
         <!-- Tombol Skema 1 -->
         <a-entity position="1.5 1.8 -1" rotation="0 -45 0" id="btnSkema1Wrapper">
           <a-box 
@@ -217,9 +216,9 @@
             event-set__leave="_event: mouseleave; scale:1 1 1; color:#2e88ff">
           </a-box>
           <a-text 
-            value="Tarik Perlahan" 
-            color="#fff" 
-            align="center" 
+            value="Tarik Perlahan"
+            color="#fff"
+            align="center"
             width="2" 
             position="0 0 0.06"
             material="depthTest: false; transparent: true">
@@ -2252,7 +2251,7 @@
           animateBlock('skema1');
         }
         
-        statusText.setAttribute('value', 'Kamu tarik perlahan. tetapi balok masih diam karena ada fs yang menahan');
+        statusText.setAttribute('value', 'Kamu tarik perlahan. tetapi balok masih diam karena ada Fs yang menahan');
         document.querySelector("#btnSkema2Wrapper").setAttribute("visible", "true");
         document.querySelector("#btnSkema2").classList.add("clickable"); 
       });
@@ -2267,7 +2266,7 @@
           animateBlock('skema2');
         }
         
-        statusText.setAttribute('value', 'Semakin kamu tarik. fs yang menahan akan semakin besar');
+        statusText.setAttribute('value', 'Semakin kamu tarik. Fs yang menahan akan semakin besar');
         document.querySelector("#btnSkema3Wrapper").setAttribute("visible", "true");
         document.querySelector("#btnSkema3").classList.add("clickable"); 
       });
@@ -2282,7 +2281,7 @@
           animateBlock('skema3');
         }
         
-        statusText.setAttribute('value', 'Kamu menarik sangat kuat. Balok akan ikut tertarik karena fs sudah berubah menjadi fk karena sudah mencapai maksimum');
+        statusText.setAttribute('value', 'Kamu menarik sangat kuat. Balok akan ikut tertarik karena Fs sudah berubah menjadi Fk karena sudah mencapai maksimum');
       });
 
       document.querySelector('#btnReset2').addEventListener('click', () => {
