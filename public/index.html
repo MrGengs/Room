@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js"></script>
     <script src="/easyrtc/easyrtc.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/networked-aframe@0.14.0/dist/networked-aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.0/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aframe-environment-component@1.5.0/dist/aframe-environment-component.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-gltf-model-plus@1.0.0/dist/gltf-model-plus.min.js"></script>
     <script>
@@ -35,7 +35,6 @@
       raycaster="far: 100; objects: .clickable,[link];"
       cursor="rayOrigin: mouse"
     >
-      <!-- Assets -->
       <a-assets>
         <img id="thumbScene1" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" />
         <a-asset-item id="avatar-male-model" src="SittingIdle_man.fbx"></a-asset-item>
@@ -50,18 +49,10 @@
         </template>
       </a-assets>
 
-      <!-- 
-        Environment and Navigation. 
-        For better performance, the nav-mesh should be a simplified version of the visual model.
-        Here, we are using the same model for both.
-      -->
       <a-gltf-model id="world-nav-mesh" src="assets/world.glb" nav-mesh class="collidable"></a-gltf-model>
 
-      <!-- Welcome Text -->
       <a-text value="Selamat Datang Di AR-Room" align="center" position="0 2 -4" scale="1.5 1.5 1.5"></a-text>
 
-      <!-- Portals -->
-      <!-- Portal 1 -->
       <a-link
         change-room="on:obbcollisionstarted;room:scene1;url:scene1.html"
         link="on:click"
@@ -69,14 +60,12 @@
         title="Go To World 1"
         image="#thumbScene1"
         position="3 1.6 -5"
-        class="clickable"
+        class="clickable collidable"
         event-set__mouseenter="material.opacity: 0.8"
         event-set__mouseleave="material.opacity: 0.6"
       >
-        <a-box position="0 0 0.5" obb-collider visible="false"></a-box>
       </a-link>
-      
-      <!-- Portal 2 -->
+
       <a-link
         change-room="on:obbcollisionstarted;room:scene2;url:scene2.html"
         link="on:click"
@@ -84,33 +73,51 @@
         title="Go To World 2"
         image="#thumbScene1"
         position="-3 1.6 -5"
-        class="clickable"
+        class="clickable collidable"
         event-set__mouseenter="material.opacity: 0.8"
         event-set__mouseleave="material.opacity: 0.6"
       >
-        <a-box position="0 0 0.5" obb-collider visible="false"></a-box>
       </a-link>
 
-      <!-- Environment -->
       <a-entity id="scene">
+        <!-- World GLB model -->
         <a-gltf-model src="assets/world.glb" position="0 0.2 0" scale="1 1 1" rotation="0 0 0"></a-gltf-model>
-        <a-box class="collidable" position="0 0 0" width="20" height="0.1" depth="20" visible="false"></a-box>
-        <a-plane class="ground" position="0 0 0" rotation="-90 0 0" width="100" height="100" visible="true"></a-plane>
+
+        <!-- Interior walls to prevent escape from inside world.glb -->
+        <!-- These walls form the interior boundaries of the world -->
+
+        <!-- Ultra small interior nav-mesh -->
+        <a-box nav-mesh position="0 0 0" width="3" height="0.1" depth="3" visible="false"></a-box>
+
+        <!-- Ultra tight boundary walls -->
+        <!-- East interior wall -->
+        <a-box nav-mesh position="1.5 2 0" width="0.1" height="4" depth="3" visible="false"></a-box>
+        <!-- West interior wall -->
+        <a-box nav-mesh position="-1.5 2 0" width="0.1" height="4" depth="3" visible="false"></a-box>
+        <!-- North interior wall -->
+        <a-box nav-mesh position="0 2 1.5" width="3" height="4" depth="0.1" visible="false"></a-box>
+        <!-- South interior wall -->
+        <a-box nav-mesh position="0 2 -1.5" width="3" height="4" depth="0.1" visible="false"></a-box>
+
+        <!-- Corner blocks (extremely close) -->
+        <a-box nav-mesh position="1.4 2 1.4" width="0.3" height="4" depth="0.3" visible="false"></a-box>
+        <a-box nav-mesh position="-1.4 2 1.4" width="0.3" height="4" depth="0.3" visible="false"></a-box>
+        <a-box nav-mesh position="1.4 2 -1.4" width="0.3" height="4" depth="0.3" visible="false"></a-box>
+        <a-box nav-mesh position="-1.4 2 -1.4" width="0.3" height="4" depth="0.3" visible="false"></a-box>
+
+        <!-- Ground -->
+        <a-plane position="0 0 0" rotation="-90 0 0" width="100" height="100" color="#4A4A4A" visible="true"></a-plane>
         <a-entity light="type:ambient;intensity:0.5"></a-entity>
       </a-entity>
 
-      <!-- Player -->
       <a-entity
         id="rig"
-        collider
-        movement-controls="fly:false;"
+        movement-controls="constrainToNavMesh: true; speed: 0.3"
         spawn-in-circle="radius:1"
         networked="template:#avatar-template;attachTemplateToLocal:false"
         player-info
       >
         <a-entity id="player" class="camera" camera position="0 1.6 0" look-controls>
-          <a-box obb-collider visible="false" height="0.4" depth="0.4" width="0.4"></a-box>
-          <!-- Ring cursor for better interaction -->
           <a-entity
             position="0 0 -1"
             geometry="primitive: ring; radiusInner: 0.018; radiusOuter: 0.025"
@@ -118,14 +125,13 @@
             cursor="fuse: true; fuseTimeout: 1200"
             raycaster="objects: .clickable; far: 20;"
             animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.2 0.2 0.2; dur: 1200; easing: linear"
-            animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120">
+            animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120"
+          >
           </a-entity>
         </a-entity>
         <a-entity id="left-hand" networked-hand-controls="hand: left" laser-controls="hand: left"></a-entity>
         <a-entity id="right-hand" networked-hand-controls="hand:right" laser-controls="hand: right"></a-entity>
       </a-entity>
     </a-scene>
-
-    </script>
   </body>
 </html>
