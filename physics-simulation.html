@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Physics Simulation (Enhanced)</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    #scene-selector,
+    #physics-info,
+    #scene3-controls,
+    #export-area {
+      position: absolute;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 6px;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    #scene-selector {
+      top: 10px;
+      left: 10px;
+    }
+
+    #physics-info {
+      top: 10px;
+      right: 10px;
+      width: 240px;
+    }
+
+    #scene3-controls {
+      left: 10px;
+      bottom: 10px;
+      max-width: 320px;
+    }
+
+    #export-area {
+      right: 10px;
+      bottom: 10px;
+      max-width: 320px;
+    }
+
+    button {
+      margin: 6px 4px;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+
+    label {
+      display: block;
+      margin-top: 6px;
+      font-size: 13px;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 6px;
+      margin-top: 4px;
+    }
+
+    .small {
+      font-size: 13px;
+    }
+
+    #label-overlay {
+      position: absolute;
+      pointer-events: none;
+      z-index: 110;
+    }
+
+    .f-a {
+      background: rgba(255, 255, 255, 0.85);
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="scene-selector">
+    <button onclick="switchScene(0)">Scene 1: Classroom</button>
+    <button onclick="switchScene(1)">Scene 2: Physics Values</button>
+    <button onclick="switchScene(2)">Scene 3: Ball Collision</button>
+  </div>
+
+  <div id="physics-info">
+    <p class="small">Static Friction (fs): <span id="fs-value">0</span> N</p>
+    <p class="small">Kinetic Friction (fk): <span id="fk-value">0</span> N</p>
+    <p class="small">Applied Force (F): <span id="f-value">0</span> N</p>
+    <p class="small">Acceleration (A): <span id="a-value">0</span> m/s²</p>
+    <hr />
+    <p class="small">Scene: <span id="scene-name">Classroom</span></p>
+  </div>
+
+  <div id="scene3-controls" style="display:none;">
+    <div style="font-weight:700">Scene 3 Controls (Ball Collision)</div>
+    <label>Number of balls<input id="num-balls" type="number" value="2" min="1" max="20"></label>
+    <label>Ball sizes (comma separated, e.g. 0.5,0.8)<input id="ball-sizes" type="text" placeholder="0.5,0.8"></label>
+    <label>Initial speeds (comma separated, e.g. 5,-3)<input id="ball-speeds" type="text" placeholder="5,-3"></label>
+    <label>Texture URL (optional)<input id="texture-url" type="text" placeholder="https://...png"></label>
+    <label>Elasticity (restitution) <input id="restitution" type="number" value="0.9" step="0.05" min="0"
+        max="1"></label>
+    <div>
+      <label for="ball-type">Select Ball Type:</label>
+      <select id="ball-type" onchange="updateBallSelection()">
+        <option value="default">Default (Simple)</option>
+        <option value="basketball">Basketball</option>
+        <option value="soccer">Soccer Ball</option>
+        <option value="volleyball">Volleyball</option>
+        <option value="tennis">Tennis Ball</option>
+        <option value="golf">Golf Ball</option>
+        <option value="bowling">Bowling Ball</option>
+        <option value="eightball">8-Ball</option>
+        <option value="beach">Beach Ball</option>
+        <option value="earth">Earth</option>
+      </select>
+    </div>
+    <button onclick="spawnBallsFromUI()">Spawn Balls</button>
+    <button onclick="clearScene()">Clear Scene</button>
+  </div>
+
+  <div id="export-area" style="display:none;">
+    <div style="font-weight:700">Simulation Data</div>
+    <button onclick="downloadCSV()">Download CSV</button>
+    <p class="small">Logged frames: <span id="logged-frames">0</span></p>
+  </div>
+
+  <div id="label-overlay"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <script>
+    // Globals
+    let scene, camera, renderer, world, controls;
+    let objects = []; // {mesh, body, type, trail}
+    let currentScene = 0;
+
+    // Physics parameters (exposed)
+    const params = {
+      staticFrictionCoef: 0.6, // mu_s
+      kineticFrictionCoef: 0.3, // mu_k
+      gravity: -9.82
+    };
+
+    // Data logging
+    let dataLog = [];
+
+    // Tambahkan variabel global di bagian atas file
+    let finishLine = 15;  // Posisi finish di sumbu X
+    let raceFinished = false;
+    let winner = null;
+
+    let ballModels = {
+      default: null,
+      basketball: 'D:/asset 3D bola/generic_basketball.glb',
+      soccer: 'D:/asset 3D bola/bola_futebol.glb',
+      volleyball: 'D:/asset 3D bola/generic_volleyball_ball_low-poly.glb',
+      tennis: 'D:/asset 3D bola/tennis_ball_low-poly_pbr.glb',
+      golf: 'D:/asset 3D bola/golf_ball_low-poly.glb',
+      bowling: 'D:/asset 3D bola/bowling_ball.glb',
+      eightball: 'D:/asset 3D bola/eight_ball.glb',
+      beach: 'D:/asset 3D bola/beach_ball_low-poly.glb',
+      earth: 'D:/asset 3D bola/bumi.glb'
+    };
+    let currentBallType = 'default';
+
+    function init() {
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x87CEEB);
+
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 2000);
+      camera.position.set(0, 6, 10);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.shadowMap.enabled = true;
+      document.body.appendChild(renderer.domElement);
+
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+      // Cannon world
+      world = new CANNON.World();
+      world.broadphase = new CANNON.NaiveBroadphase();
+      world.solver.iterations = 10;
+      world.gravity.set(0, params.gravity, 0);
+
+      // Lighting
+      const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+      hemi.position.set(0, 20, 0); scene.add(hemi);
+      const dir = new THREE.DirectionalLight(0xffffff, 0.8); dir.position.set(5, 10, 7); dir.castShadow = true; scene.add(dir);
+
+      // Start with scene 0
+      loadScene(0);
+      window.addEventListener('resize', onWindowResize);
+      animate();
+    }
+
+    function switchScene(n) { loadScene(n); }
+
+    function loadScene(n) {
+      // clear
+      clearScene(true); // keep sky and camera
+      currentScene = n;
+      document.getElementById('scene-name').textContent = (n === 0 ? 'Classroom' : n === 1 ? 'Physics Values' : 'Ball Collision');
+
+      // UI toggles
+      document.getElementById('scene3-controls').style.display = (n === 2) ? 'block' : 'none';
+      document.getElementById('export-area').style.display = (n === 2) ? 'block' : 'none';
+
+      if (n === 0) createClassroom();
+      if (n === 1) createPhysicsValuesScene();
+      if (n === 2) createBallCollisionScene();
+    }
+
+    // -------------------- SCENE: CLASSROOM --------------------
+    let classroom = { floorBody: null, floorMesh: null, playerBlock: null, npcBody: null };
+
+    function createClassroom() {
+      // floor (visually more colorful)
+      const floorGeo = new THREE.PlaneGeometry(20, 20);
+      const floorMat = new THREE.MeshStandardMaterial({ color: 0xffdd57, roughness: 0.9 }); // conspicuous
+      const floorMesh = new THREE.Mesh(floorGeo, floorMat); floorMesh.rotation.x = -Math.PI / 2; floorMesh.receiveShadow = true; scene.add(floorMesh);
+
+      // walls
+      const wallMat = new THREE.MeshStandardMaterial({ color: 0xE0F7FA, roughness: 0.9 });
+      const backWall = new THREE.Mesh(new THREE.PlaneGeometry(20, 6), wallMat); backWall.position.set(0, 3, -10); scene.add(backWall);
+      const leftWall = new THREE.Mesh(new THREE.PlaneGeometry(20, 6), wallMat); leftWall.position.set(-10, 3, 0); leftWall.rotation.y = Math.PI / 2; scene.add(leftWall);
+
+      // physics floor
+      const floorShape = new CANNON.Plane();
+      const floorBody = new CANNON.Body({ mass: 0, shape: floorShape, material: new CANNON.Material('floor') });
+      floorBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
+      world.addBody(floorBody);
+      classroom.floorBody = floorBody; classroom.floorMesh = floorMesh;
+
+      // create movable block - conspicuous color
+      createMovableBlock(0, 0.6, 0, 1, 5, 0x00ff99);
+      // create NPC that will push block
+      createNPC(3, 0.9, 0);
+
+      // overlay labels for F and A near the block
+      createForceOverlay();
+    }
+
+    function createMovableBlock(x, y, z, size = 1, mass = 5, color = 0x27F5C5) {
+      const geometry = new THREE.BoxGeometry(size, size, size);
+      const material = new THREE.MeshStandardMaterial({ color, roughness: 0.7 });
+      const mesh = new THREE.Mesh(geometry, material); mesh.castShadow = true; mesh.receiveShadow = true; scene.add(mesh);
+
+      const shape = new CANNON.Box(new CANNON.Vec3(size / 2, size / 2, size / 2));
+      const body = new CANNON.Body({ mass: mass, shape: shape, position: new CANNON.Vec3(x, y, z), material: new CANNON.Material('block') });
+      body.angularDamping = 0.9;
+      world.addBody(body);
+
+      // store as first object (for NPC to push)
+      objects.push({ mesh, body, type: 'block' });
+
+      // add collision listener for visual effects
+      body.addEventListener('collide', function (e) { spawnCollisionEffect(e.contact.bi.position); });
+    }
+
+    function createNPC(x, y, z) {
+      // Visual NPC
+      const geo = new THREE.BoxGeometry(0.5, 1.8, 0.5);
+      const mat = new THREE.MeshStandardMaterial({ color: 0xff4444 });
+      const mesh = new THREE.Mesh(geo, mat); mesh.position.set(x, y, z); mesh.castShadow = true; scene.add(mesh);
+
+      // Static physics body (we'll apply forces to block instead)
+      const shape = new CANNON.Box(new CANNON.Vec3(0.25, 0.9, 0.25));
+      const body = new CANNON.Body({ mass: 0, shape, position: new CANNON.Vec3(x, y, z) });
+      world.addBody(body);
+      objects.push({ mesh, body, type: 'npc' });
+
+      // NPC push logic: apply periodic push to the block using a force value
+      const pushMagnitude = 12; // Newtons
+      setInterval(() => {
+        // find block
+        const block = objects.find(o => o.type === 'block');
+        if (!block) return;
+        // Compute friction threshold (approx normal = mass * g)
+        const normal = block.body.mass * Math.abs(world.gravity.y);
+        const fsThreshold = params.staticFrictionCoef * normal; // max static friction force magnitude
+        const applied = pushMagnitude; // NPC applied force magnitude
+
+        // If applied < fsThreshold and block is nearly still, do not overcome static friction
+        const vel = block.body.velocity.length();
+        if (vel < 0.05 && applied < fsThreshold) {
+          // no motion, display applied but no acceleration; we simulate by not applying force
+          block._lastAppliedForce = 0;
+        } else {
+          // apply force to block center
+          const f = new CANNON.Vec3(-pushMagnitude, 0, 0);
+          block.body.applyForce(f, block.body.position);
+          block._lastAppliedForce = pushMagnitude;
+        }
+      }, 900);
+    }
+
+    // Overlay HTML label for F and A
+    function createForceOverlay() {
+      const overlay = document.getElementById('label-overlay');
+      overlay.innerHTML = '<div id="fa" class="f-a">F: <span id="label-F">0</span> N<br/>A: <span id="label-A">0</span> m/s²</div>';
+      // position will be updated each frame near the block
+    }
+
+    // -------------------- SCENE: PHYSICS VALUES --------------------
+    function createPhysicsValuesScene() {
+      // Just show a static classroom-less background with the numeric values in the existing panel
+      document.getElementById('fs-value').textContent = (params.staticFrictionCoef * 9.82 * 5).toFixed(2); // example using mass 5
+      document.getElementById('fk-value').textContent = (params.kineticFrictionCoef * 9.82 * 5).toFixed(2);
+      document.getElementById('f-value').textContent = '0.00';
+      document.getElementById('a-value').textContent = '0.00';
+
+      // Add explanatory text in the scene
+      const txt = makeTextSprite('Static Friction (fs) prevents motion until threshold is exceeded.\nKinetic Friction (fk) opposes motion while sliding.');
+      txt.position.set(0, 2, 0); scene.add(txt);
+      objects.push({ mesh: txt, body: null, type: 'label' });
+    }
+
+    // utility to create simple 3D text as sprite using canvas
+    function makeTextSprite(message) {
+      const canvas = document.createElement('canvas'); canvas.width = 512; canvas.height = 128; const ctx = canvas.getContext('2d');
+      ctx.fillStyle = 'rgba(255,255,255,0.95)'; ctx.fillRect(0, 0, 512, 128);
+      ctx.fillStyle = 'black'; ctx.font = '22px Arial'; wrapText(ctx, message, 12, 30, 480, 24);
+      const tex = new THREE.CanvasTexture(canvas);
+      const mat = new THREE.SpriteMaterial({ map: tex }); const sprite = new THREE.Sprite(mat); sprite.scale.set(6, 1.5, 1);
+      return sprite;
+    }
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' '); let line = '';
+      for (let n = 0; n < words.length; n++) { const testLine = line + words[n] + ' '; const metrics = ctx.measureText(testLine); if (metrics.width > maxWidth && n > 0) { ctx.fillText(line, x, y); line = words[n] + ' '; y += lineHeight; } else { line = testLine; } }
+      ctx.fillText(line, x, y);
+    }
+
+    // -------------------- SCENE: BALL COLLISION --------------------
+    function createBallCollisionScene() { }
+    // floor for balls
+    const floorGeo = new THREE.PlaneGeometry(60, 60);
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.95 });
+    const floorMesh = new THREE.Mesh(floorGeo, floorMat); floorMesh.rotation.x = -Math.PI / 2; floorMesh.receiveShadow = true; scene.add(floorMesh);
+
+    const floorShape = new CANNON.Plane();
+    const floorBody = new CANNON.Body({ mass: 0, shape: floorShape });
+    floorBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0); world.addBody(floorBody);
+
+    // Helper function to get model path based on ball type
+    function getModelPathForBallType(ballType) {
+      const modelPaths = {
+        'beach': 'C:/Users/ASUS/Music/asset 3D bola/beach_ball_low-poly.glb',
+        'soccer': 'C:/Users/ASUS/Music/asset 3D bola/bola_futebol.glb',
+        'basketball': 'C:/Users/ASUS/Music/asset 3D bola/generic_basketball.glb',
+        'volleyball': 'C:/Users/ASUS/Music/asset 3D bola/generic_volleyball_ball_low-poly.glb',
+        'tennis': 'C:/Users/ASUS/Music/asset 3D bola/tennis_ball_low-poly_pbr.glb',
+        'golf': 'C:/Users/ASUS/Music/asset 3D bola/golf_ball_low-poly.glb',
+        'bowling': 'C:/Users/ASUS/Music/asset 3D bola/bowling_ball.glb',
+        'eight': 'C:/Users/ASUS/Music/asset 3D bola/eight_ball.glb'
+      };
+      return modelPaths[ballType] || null;
+    }
+
+    // Update ball selection in the UI
+    function updateBallSelection() {
+      const select = document.getElementById('ball-type');
+      currentBallType = select.value;
+
+      // Clear existing balls and spawn new ones with the selected type
+      if (currentScene === 2) {
+        clearScene();
+        spawnDefaultBalls();
+      }
+    }
+
+    function spawnDefaultBalls() {
+      if (currentScene !== 2) return;
+      raceFinished = false;
+      winner = null;
+      objects = []; // Clear existing objects
+
+      const ballType = document.getElementById('ball-type').value;
+      const modelPath = getModelPathForBallType(ballType);
+      
+      // First ball
+      const ball1 = spawnBall(
+        -55,  // x position
+        1.2,  // y position
+        0,    // z position
+        0.5,  // radius
+        7,    // mass
+        new THREE.Color(0xff4444),
+        4,    // initial velocity X
+        null, // texture URL
+        ballType !== 'default' ? modelPath : null // 3D model path
+      );
+
+      // Second ball
+      const ball2 = spawnBall(
+        -80,  // x position
+        1.6,  // y position
+        0,    // z position
+        0.9,  // radius
+        2.5,  // mass
+        new THREE.Color(0x3333ff),
+        8,    // initial velocity X
+        null, // texture URL
+        ballType !== 'default' ? modelPath : null // 3D model path
+      );
+
+      // Pastikan bola tidak saling menembus sejak awal
+      const minDistance = ball1.mesh.geometry.parameters.radius +
+        ball2.mesh.geometry.parameters.radius + 0.1; // tambahkan margin
+
+      const pos1 = ball1.body.position;
+      const pos2 = ball2.body.position;
+      const distance = pos1.distanceTo(pos2);
+
+      if (distance < minDistance) {
+        // Jika terlalu dekat, geser bola kedua
+        const direction = new CANNON.Vec3();
+        pos2.vsub(pos1, direction);
+        direction.normalize();
+
+        const correction = (minDistance - distance) / 2;
+        const correctionVec = direction.scale(correction * 0.5);
+
+        // Geser kedua bola berlawanan arah
+        ball2.body.position.vadd(correctionVec, ball2.body.position);
+        ball1.body.position.vsub(correctionVec, ball1.body.position);
+
+        // Update posisi visual
+        ball2.mesh.position.copy(ball2.body.position);
+        ball1.mesh.position.copy(ball1.body.position);
+      }
+
+      // Tambahkan garis finish
+      const finishGeometry = new THREE.PlaneGeometry(0.5, 10);
+      const finishMaterial = new THREE.MeshBasicMaterial({
+        color: 0x00ff00,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.5
+      });
+      const finishLineMesh = new THREE.Mesh(finishGeometry, finishMaterial);
+      finishLineMesh.position.set(finishLine, 2.5, 0);
+      finishLineMesh.rotation.y = Math.PI / 2;
+      scene.add(finishLineMesh);
+      objects.push({ mesh: finishLineMesh, type: 'finish' });
+    }
+
+    // spawnBall with trail support, collision effects, and 3D model support
+    function spawnBall(x, y, z, radius, mass, threeColorOrMaterial, initialVelocityX = 0, textureURL = null, modelPath = null) {
+      // Create a group to hold both the model and the physics body
+      const ballGroup = new THREE.Group();
+      ballGroup.position.set(x, y, z);
+      
+      // Create a default material in case model loading fails
+      let material;
+      if (threeColorOrMaterial instanceof THREE.Material) {
+        material = threeColorOrMaterial;
+      } else {
+        material = new THREE.MeshStandardMaterial({
+          color: threeColorOrMaterial || 0x00ff00,
+          roughness: 0.3,
+          metalness: 0.7,
+          emissive: 0x000000,
+          emissiveIntensity: 0
+        });
+      }
+
+      // Create physics body first
+      const shape = new CANNON.Sphere(radius);
+      const body = new CANNON.Body({
+        mass: mass,
+        shape: shape,
+        position: new CANNON.Vec3(x, y, z),
+        linearDamping: 0.01,
+        material: new CANNON.Material({
+          restitution: 0.9,
+          friction: 0.3
+        })
+      });
+
+      // Set initial velocity if provided
+      if (initialVelocityX !== 0) {
+        body.velocity.x = initialVelocityX;
+      }
+
+      // Add glow effect
+      const glowGeometry = new THREE.SphereGeometry(radius * 1.2, 32, 32);
+      const glowMaterial = new THREE.MeshBasicMaterial({
+        color: material.color,
+        transparent: true,
+        opacity: 0,
+        blending: THREE.AdditiveBlending,
+        side: THREE.BackSide
+      });
+      const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
+      
+      let mesh;
+
+      // Create a collision mesh that will be used for raycasting and collision detection
+      const collisionGeometry = new THREE.SphereGeometry(radius, 16, 16);
+      const collisionMaterial = new THREE.MeshBasicMaterial({
+        color: 0xff0000,
+        visible: false // Make it invisible
+      });
+      const collisionMesh = new THREE.Mesh(collisionGeometry, collisionMaterial);
+      collisionMesh.castShadow = true;
+      collisionMesh.receiveShadow = true;
+      
+      // Add collision mesh to the group
+      ballGroup.add(collisionMesh);
+
+      if (modelPath) {
+        // Load 3D model if path is provided
+        const loader = new THREE.GLTFLoader();
+        loader.load(
+          modelPath,
+          (gltf) => {
+            const model = gltf.scene;
+            // Scale the model to match the radius
+            const box = new THREE.Box3().setFromObject(model);
+            const size = box.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const scale = (radius * 2) / maxDim;
+            
+            model.scale.set(scale, scale, scale);
+            model.castShadow = true;
+            model.receiveShadow = true;
+            
+            // Center the model
+            box.setFromObject(model);
+            const center = box.getCenter(new THREE.Vector3());
+            model.position.sub(center);
+            
+            // Add the model to the group
+            ballGroup.add(model);
+          },
+          undefined,
+          (error) => {
+            console.error('Error loading model:', error);
+            // Fallback to default sphere if model fails to load
+            const geometry = new THREE.SphereGeometry(radius, 32, 32);
+            mesh = new THREE.Mesh(geometry, material);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            ballGroup.add(mesh);
+          }
+        );
+      } else {
+        // Use default sphere if no model path
+        const geometry = new THREE.SphereGeometry(radius, 32, 32);
+        mesh = new THREE.Mesh(geometry, material);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        ballGroup.add(mesh);
+      }
+
+      // Add glow effect
+      ballGroup.add(glowMesh);
+      scene.add(ballGroup);
+      
+      // Add the body to the world
+      world.addBody(body);
+      
+      // Store references for updates
+      body.userData.mesh = ballGroup;
+      body.userData.radius = radius;
+
+      // Add collision sound effect (optional)
+      let sound = null;
+      try {
+        const audioLoader = new THREE.AudioLoader();
+        const listener = new THREE.AudioListener();
+        camera.add(listener); // attach listener to camera so audio is audible
+        sound = new THREE.Audio(listener);
+        audioLoader.load('https://assets.mixkit.co/active_storage/sfx/2090/2090-preview.mp3', function (buffer) {
+          sound.setBuffer(buffer);
+          sound.setVolume(0.2);
+        });
+      } catch (e) {
+        console.log('Audio not available, continuing without sound');
+      }
+
+      // Add collision event listener
+      body.addEventListener('collide', function (e) {
+        // Play sound if available
+        if (sound) {
+          sound.play();
+        }
+
+        // Visual effects
+        const intensity = e.contact.getImpactVelocityAlongNormal();
+        if (intensity > 1) {
+          const pos = e.contact.bi.position;
+          const effectColor = material.color || new THREE.Color(0xffffff);
+          createCollisionParticles(pos.x, pos.y, pos.z, intensity, effectColor);
+          createShockwave(pos.x, pos.y, pos.z, intensity * 0.5);
+        }
+
+        // Flash effect for the ball
+        if (ballGroup.userData && ballGroup.userData.model) {
+          // For 3D models, find all materials and flash them
+          ballGroup.userData.model.traverse((child) => {
+            if (child.isMesh && child.material) {
+              const originalColor = child.material.color ? child.material.color.clone() : new THREE.Color(0xffffff);
+              const flashColor = new THREE.Color().lerpColors(originalColor, 0xffffff, 0.7);
+              child.material.color.copy(flashColor);
+
+              // Reset color after delay
+              setTimeout(() => {
+                if (child.material && child.material.color) {
+                  child.material.color.copy(originalColor);
+                }
+              }, 100);
+            }
+          });
+        } else if (mesh && mesh.material) {
+          // For default sphere
+          const originalColor = mesh.material.color.clone();
+          const flashColor = new THREE.Color().lerpColors(originalColor, 0xffffff, 0.7);
+          mesh.material.color.copy(flashColor);
+
+          // Add emissive effect
+          if (mesh.material.emissive) {
+            const originalEmissive = mesh.material.emissive.clone();
+            mesh.material.emissive.copy(flashColor);
+            mesh.material.emissiveIntensity = 1.0;
+
+            // Reset after delay
+            setTimeout(() => {
+              if (mesh && mesh.material && mesh.material.emissive) {
+                mesh.material.emissive.copy(originalEmissive);
+                mesh.material.emissiveIntensity = 0;
+              }
+            }, 100);
+          }
+
+          // Glow effect if available
+          if (glowMesh && glowMesh.material) {
+            glowMesh.material.opacity = 0.6 * (intensity / 10);
+            glowMesh.material.color.copy(flashColor);
+
+            // Reset glow after delay
+            setTimeout(() => {
+              if (glowMesh && glowMesh.material) {
+                glowMesh.material.opacity = 0;
+              }
+            }, 200);
+          }
+        }
+
+        // 3. Scale effect with bounce
+        if (ballGroup) {
+          const originalScale = ballGroup.scale.clone();
+          const scaleFactor = 1.0 + (intensity / 10) * 0.2;
+          ballGroup.scale.multiplyScalar(scaleFactor);
+
+          // Reset scale after delay
+          setTimeout(() => {
+            if (ballGroup) {
+              ballGroup.scale.copy(originalScale);
+            }
+          }, 100);
+        }
+
+        // 4. Create ripple effect on floor
+        if (e.contact && e.contact.bi && e.contact.bi.position) {
+          const pos = e.contact.bi.position;
+          createRippleEffect(pos.x, 0.01, pos.z, intensity * 0.2, material.color || new THREE.Color(0xffffff));
+        }
+
+        // Reset effects after delay with animation
+        const startTime = Date.now();
+        const animateReset = () => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / 200, 1);
+
+          // Fade out glow
+          if (glowMesh && glowMesh.material) {
+            const intensity = Math.max(0.1, Math.min(1, (e.contact?.getImpactVelocityAlongNormal?.() || 1) / 10));
+            glowMesh.material.opacity = 0.6 * intensity * (1 - progress);
+
+            if (progress < 1) {
+              requestAnimationFrame(animateReset);
+            } else {
+              glowMesh.material.opacity = 0;
+            }
+          }
+          const bounce = Math.sin(progress * Math.PI * 2) * 0.1 * (1 - progress);
+          const currentScale = 1 + (scaleFactor - 1) * (1 - progress) + bounce;
+          ballGroup.scale.copy(originalScale).multiplyScalar(currentScale);
+
+          // Fade color back
+          const colorProgress = Math.min(progress * 1.5, 1);
+          mesh.material.color.lerpColors(flashColor, originalColor, colorProgress);
+          mesh.material.emissive.lerp(flashColor, originalColor, colorProgress);
+          mesh.material.emissiveIntensity = 1.0 - colorProgress;
+
+          if (progress < 1) {
+            requestAnimationFrame(animateReset);
+          } else {
+            // Final reset
+            mesh.material.color.copy(originalColor);
+            mesh.material.emissive.set(0x000000);
+            mesh.material.emissiveIntensity = 0;
+            ballGroup.scale.copy(originalScale);
+          }
+        };
+        animateReset();
+
+        // 3. Enhanced particle effect
+        createCollisionParticles(
+          impactPoint.x,
+          impactPoint.y,
+          impactPoint.z,
+          impactStrength * 1.5, // More particles for stronger impacts
+          mesh.material.color,
+          impactStrength * 5 // More particles
+        );
+
+        // 4. Shockwave effect
+        if (impactStrength > 0.3) { // Only show shockwave for stronger impacts
+          createShockwave(
+            impactPoint.x,
+            impactPoint.y,
+            impactPoint.z,
+            impactStrength * 2.5
+          );
+        }
+
+        // 5. Enhanced screen shake effect for stronger impacts
+        if (impactStrength > 0.5) {
+          const intensity = Math.pow(impactStrength, 2) * 0.8;
+          const shakeDuration = 300 + intensity * 200; // ms
+
+          // Store original camera position and rotation
+          const originalPosition = camera.position.clone();
+          const originalRotation = {
+            x: camera.rotation.x,
+            y: camera.rotation.y,
+            z: camera.rotation.z
+          };
+
+          let shakeStart = Date.now();
+
+          const shake = () => {
+            const elapsed = Date.now() - shakeStart;
+            const progress = elapsed / shakeDuration;
+
+            if (progress < 1) {
+              // Ease out the shake intensity
+              const currentIntensity = intensity * (1 - progress * progress);
+
+              // Apply random position shake
+              camera.position.x = originalPosition.x + (Math.random() - 0.5) * currentIntensity * 0.1;
+              camera.position.y = originalPosition.y + (Math.random() - 0.5) * currentIntensity * 0.1;
+              camera.position.z = originalPosition.z + (Math.random() - 0.5) * currentIntensity * 0.05;
+
+              // Apply subtle rotation shake
+              camera.rotation.x = originalRotation.x + (Math.random() - 0.5) * currentIntensity * 0.005;
+              camera.rotation.y = originalRotation.y + (Math.random() - 0.5) * currentIntensity * 0.005;
+
+              // Make sure camera still looks at the scene center
+              camera.lookAt(scene.position);
+
+              requestAnimationFrame(shake);
+            } else {
+              // Reset to original position and rotation
+              camera.position.copy(originalPosition);
+              camera.rotation.x = originalRotation.x;
+              camera.rotation.y = originalRotation.y;
+              camera.rotation.z = originalRotation.z;
+              camera.lookAt(scene.position);
+            }
+          };
+
+          shake();
+        }
+      });
+
+      // Initialize trail effect (simple line trail)
+      const trail = new THREE.Group();
+      scene.add(trail);
+
+      const trailPositions = [];
+      const trailMax = 12;
+      for (let i = 0; i < trailMax; i++) trailPositions.push(new THREE.Vector3(x, y, z));
+
+      // create initial line for trail
+      const trailGeometry = new THREE.BufferGeometry();
+      const trailPositionArray = new Float32Array(trailMax * 3);
+      trailGeometry.setAttribute('position', new THREE.BufferAttribute(trailPositionArray, 3));
+      const trailMaterial = new THREE.LineBasicMaterial({ color: mesh.material.color, transparent: true, opacity: 0.6 });
+      const trailLine = new THREE.Line(trailGeometry, trailMaterial);
+      trail.add(trailLine);
+
+      objects.push({
+        mesh: mesh,
+        body: body,
+        type: 'ball',
+        trail: trail,
+        trailPositions: trailPositions,
+        trailGeometry: trailGeometry,
+        trailMax: trailMax
+      });
+
+      return { mesh, body };
+    }
+
+    // Create ripple effect on floor
+    function createRippleEffect(x, y, z, intensity, color) {
+      const rippleGeometry = new THREE.CircleGeometry(0.1, 32);
+      const rippleMaterial = new THREE.MeshBasicMaterial({
+        color: color || 0xffffff,
+        transparent: true,
+        opacity: 0.7,
+        side: THREE.DoubleSide
+      });
+
+      const ripple = new THREE.Mesh(rippleGeometry, rippleMaterial);
+      ripple.rotation.x = -Math.PI / 2; // Lay flat on the ground
+      ripple.position.set(x, y, z);
+      scene.add(ripple);
+
+      const startTime = Date.now();
+      const duration = 800;
+      const maxSize = 2 * intensity;
+
+      const animateRipple = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = elapsed / duration;
+
+        if (progress < 1) {
+          // Animate scale and fade out
+          const scale = 1 + progress * maxSize;
+          ripple.scale.set(scale, scale, scale);
+          ripple.material.opacity = 0.7 * (1 - progress);
+          requestAnimationFrame(animateRipple);
+        } else {
+          scene.remove(ripple);
+        }
+      };
+
+      animateRipple();
+    }
+
+    // Create particle effect on collision
+    function createCollisionParticles(x, y, z, intensity, color, particleCount = 30) {
+      const count = Math.max(12, Math.floor(particleCount * Math.min(intensity * 2, 1) + 8));
+
+      // Create a gradient color from white to the ball's color
+      const startColor = new THREE.Color(0xffffff);
+      const endColor = color instanceof THREE.Color ? color.clone() : new THREE.Color(color);
+
+      // Geometry and initial positions
+      const positions = new Float32Array(count * 3);
+      const colors = new Float32Array(count * 3);
+      const velocities = new Float32Array(count * 3);
+      const sizes = new Float32Array(count);
+
+      for (let i = 0; i < count; i++) {
+        const i3 = i * 3;
+        // Random direction with more emphasis on the collision normal
+        const theta = (Math.random() * 2 - 1) * Math.PI * 0.5; // Limit angle for more directional effect
+        const phi = Math.random() * Math.PI * 2;
+        const speed = (0.1 + Math.random() * 0.3) * (1 + intensity * 0.5);
+        const vx = Math.sin(theta) * Math.cos(phi) * speed;
+        const vy = Math.abs(Math.cos(theta)) * speed * 0.5; // More upward bias
+        const vz = Math.sin(theta) * Math.sin(phi) * speed;
+
+        positions[i3 + 0] = x;
+        positions[i3 + 1] = y;
+        positions[i3 + 2] = z;
+
+        velocities[i3 + 0] = vx;
+        velocities[i3 + 1] = vy;
+        velocities[i3 + 2] = vz;
+
+        // Random size with some variation
+        sizes[i] = 0.1 + Math.random() * 0.15 * (1 + intensity);
+
+        // Color interpolation
+        const t = Math.random() * 0.7; // Keep some white particles
+        const r = startColor.r * (1 - t) + endColor.r * t;
+        const g = startColor.g * (1 - t) + endColor.g * t;
+        const b = startColor.b * (1 - t) + endColor.b * t;
+
+        colors[i3 + 0] = r;
+        colors[i3 + 1] = g;
+        colors[i3 + 2] = b;
+      }
+
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+      const particleMaterial = new THREE.PointsMaterial({
+        vertexColors: true,
+        size: 0.15 + intensity * 0.1,
+        sizeAttenuation: true,
+        transparent: true,
+        opacity: 0.9,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+
+      // Add size variation
+      geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      const points = new THREE.Points(geometry, particleMaterial);
+      scene.add(points);
+
+      const startTime = performance.now();
+      const duration = 900 + intensity * 300; // Longer duration for stronger impacts
+
+      function animateParticles() {
+        const now = performance.now();
+        const elapsed = now - startTime;
+        const progress = elapsed / duration;
+
+        if (progress >= 1) {
+          scene.remove(points);
+          geometry.dispose();
+          particleMaterial.dispose();
+          return;
+        }
+
+        // Update particle positions
+        const positions = geometry.attributes.position.array;
+        const particleSizes = geometry.attributes.size.array;
+
+        for (let i = 0; i < count; i++) {
+          const i3 = i * 3;
+
+          // Update position with velocity
+          positions[i3] += velocities[i3] * 16.67; // 60fps factor
+          positions[i3 + 1] += velocities[i3 + 1] * 16.67;
+          positions[i3 + 2] += velocities[i3 + 2] * 16.67;
+
+          // Apply gravity with some randomness
+          const gravity = 0.0008 + Math.random() * 0.0004;
+          velocities[i3 + 1] -= gravity;
+
+          // Add some air resistance
+          velocities[i3] *= 0.99;
+          velocities[i3 + 1] *= 0.99;
+          velocities[i3 + 2] *= 0.99;
+
+          // Fade out and shrink particles
+          const fadeProgress = Math.pow(progress, 0.7); // Non-linear fade
+          particleSizes[i] = (0.1 + Math.random() * 0.05) * (1 - fadeProgress);
+        }
+
+        // Update material properties
+        particleMaterial.opacity = 0.9 * (1 - progress * progress); // Faster fade at the end
+
+        // Mark attributes as needing update
+        geometry.attributes.position.needsUpdate = true;
+        geometry.attributes.size.needsUpdate = true;
+
+        requestAnimationFrame(animateParticles);
+      }
+
+      requestAnimationFrame(animateParticles);
+    }
+
+    // Create shockwave effect
+    function createShockwave(x, y, z, intensity) {
+      const geometry = new THREE.RingGeometry(0.1, 0.2, 32);
+      const material = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.8
+      });
+
+      const ring = new THREE.Mesh(geometry, material);
+      ring.position.set(x, y, z);
+      ring.rotation.x = -Math.PI / 2; // Make it horizontal
+      scene.add(ring);
+
+      const startTime = Date.now();
+      const duration = 500; // 0.5 seconds
+      const maxSize = 2 * intensity;
+
+      function animateShockwave() {
+        const now = Date.now();
+        const elapsed = now - startTime;
+        const progress = elapsed / duration;
+
+        if (progress >= 1) {
+          scene.remove(ring);
+          return;
+        }
+
+        // Scale up and fade out
+        const scale = 1 + progress * maxSize;
+        ring.scale.set(scale, scale, scale);
+        material.opacity = 0.8 * (1 - progress);
+
+        requestAnimationFrame(animateShockwave);
+      }
+
+      animateShockwave();
+    }
+
+    // -------------------- TRAILS & EFFECTS --------------------
+    function updateTrails() {
+      objects.forEach(obj => {
+        if (obj.type === 'ball' && obj.trailPositions) {
+          // Update trail positions
+          obj.trailPositions.pop();
+          obj.trailPositions.unshift(obj.body.position.clone());
+
+          // Create or update trail geometry
+          if (!obj.trailGeometry) {
+            const geometry = new THREE.BufferGeometry();
+            const material = new THREE.LineBasicMaterial({
+              color: obj.mesh.material.color,
+              transparent: true,
+              opacity: 0.6,
+              linewidth: 2
+            });
+
+            const positions = new Float32Array(maxTrailLength * 3);
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const line = new THREE.Line(geometry, material);
+            obj.trail.add(line);
+            obj.trailGeometry = geometry;
+          }
+
+          // Update positions
+          const positions = obj.trailGeometry.attributes.position.array;
+          for (let i = 0; i < obj.trailPositions.length; i++) {
+            const p = obj.trailPositions[i];
+            const alpha = 1 - (i / obj.trailPositions.length);
+            positions[i * 3] = p.x;
+            positions[i * 3 + 1] = p.y;
+            positions[i * 3 + 2] = p.z;
+
+            // Update opacity based on trail position
+            if (obj.trail.children[0] && obj.trail.children[0].material) {
+              obj.trail.children[0].material.opacity = 0.6 * alpha;
+            }
+          }
+          obj.trailGeometry.attributes.position.needsUpdate = true;
+        }
+      });
+    }
+
+    // collision visual effect (small burst)
+    function spawnCollisionEffect(position) {
+      const geo = new THREE.SphereGeometry(0.12, 8, 8);
+      const mat = new THREE.MeshStandardMaterial({ color: 0xffff66, emissive: 0xffaa33, transparent: true, opacity: 0.95 });
+      const m = new THREE.Mesh(geo, mat); m.position.copy(position); scene.add(m);
+      // fade and remove
+      const t0 = performance.now(); const dur = 450;
+      const tick = () => {
+        const dt = performance.now() - t0; const f = dt / dur;
+        if (f > 1) { scene.remove(m); return; }
+        m.scale.setScalar(1 + f * 2); m.material.opacity = 1 - f; requestAnimationFrame(tick);
+      }; tick();
+    }
+
+    // collision wave (ring)
+    function spawnCollisionWave(position, size = 0.5) {
+      const geom = new THREE.RingGeometry(size * 0.2, size, 32);
+      const mat = new THREE.MeshBasicMaterial({
+        color: 0xffffcc,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.8
+      });
+
+      const ring = new THREE.Mesh(geom, mat); ring.rotation.x = -Math.PI / 2; ring.position.copy(position); scene.add(ring);
+      const t0 = performance.now(); const dur = 600;
+      const tick = () => {
+        const f = (performance.now() - t0) / dur; if (f > 1) { scene.remove(ring); return; }
+        ring.scale.setScalar(1 + f * 3); ring.material.opacity = 1 - f; requestAnimationFrame(tick);
+      }; tick();
+    }
+
+    // -------------------- GENERAL UTILITIES --------------------
+    function clearScene(full = false) {
+      // remove all scene objects that are tracked
+      objects.forEach(o => { try { if (o.mesh) scene.remove(o.mesh); if (o.trail) scene.remove(o.trail); if (o.body) world.removeBody(o.body); } catch (e) { } });
+      objects = [];
+      dataLog = []; document.getElementById('logged-frames').textContent = '0';
+
+      if (full) { // remove all but lighting and camera
+        // (camera and lights are left as they are created in init)
+      }
+    }
+
+    function onWindowResize() { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); }
+
+    // animate loop
+    let lastTime = performance.now() / 1000;
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Calculate delta time
+      const time = performance.now() / 1000;
+      const dt = time - lastTime;
+      lastTime = time;
+
+      // Update physics
+      world.step(1/60, dt, 3);
+
+      // Update all objects
+      objects.forEach(o => {
+        // Update physics body to mesh sync
+        if (o.body) {
+          // Update the main mesh if it exists
+          if (o.mesh) {
+            o.mesh.position.copy(o.body.position);
+            o.mesh.quaternion.copy(o.body.quaternion);
+          }
+          
+          // Update any custom mesh stored in userData
+          if (o.body.userData && o.body.userData.mesh) {
+            o.body.userData.mesh.position.copy(o.body.position);
+            o.body.userData.mesh.quaternion.copy(o.body.quaternion);
+          }
+          
+          // Handle physics for scene 1 (classroom)
+          if (currentScene === 0 && o.body.mass > 0) {
+            const fsThresh = o.body.mass * 9.8 * 0.5; // Static friction threshold
+            const lastApplied = o._lastAppliedForce || 0;
+            
+            if (lastApplied < fsThresh) {
+              // Zero velocities if force is below static friction threshold
+              o.body.velocity.set(0, 0, 0);
+            }
+            
+            // Update overlay labels
+            const fVal = lastApplied;
+            const aVal = (fVal / o.body.mass) || 0;
+            
+            const fElement = document.getElementById('f-value');
+            const aElement = document.getElementById('a-value');
+            const labelF = document.getElementById('label-F');
+            const labelA = document.getElementById('label-A');
+            
+            if (fElement) fElement.textContent = fVal.toFixed(2);
+            if (aElement) aElement.textContent = aVal.toFixed(2);
+            if (labelF) labelF.textContent = fVal.toFixed(2);
+            if (labelA) labelA.textContent = aVal.toFixed(2);
+
+            // Update block overlay position
+            if (o.mesh) {
+              const screenPos = toScreenPosition(o.mesh.position, camera);
+              const el = document.getElementById('fa');
+              if (el) {
+                el.style.left = (screenPos.x + 12) + 'px';
+                el.style.top = (screenPos.y - 30) + 'px';
+              }
+            }
+          }
+        }
+      });
+
+      // Update trails
+      updateTrails();
+
+      // Log data if in Scene 3 or recording
+      if (currentScene === 2 || isRecording) {
+        const frame = { t: performance.now(), items: [] };
+        objects.filter(o => o.type === 'ball' && o.body).forEach(b => {
+          const pos = b.body.position;
+          const vel = b.body.velocity;
+          const ke = 0.5 * b.body.mass * vel.lengthSquared();
+          frame.items.push({
+            id: objects.indexOf(b),
+            x: pos.x,
+            y: pos.y,
+            z: pos.z,
+            vx: vel.x,
+            vy: vel.y,
+            vz: vel.z,
+            ke
+          });
+        });
+        dataLog.push(frame);
+        const framesElement = document.getElementById('logged-frames');
+        if (framesElement) {
+          framesElement.textContent = dataLog.length.toString();
+        }
+      }
+
+      // Update overlay position for the block label in scene 2
+      if (currentScene === 1) {
+        const block = objects.find(o => o.type === 'block');
+        if (block && block.mesh) {
+          const screenPos = toScreenPosition(block.mesh.position.clone().add(new THREE.Vector3(0, 1.5, 0)), camera);
+          const label = document.getElementById('block-label');
+          if (label) {
+            label.style.left = `${screenPos.x}px`;
+            label.style.top = `${screenPos.y}px`;
+          }
+        }
+      }
+
+      // Update controls and render
+      if (controls) controls.update();
+      renderer.render(scene, camera);
+    }
+
+    // helper to map 3D position to screen pixels
+    function toScreenPosition(pos, camera) {
+      const vector = pos.clone().project(camera);
+      const x = (vector.x + 1) / 2 * window.innerWidth;
+      const y = (-vector.y + 1) / 2 * window.innerHeight;
+      return { x, y };
+    }
+
+    // -------------------- DATA EXPORT --------------------
+    function downloadCSV() {
+      if (dataLog.length === 0) { alert('No data logged.'); return; }
+      let csv = 'frame_time_ms,item_id,x,y,z,vx,vy,vz,kinetic_energy\n';
+      dataLog.forEach(frame => {
+        const t = frame.t.toFixed(1);
+        frame.items.forEach(it => {
+          csv += `${t},${it.id},${it.x.toFixed(4)},${it.y.toFixed(4)},${it.z.toFixed(4)},${it.vx.toFixed(4)},${it.vy.toFixed(4)},${it.vz.toFixed(4)},${it.ke.toFixed(6)}\n`;
+        });
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'simulation_data.csv'; a.click(); URL.revokeObjectURL(url);
+    }
+
+    // -------------------- BOILERPLATE START --------------------
+    // initial scene
+    init();
+
+    // Start the animation loop
+    animate();
+
+    // Spawn helper bound to global so UI can call
+    window.spawnBallsFromUI = spawnBallsFromUI;
+    window.switchScene = switchScene;
+    window.clearScene = clearScene;
+    window.downloadCSV = downloadCSV;
+    window.animate = animate; // Make animate available globally if needed
+  </script>
+</body>
+
+</html>
