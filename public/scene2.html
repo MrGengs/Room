@@ -20,6 +20,17 @@
       <!-- Assets - Conditional Loading -->
       <a-assets timeout="10000">
         <img id="thumbScene1" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" />
+        <!-- Ball Models -->
+        <a-asset-item id="beach-ball" src="/assets/beach_ball_low-poly.glb"></a-asset-item>
+        <a-asset-item id="soccer-ball" src="/assets/bola_futebol.glb"></a-asset-item>
+        <a-asset-item id="bowling-ball" src="/assets/bowling_ball.glb"></a-asset-item>
+        <a-asset-item id="earth-ball" src="/assets/bumi.glb"></a-asset-item>
+        <a-asset-item id="eight-ball" src="/assets/eight_ball.glb"></a-asset-item>
+        <a-asset-item id="basketball" src="/assets/generic_basketball.glb"></a-asset-item>
+        <a-asset-item id="volleyball" src="/assets/generic_volleyball_ball_low-poly.glb"></a-asset-item>
+        <a-asset-item id="golf-ball" src="/assets/golf_ball_low-poly.glb"></a-asset-item>
+        <a-asset-item id="tennis-ball" src="/assets/tennis_ball_low-poly_pbr.glb"></a-asset-item>
+        
         <!-- Fallback untuk jika GLB tidak tersedia -->
         <a-mixin id="fallback-box"
                  geometry="primitive: box; width: 2; height: 1; depth: 1"
@@ -28,6 +39,11 @@
                  geometry="primitive: plane; width: 20; height: 20"
                  material="color: #228B22"
                  rotation="-90 0 0"></a-mixin>
+                 
+        <!-- Ball material mixin -->
+        <a-mixin id="ball-material"
+          material="metalness: 0.2; roughness: 0.3"
+          geometry="primitive: sphere; segmentsWidth: 32; segmentsHeight: 16"></a-mixin>
       </a-assets>
 
       <a-entity id="environment"></a-entity>
@@ -89,6 +105,103 @@
             animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.2 0.2 0.2; dur: 1200; easing: linear"
             animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120">
           </a-entity>
+      </a-entity>
+
+      <!-- Ball Selection Menu -->
+      <a-entity id="ball-selector" position="0 1.5 -2" visible="false"
+        animation="property: position; from: 0 0.5 -2; to: 0 1.5 -2; dur: 500; startEvents: menuopen">
+        <a-entity geometry="primitive: plane; width: 5.5; height: 4" material="color: #2a2a2a; opacity: 0.95; transparent: true" position="0 0 0">
+          <a-text id="ball-selector-title" value="PILIH BOLA" position="0 1.6 0.1" align="center" color="white" width="5" scale="1.2 1.2 1"></a-text>
+          <a-text id="ball-preview-text" value="Pilih model bola yang diinginkan" position="0 1.3 0.1" align="center" color="#aaa" width="4.5" scale="0.7 0.7 1"></a-text>
+          
+          <!-- Ball Previews Grid -->
+          <a-entity id="ball-previews" position="0 0.4 0">
+            <!-- Row 1 -->
+            <a-entity position="-1.5 0.7 0.1" class="ball-option" data-ball="soccer">
+              <a-entity gltf-model="#soccer-ball" scale="0.15 0.15 0.15" class="clickable"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear">
+              </a-entity>
+              <a-text value="Sepak Bola" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
+            </a-entity>
+            
+            <a-entity position="-0.5 0.7 0.1" class="ball-option" data-ball="basketball">
+              <a-entity gltf-model="#basketball" scale="0.15 0.15 0.15" class="clickable"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear">
+              </a-entity>
+              <a-text value="Basket" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
+            </a-entity>
+            
+            <a-entity position="0.5 0.7 0.1" class="ball-option" data-ball="tennis">
+              <a-entity gltf-model="#tennis-ball" scale="0.15 0.15 0.15" class="clickable"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear">
+              </a-entity>
+              <a-text value="Tenis" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
+            </a-entity>
+            
+            <!-- Row 2 -->
+            <a-entity position="-1.5 0 0.1" class="ball-option" data-ball="bowling">
+              <a-entity gltf-model="#bowling-ball" scale="0.15 0.15 0.15" class="clickable"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear">
+              </a-entity>
+              <a-text value="Bowling" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
+            </a-entity>
+            
+            <a-entity position="-0.5 0 0.1" class="ball-option" data-ball="beach">
+              <a-entity gltf-model="#beach-ball" scale="0.15 0.15 0.15" class="clickable"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 7000; easing: linear">
+              </a-entity>
+              <a-text value="Pantai" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
+            </a-entity>
+            
+            <a-entity position="0.5 0 0.1" class="ball-option" data-ball="earth">
+              <a-entity gltf-model="#earth-ball" scale="0.15 0.15 0.15" class="clickable"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 20000; easing: linear">
+              </a-entity>
+              <a-text value="Bumi" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
+            </a-entity>
+            
+            <!-- Row 3 -->
+            <a-entity position="-1.5 -0.7 0.1" class="ball-option" data-ball="eight">
+              <a-entity gltf-model="#eight-ball" scale="0.15 0.15 0.15" class="clickable"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear">
+              </a-entity>
+              <a-text value="Bola 8" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
+            </a-entity>
+            
+            <a-entity position="-0.5 -0.7 0.1" class="ball-option" data-ball="volleyball">
+              <a-entity gltf-model="#volleyball" scale="0.15 0.15 0.15" class="clickable"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 9000; easing: linear">
+              </a-entity>
+              <a-text value="Voli" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
+            </a-entity>
+            
+            <a-entity position="0.5 -0.7 0.1" class="ball-option" data-ball="golf">
+              <a-entity gltf-model="#golf-ball" scale="0.15 0.15 0.15" class="clickable"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 6000; easing: linear">
+              </a-entity>
+              <a-text value="Golf" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
+            </a-entity>
+            
+            <!-- Row 4 - Default Ball -->
+            <a-entity position="0 -1.4 0.1" class="ball-option" data-ball="default">
+              <a-sphere radius="0.15" color="#ffffff" class="clickable"
+                material="metalness: 0.3; roughness: 0.2"
+                animation="property: scale; dir: alternate; dur: 1500; loop: true; to: 1.1 1.1 1.1; easing: easeInOutQuad">
+              </a-sphere>
+              <a-text value="Bola Default" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
+            </a-entity>
+          </a-entity>
+          
+          <!-- Close Button -->
+          <a-entity position="0 -2 0.1">
+            <a-plane color="#d32f2f" width="2" height="0.6" class="clickable" id="close-ball-selector"
+              event-set__mouseenter="material.opacity: 0.8; scale: 1.05 1.05 1"
+              event-set__mouseleave="material.opacity: 1; scale: 1 1 1"
+              animation="property: scale; dir: alternate; dur: 2000; loop: true; to: 1.02 1.02 1.02; easing: easeInOutSine">
+              <a-text value="TUTUP" position="0 0 0.1" align="center" color="white" width="3" scale="0.8 0.8 1"></a-text>
+            </a-plane>
+          </a-entity>
+        </a-entity>
       </a-entity>
       
       <!-- Main Menu -->
@@ -302,32 +415,43 @@
       <!-- Bab 3 - Tumbukan -->
       <a-entity id="bab3" visible="false">
         <!-- Bola-bola untuk simulasi tumbukan -->
-        <a-sphere 
+        <a-entity 
           id="ball1" 
-          class="collidable"
-          position="-4 1 -3" 
-          radius="0.25" 
-          color="#cc2f2f"
-          material="depthTest: true"
-          shadow="cast: true">
-        </a-sphere>
+          class="collidable clickable"
+          position="-2 1 -3"
+          dynamic-body="mass: 1; linearDamping: 0.5; angularDamping: 0.5"
+          shadow="cast: true; receive: true">
+          <a-sphere 
+            radius="0.3"
+            color="#ee3333"
+            material="metalness: 0.3; roughness: 0.2"
+            shadow="cast: true; receive: true">
+          </a-sphere>
+        </a-entity>
+        
+        <a-entity 
+          id="ball2" 
+          class="collidable clickable"
+          position="2 1 -3"
+          dynamic-body="mass: 1; linearDamping: 0.5; angularDamping: 0.5"
+          shadow="cast: true; receive: true">
+          <a-sphere 
+            radius="0.3"
+            color="#3333ee"
+            material="metalness: 0.3; roughness: 0.2"
+            shadow="cast: true; receive: true">
+          </a-sphere>
+        </a-entity>
+
         <a-text 
           id="label1" 
           value="m1 = 1kg&#10;v1 = 1m/s" 
-          position="-4 2 -3" 
+          position="-2 2 -3" 
           align="center"
           color="white"
           material="depthTest: false; transparent: true">
         </a-text>
         
-        <a-sphere 
-          id="ball2" 
-          class="collidable"
-          position="4 1 -3" 
-          radius="0.25" 
-          color="#4545ff"
-          material="depthTest: true"
-          shadow="cast: true">
         </a-sphere>
         <a-text 
           id="label2" 
@@ -1252,8 +1376,15 @@
 
       function resetBab3() {
         animating = false;
+        
+        // Reset ball positions
+        const ball1 = document.querySelector('#ball1');
+        const ball2 = document.querySelector('#ball2');
+        
         ball1.setAttribute("position", "-2 1 -3");
         ball2.setAttribute("position", "2 1 -3");
+        
+        // Remove all animations
         ball1.removeAttribute("animation__go");
         ball2.removeAttribute("animation__go");
         ball1.removeAttribute("animation__after");
@@ -1264,12 +1395,20 @@
         // Reset trails
         console.log('Resetting all effects...');
         
+        // Reset simulation state
         done = false;
         m1 = 1, v1 = 1;
         m2 = 1, v2 = -1;
+        
+        // Reset UI
         document.querySelector("#UImerahWrapper").setAttribute("visible", "true");
         document.querySelector("#UIbiruWrapper").setAttribute("visible", "true");
         document.querySelector("#btnPlayText").setAttribute("value", "Start");
+        
+        // Reset ball models
+        updateBallModel(ball1, currentBall1);
+        updateBallModel(ball2, currentBall2);
+        
         updateLabel();
       }
 
@@ -1448,6 +1587,396 @@
         },
       });
 
+      // Ball model configuration with display names and colors
+      const BALL_MODELS = {
+        'default': { 
+          name: 'Bola Biasa', 
+          model: '', 
+          scale: '1 1 1',
+          color: '#888888'
+        },
+        'beach_ball': { 
+          name: 'Bola Pantai', 
+          model: '#beach-ball', 
+          scale: '0.3 0.3 0.3',
+          color: '#FFD700'
+        },
+        'soccer': { 
+          name: 'Sepak Bola', 
+          model: '#soccer-ball', 
+          scale: '0.3 0.3 0.3',
+          color: '#FFFFFF'
+        },
+        'bowling': { 
+          name: 'Bola Bowling', 
+          model: '#bowling-ball', 
+          scale: '0.3 0.3 0.3',
+          color: '#5D4037'
+        },
+        'earth': { 
+          name: 'Bumi', 
+          model: '#earth-ball', 
+          scale: '0.3 0.3 0.3',
+          color: '#1E88E5'
+        },
+        'eight_ball': { 
+          name: 'Bola 8', 
+          model: '#eight-ball', 
+          scale: '0.3 0.3 0.3',
+          color: '#000000'
+        },
+        'basketball': { 
+          name: 'Bola Basket', 
+          model: '#basketball', 
+          scale: '0.3 0.3 0.3',
+          color: '#FF8C00'
+        },
+        'volleyball': { 
+          name: 'Bola Voli', 
+          model: '#volleyball', 
+          scale: '0.3 0.3 0.3',
+          color: '#FFEE58'
+        },
+        'golf': { 
+          name: 'Bola Golf', 
+          model: '#golf-ball', 
+          scale: '0.3 0.3 0.3',
+          color: '#FFFFFF'
+        },
+        'tennis': { 
+          name: 'Bola Tenis', 
+          model: '#tennis-ball', 
+          scale: '0.3 0.3 0.3',
+          color: '#FFEB3B'
+        }
+      };
+      
+      // Notification system
+      function showNotification(message, color = '#2196F3') {
+        const notification = document.createElement('a-text');
+        notification.setAttribute('id', 'ball-notification');
+        notification.setAttribute('value', message);
+        notification.setAttribute('position', '0 1.5 -2');
+        notification.setAttribute('align', 'center');
+        notification.setAttribute('width', '4');
+        notification.setAttribute('color', color);
+        notification.setAttribute('animation', 'property: opacity; from: 1; to: 0; dur: 2000; delay: 1000; loop: false');
+        notification.setAttribute('material', 'depthTest: false');
+        
+        // Remove any existing notification
+        const existingNotification = document.querySelector('#ball-notification');
+        if (existingNotification) {
+          existingNotification.parentNode.removeChild(existingNotification);
+        }
+        
+        // Add to scene
+        document.querySelector('a-scene').appendChild(notification);
+        
+        // Auto-remove after animation
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+          }
+        }, 3000);
+      }
+      
+      let currentBall1 = 'default';
+      let currentBall2 = 'default';
+      let selectedBall = 1; // 1 for ball1, 2 for ball2
+      let ballSelectorOpen = false;
+      
+      // Handle click outside the selector
+      function handleClickOutside(event) {
+        const selector = document.querySelector('#ball-selector');
+        const isClickInside = selector.contains(event.target) || 
+                            event.target.closest('.ball-option') ||
+                            event.target.id === 'ball1' || 
+                            event.target.id === 'ball2';
+        
+        if (!isClickInside) {
+          closeBallSelector();
+        }
+      }
+      
+      // Function to close ball selector
+      function closeBallSelector() {
+        if (!ballSelectorOpen) return;
+        
+        const selector = document.querySelector('#ball-selector');
+        selector.setAttribute('visible', 'false');
+        ballSelectorOpen = false;
+        
+        // Remove click outside handler
+        document.removeEventListener('click', handleClickOutside);
+      }
+      
+      // Function to open ball selector
+      function openBallSelector(ballNumber, position) {
+        if (ballSelectorOpen) return;
+        
+        selectedBall = ballNumber;
+        const selector = document.querySelector('#ball-selector');
+        const ballColor = ballNumber === 1 ? 'Biru' : 'Merah';
+        
+        // Position the selector
+        selector.setAttribute('position', position);
+        
+        // Update the title to show which ball is being selected
+        document.querySelector('#ball-selector-title').setAttribute('value', `PILIH BOLA ${ballColor}`);
+        
+        // Show the selector
+        selector.setAttribute('visible', 'true');
+        
+        // Trigger the animation
+        selector.emit('menuopen');
+        
+        // Update state
+        ballSelectorOpen = true;
+        
+        // Show which ball is being selected
+        showNotification(`Memilih model untuk Bola ${ballColor}`, ballNumber === 1 ? '#2196F3' : '#F44336');
+        
+        // Add click outside handler
+        document.addEventListener('click', handleClickOutside);
+      }
+      
+      // Ball selection handlers
+      document.querySelectorAll('.ball-option').forEach(option => {
+        option.addEventListener('click', function() {
+          if (!ballSelectorOpen) return;
+          
+          const ballType = this.getAttribute('data-ball');
+          const ballElement = selectedBall === 1 ? document.querySelector('#ball1') : document.querySelector('#ball2');
+          const ballColor = selectedBall === 1 ? 'Biru' : 'Merah';
+          
+          // Update the current ball type
+          if (selectedBall === 1) {
+            currentBall1 = ballType;
+          } else {
+            currentBall2 = ballType;
+          }
+          
+          // Update the ball model
+          updateBallModel(ballElement, ballType);
+          
+          // Show notification with the ball's name and color
+          const ballInfo = BALL_MODELS[ballType] || { name: 'Bola Default' };
+          showNotification(`Menggunakan ${ballInfo.name} untuk Bola ${ballColor}`, selectedBall === 1 ? '#2196F3' : '#F44336');
+          
+          // Close the selector
+          closeBallSelector();
+        });
+        
+        // Add hover effect
+        option.addEventListener('mouseenter', function() {
+          if (!ballSelectorOpen) return;
+          
+          // Scale up the option
+          this.setAttribute('scale', '1.1 1.1 1.1');
+          
+          // Add pulse animation
+          this.setAttribute('animation', {
+            property: 'scale',
+            to: '1.15 1.15 1.15',
+            dir: 'alternate',
+            dur: 1000,
+            loop: true,
+            easing: 'easeInOutSine'
+          });
+          
+          // Update preview text with ball info
+          const ballType = this.getAttribute('data-ball');
+          const ballInfo = BALL_MODELS[ballType] || { 
+            name: 'Bola Default', 
+            description: 'Bola standar tanpa tekstur khusus' 
+          };
+          
+          document.querySelector('#ball-preview-text').setAttribute('value', ballInfo.description);
+          document.querySelector('#ball-selector-title').setAttribute('value', ballInfo.name);
+        });
+        
+        option.addEventListener('mouseleave', function() {
+          if (!ballSelectorOpen) return;
+          
+          // Reset scale and remove animation
+          this.setAttribute('scale', '1 1 1');
+          this.removeAttribute('animation');
+          
+          // Reset preview text
+          document.querySelector('#ball-preview-text').setAttribute('value', 'Pilih model bola yang diinginkan');
+          const ballColor = selectedBall === 1 ? 'Biru' : 'Merah';
+          document.querySelector('#ball-selector-title').setAttribute('value', `PILIH BOLA ${ballColor}`);
+        });
+      });
+      
+      // Toggle ball selector for ball1
+      document.querySelector('#ball1').addEventListener('click', function() {
+        openBallSelector(1, { x: -1, y: 1.5, z: -2 });
+      });
+      
+      // Toggle ball selector for ball2
+      document.querySelector('#ball2').addEventListener('click', function() {
+        openBallSelector(2, { x: 1, y: 1.5, z: -2 });
+      });
+      
+      // Close selector when clicking close button
+      document.querySelector('#close-ball-selector').addEventListener('click', function() {
+        closeBallSelector();
+      });
+      
+      // Function to add tooltip to an entity
+      function addTooltip(entity, text, offset = { x: 0, y: 0, z: 0 }) {
+        const tooltip = document.createElement('a-entity');
+        tooltip.setAttribute('class', 'tooltip');
+        tooltip.setAttribute('position', `${offset.x} ${offset.y} ${offset.z}`);
+        tooltip.setAttribute('visible', 'false');
+        tooltip.setAttribute('geometry', 'primitive: plane; width: auto; height: auto');
+        tooltip.setAttribute('material', 'color: #333; opacity: 0.8; transparent: true');
+        tooltip.setAttribute('text', `value: ${text}; color: white; align: center; width: 1.5`);
+        tooltip.setAttribute('look-at', '[camera]');
+        tooltip.setAttribute('scale', '0.5 0.5 1');
+        
+        entity.appendChild(tooltip);
+      }
+      
+      // Function to update ball model
+      function updateBallModel(ballElement, ballType) {
+        const model = BALL_MODELS[ballType];
+        const existingModel = ballElement.querySelector('a-entity[gltf-model]');
+        const existingSphere = ballElement.querySelector('a-sphere:not(.clickable)');
+        const isBall1 = ballElement.id === 'ball1';
+        
+        // Store current physics properties
+        const currentPosition = ballElement.getAttribute('position') || {x: isBall1 ? -2 : 2, y: 1, z: -3};
+        const currentRotation = ballElement.getAttribute('rotation') || {x: 0, y: 0, z: 0};
+        const currentVelocity = ballElement.getAttribute('velocity') || {x: 0, y: 0, z: 0};
+        
+        // Remove existing model if exists
+        if (existingModel) {
+          existingModel.parentNode.removeChild(existingModel);
+        }
+        
+        // If default sphere, make sure it exists
+        if (ballType === 'default') {
+          if (!existingSphere) {
+            const newSphere = document.createElement('a-sphere');
+            newSphere.setAttribute('radius', '0.3');
+            newSphere.setAttribute('color', isBall1 ? '#ee3333' : '#3333ee');
+            newSphere.setAttribute('material', 'metalness: 0.3; roughness: 0.2');
+            newSphere.setAttribute('shadow', 'cast: true; receive: true');
+            ballElement.appendChild(newSphere);
+          } else {
+            existingSphere.setAttribute('visible', 'true');
+            existingSphere.setAttribute('color', isBall1 ? '#ee3333' : '#3333ee');
+          }
+          
+          // Update physics shape for default sphere
+          ballElement.setAttribute('dynamic-body', {
+            shape: 'sphere',
+            sphereRadius: 0.3,
+            mass: isBall1 ? m1 : m2,
+            linearDamping: 0.5,
+            angularDamping: 0.5
+          });
+          
+          return;
+        }
+        
+        // Hide default sphere if exists
+        if (existingSphere) {
+          existingSphere.setAttribute('visible', 'false');
+        }
+        
+        // Create new GLTF model
+        const newModel = document.createElement('a-entity');
+        newModel.setAttribute('gltf-model', model.model);
+        newModel.setAttribute('scale', model.scale || '0.3 0.3 0.3');
+        newModel.setAttribute('position', '0 0 0');
+        newModel.setAttribute('rotation', '0 0 0');
+        newModel.setAttribute('shadow', 'cast: true; receive: true');
+        newModel.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear');
+        
+        // Update physics shape for GLTF model
+        ballElement.setAttribute('dynamic-body', {
+          shape: 'box',
+          halfExtents: {x: 0.3, y: 0.3, z: 0.3},
+          mass: isBall1 ? m1 : m2,
+          linearDamping: 0.5,
+          angularDamping: 0.5
+        });
+        
+        ballElement.appendChild(newModel);
+        
+        // Restore position and rotation
+        ballElement.setAttribute('position', currentPosition);
+        ballElement.setAttribute('rotation', currentRotation);
+        
+        // If the simulation is running, restore velocity
+        if (window.animating) {
+          setTimeout(() => {
+            ballElement.setAttribute('velocity', currentVelocity);
+          }, 0);
+        }
+      }
+      
+      // Initialize ball models and UI
+      document.addEventListener('DOMContentLoaded', () => {
+        // Get ball elements
+        const ball1 = document.querySelector('#ball1');
+        const ball2 = document.querySelector('#ball2');
+        
+        // Add tooltips to balls
+        addTooltip(ball1, 'Klik untuk mengganti model bola', { x: 0, y: 0.5, z: 0 });
+        addTooltip(ball2, 'Klik untuk mengganti model bola', { x: 0, y: 0.5, z: 0 });
+        
+        // Initialize ball models
+        updateBallModel(ball1, currentBall1);
+        updateBallModel(ball2, currentBall2);
+        
+        // Add hover effects to balls
+        [ball1, ball2].forEach((ball, index) => {
+          const isBall1 = index === 0;
+          
+          ball.addEventListener('mouseenter', function() {
+            if (ballSelectorOpen) return;
+            this.setAttribute('scale', '1.05 1.05 1.05');
+            
+            // Show tooltip
+            const tooltip = this.querySelector('.tooltip');
+            if (tooltip) {
+              tooltip.setAttribute('visible', 'true');
+            }
+          });
+          
+          ball.addEventListener('mouseleave', function() {
+            if (ballSelectorOpen) return;
+            this.setAttribute('scale', '1 1 1');
+            
+            // Hide tooltip
+            const tooltip = this.querySelector('.tooltip');
+            if (tooltip) {
+              tooltip.setAttribute('visible', 'false');
+            }
+          });
+        });
+        
+        // Close selector when clicking close button
+        document.querySelector('#close-ball-selector').addEventListener('click', function() {
+          closeBallSelector();
+        });
+        
+        // Close selector when clicking outside
+        document.addEventListener('click', function(event) {
+          const selector = document.querySelector('#ball-selector');
+          if (selector.getAttribute('visible') === 'true' && 
+              !event.target.closest('#ball-selector') && 
+              !event.target.closest('#ball1') && 
+              !event.target.closest('#ball2')) {
+            closeBallSelector();
+          }
+        });
+      });
+      
       // Info untuk pengguna
       console.log('VR Fisika loaded successfully!');
       console.log('If GLB models fail to load due to CORS, fallback models will be used.');
