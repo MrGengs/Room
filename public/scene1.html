@@ -95,15 +95,49 @@
             visible="false"
           ></a-box>
           <!-- Visual model for the car -->
-          <a-entity id="ferrari" gltf-model="url(assets/ferrari.glb)" position="0 0 0" scale="1 1 1"></a-entity>
+          <a-entity id="ferrari" gltf-model="url(assets/ferrari.glb)" position="0 0 0" scale="1.3 1.3 1.3"></a-entity>
           <!-- Arrow indicator for car -->
           <a-entity id="car-arrow" 
             gltf-model="url(assets/arrow.glb)"
             position="0 2.5 0" 
             rotation="0 0 0"
-            scale="0.5 0.5 0.5"
+            scale="0.7 0.7 0.7"
             visible="false">
           </a-entity>
+          
+          <!-- Force indicator for car -->
+          <a-text 
+            id="car-force-indicator"
+            value="F: 0N"
+            position="0 3.2 0"
+            align="center"
+            color="#FF5722"
+            font="kelsonsans"
+            width="8"
+            visible="false">
+          </a-text>
+          
+          <!-- Acceleration indicator for car -->
+          <a-text 
+            id="car-acceleration-indicator"
+            value="A: 0 m/s²"
+            position="0 2.8 0"
+            align="center"
+            color="#4CAF50"
+            font="kelsonsans"
+            width="8"
+            visible="false">
+          </a-text>
+        <!-- NPC Pusher -->
+        <a-entity
+          id="npc-pusher"
+          gltf-model="url(assets/push.glb)"
+          position="0 0 3.1"
+          rotation="0 180 0"
+          scale="0.01 0.01 0.01"
+          animation-mixer="clip: mixamo.com; loop: repeat"
+          visible="false"
+        ></a-entity>
         </a-entity>
 
         <!-- Sepeda model with collision -->
@@ -124,14 +158,400 @@
           <a-entity id="sepeda" gltf-model="url(assets/sepeda.glb)" scale="0.5 0.5 0.5"></a-entity>
           <!-- Arrow indicator for sepeda -->
           <a-entity id="sepeda-arrow" 
-            gltf-model="url(assets/Orange Arrow.glb)"
+            gltf-model="url(assets/arrow.glb)"
             position="0 1.5 0" 
             rotation="0 180 0"
             scale="0.3 0.3 0.3"
             visible="false">
           </a-entity>
+          
+          <!-- Force indicator for bicycle -->
+          <a-text 
+            id="bicycle-force-indicator"
+            value="F: 0N"
+            position="0 2.2 0"
+            align="center"
+            color="#FF5722"
+            font="kelsonsans"
+            width="8"
+            visible="false">
+          </a-text>
+          
+          <!-- Acceleration indicator for bicycle -->
+          <a-text 
+            id="bicycle-acceleration-indicator"
+            value="A: 0 m/s²"
+            position="0 1.8 0"
+            align="center"
+            color="#4CAF50"
+            font="kelsonsans"
+            width="8"
+            visible="false">
+          </a-text>
         </a-entity>
         
+        <!-- 3D Physics Control Panel -->
+        <a-entity id="physics-panel-3d" position="8 2.8 3" rotation="0 -90 0">
+          <!-- Main Panel Background -->
+          <a-plane 
+            id="panel-bg"
+            width="4.5" 
+            height="9.0" 
+            color="#1a1a1a" 
+            opacity="0.95"
+            class="clickable">
+          </a-plane>
+          
+          <!-- Panel Title -->
+          <a-text 
+            value="Physics Control" 
+            position="0 4.2 0.01" 
+            align="center" 
+            color="#FFFFFF" 
+            font="kelsonsans" 
+            width="8">
+          </a-text>
+          
+          <!-- Control Section Background -->
+          <a-plane 
+            width="3.6" 
+            height="2.0" 
+            color="#2a2a2a" 
+            opacity="0.9"
+            position="0 2.2 0.005">
+          </a-plane>
+          
+          <!-- Force Controls Section -->
+          <a-text 
+            value="Force (N)" 
+            position="0 2.8 0.02" 
+            align="center" 
+            color="#FFC107" 
+            font="kelsonsans" 
+            width="6">
+          </a-text>
+          
+          <a-box 
+            id="force-minus" 
+            width="0.35" 
+            height="0.35" 
+            depth="0.06" 
+            color="#FF5722" 
+            position="-1.0 2.4 0.03"
+            class="clickable"
+            cursor-listener
+            event-set__mouseenter="color: #FF7043"
+            event-set__mouseleave="color: #FF5722">
+            <a-text 
+              value="-" 
+              position="0 0 0.04" 
+              align="center" 
+              color="white" 
+              font="kelsonsans" 
+              width="12">
+            </a-text>
+          </a-box>
+          
+          <a-text 
+            id="force-display" 
+            value="100" 
+            position="0 2.4 0.02" 
+            align="center" 
+            color="#4CAF50" 
+            font="kelsonsans" 
+            width="8">
+          </a-text>
+          
+          <a-box 
+            id="force-plus" 
+            width="0.35" 
+            height="0.35" 
+            depth="0.06" 
+            color="#4CAF50" 
+            position="1.0 2.4 0.03"
+            class="clickable"
+            cursor-listener
+            event-set__mouseenter="color: #66BB6A"
+            event-set__mouseleave="color: #4CAF50">
+            <a-text 
+              value="+" 
+              position="0 0 0.04" 
+              align="center" 
+              color="white" 
+              font="kelsonsans" 
+              width="12">
+            </a-text>
+          </a-box>
+          
+          <!-- Distance Controls Section -->
+          <a-text 
+            value="Distance (m)" 
+            position="0 1.9 0.02" 
+            align="center" 
+            color="#FFC107" 
+            font="kelsonsans" 
+            width="6">
+          </a-text>
+          
+          <a-box 
+            id="distance-minus" 
+            width="0.35" 
+            height="0.35" 
+            depth="0.06" 
+            color="#FF5722" 
+            position="-1.0 1.5 0.03"
+            class="clickable"
+            cursor-listener
+            event-set__mouseenter="color: #FF7043"
+            event-set__mouseleave="color: #FF5722">
+            <a-text 
+              value="-" 
+              position="0 0 0.04" 
+              align="center" 
+              color="white" 
+              font="kelsonsans" 
+              width="12">
+            </a-text>
+          </a-box>
+          
+          <a-text 
+            id="distance-display" 
+            value="5" 
+            position="0 1.5 0.02" 
+            align="center" 
+            color="#4CAF50" 
+            font="kelsonsans" 
+            width="8">
+          </a-text>
+          
+          <a-box 
+            id="distance-plus" 
+            width="0.35" 
+            height="0.35" 
+            depth="0.06" 
+            color="#4CAF50" 
+            position="1.0 1.5 0.03"
+            class="clickable"
+            cursor-listener
+            event-set__mouseenter="color: #66BB6A"
+            event-set__mouseleave="color: #4CAF50">
+            <a-text 
+              value="+" 
+              position="0 0 0.04" 
+              align="center" 
+              color="white" 
+              font="kelsonsans" 
+              width="12">
+            </a-text>
+          </a-box>
+          
+          <!-- Action Buttons Section -->
+          <a-box 
+            id="apply-force-btn" 
+            width="1.6" 
+            height="0.45" 
+            depth="0.06" 
+            color="#4CAF50" 
+            position="-0.9 1.0 0.03"
+            class="clickable"
+            cursor-listener
+            event-set__mouseenter="color: #66BB6A"
+            event-set__mouseleave="color: #4CAF50">
+            <a-text 
+              value="Apply Force" 
+              position="0 0 0.04" 
+              align="center" 
+              color="white" 
+              font="kelsonsans" 
+              width="6">
+            </a-text>
+          </a-box>
+          
+          <a-box 
+            id="reset-btn" 
+            width="1.6" 
+            height="0.45" 
+            depth="0.06" 
+            color="#f44336" 
+            position="0.9 1.0 0.03"
+            class="clickable"
+            cursor-listener
+            event-set__mouseenter="color: #EF5350"
+            event-set__mouseleave="color: #f44336">
+            <a-text 
+              value="Reset" 
+              position="0 0 0.04" 
+              align="center" 
+              color="white" 
+              font="kelsonsans" 
+              width="6">
+            </a-text>
+          </a-box>
+          
+          <!-- Separator Line -->
+          <a-plane 
+            width="3.2" 
+            height="0.03" 
+            color="#555" 
+            position="0 0.7 0.01">
+          </a-plane>
+          
+          <!-- Data Display Section Background -->
+          <a-plane 
+            width="4.2" 
+            height="4.5" 
+            color="#1e1e1e" 
+            opacity="0.9"
+            position="0 -1.8 0.005">
+          </a-plane>
+          
+          <!-- Car Data Section -->
+          <a-text 
+            value="CAR DATA" 
+            position="0 0.3 0.02" 
+            align="center" 
+            color="#FFC107" 
+            font="kelsonsans" 
+            width="7">
+          </a-text>
+          
+          <!-- Car Data Row 1 -->
+          <a-text 
+            value="Mass: 1200 kg" 
+            position="-1.8 -0.1 0.02" 
+            align="left" 
+            color="#E0E0E0" 
+            font="kelsonsans" 
+            width="5">
+          </a-text>
+          <a-text 
+            value="Accel:" 
+            position="0.2 -0.1 0.02" 
+            align="left" 
+            color="#E0E0E0" 
+            font="kelsonsans" 
+            width="5">
+          </a-text>
+          <a-text 
+            id="car-acceleration-3d" 
+            value="0 m/s²" 
+            position="1.8 -0.1 0.02" 
+            align="right" 
+            color="#4CAF50" 
+            font="kelsonsans" 
+            width="5">
+          </a-text>
+          
+          <!-- Car Data Row 2 -->
+          <a-text 
+            value="Velocity:" 
+            position="-1.8 -0.5 0.02" 
+            align="left" 
+            color="#E0E0E0" 
+            font="kelsonsans" 
+            width="5">
+          </a-text>
+          <a-text 
+            id="car-velocity-3d" 
+            value="0 m/s" 
+            position="-0.3 -0.5 0.02" 
+            align="left" 
+            color="#4CAF50" 
+            font="kelsonsans" 
+            width="5">
+          </a-text>
+          <a-text 
+            value="Distance:" 
+            position="0.2 -0.5 0.02" 
+            align="left" 
+            color="#E0E0E0" 
+            font="kelsonsans" 
+            width="5">
+          </a-text>
+          <a-text 
+            id="car-distance-3d" 
+            value="0 m" 
+            position="1.8 -0.5 0.02" 
+            align="right" 
+            color="#4CAF50" 
+            font="kelsonsans" 
+            width="5">
+          </a-text>
+          
+          <!-- Bicycle Data Section -->
+          <a-text 
+            value="BICYCLE DATA" 
+            position="0 -1.2 0.02" 
+            align="center" 
+            color="#FF9800" 
+            font="kelsonsans" 
+            width="7">
+          </a-text>
+          
+          <!-- Bicycle Data Row 1 -->
+          <a-text 
+            value="Mass: 50 kg" 
+            position="-1.8 -1.6 0.02" 
+            align="left" 
+            color="#E0E0E0" 
+            font="kelsonsans" 
+            width="5">
+          </a-text>
+          <a-text 
+            value="Accel:" 
+            position="0.2 -1.6 0.02" 
+            align="left" 
+            color="#E0E0E0" 
+            font="kelsonsans" 
+            width="5">
+          </a-text>
+          <a-text 
+            id="bicycle-acceleration-3d" 
+            value="0 m/s²" 
+            position="1.8 -1.6 0.02" 
+            align="right" 
+            color="#4CAF50" 
+            font="kelsonsans" 
+            width="5">
+          </a-text>
+          
+          <!-- Bicycle Data Row 2 -->
+          <a-text 
+            value="Velocity:" 
+            position="-1.8 -2.0 0.02" 
+            align="left" 
+            color="#E0E0E0" 
+            font="kelsonsans" 
+            width="5">
+          </a-text>
+          <a-text 
+            id="bicycle-velocity-3d" 
+            value="0 m/s" 
+            position="-0.3 -2.0 0.02" 
+            align="left" 
+            color="#4CAF50" 
+            font="kelsonsans" 
+            width="5">
+          </a-text>
+          <a-text 
+            value="Distance:" 
+            position="0.2 -2.0 0.02" 
+            align="left" 
+            color="#E0E0E0" 
+            font="kelsonsans" 
+            width="5">
+          </a-text>
+          <a-text 
+            id="bicycle-distance-3d" 
+            value="0 m" 
+            position="1.8 -2.0 0.02" 
+            align="right" 
+            color="#4CAF50" 
+            font="kelsonsans" 
+            width="5">
+          </a-text>
+        </a-entity>
+
         <!-- Portal back to index.html -->
         <a-link
           link="on:click"
@@ -173,45 +593,40 @@
       </a-entity>
     </a-scene>
 
-    <!-- Physics Control Panel -->
-    <div id="physics-panel" style="position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: white; padding: 20px; border-radius: 10px; font-family: Arial; z-index: 1000;">
-      <h3 style="margin-top: 0;">Physics Simulation Control</h3>
-      
-      <div style="margin-bottom: 15px;">
-        <label>Force (N): </label>
-        <input type="number" id="force-input" value="100" min="0" max="5000" step="10" style="width: 80px;">
-      </div>
-      
-      <div style="margin-bottom: 15px;">
-        <label>Distance (m): </label>
-        <input type="number" id="distance-input" value="5" min="0" max="50" step="0.5" style="width: 80px;">
-      </div>
-      
-      <div style="margin-bottom: 15px;">
-        <button id="apply-force-btn" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Apply Force</button>
-        <button id="reset-btn" style="background: #f44336; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-left: 10px;">Reset</button>
-      </div>
-      
-      <hr style="border-color: #555;">
-      
-      <div style="margin-bottom: 10px;">
-        <h4 style="margin-bottom: 5px;">Car Data:</h4>
-        <div>Mass: <span id="car-mass">1200</span> kg</div>
-        <div>Acceleration: <span id="car-acceleration">0</span> m/s²</div>
-        <div>Velocity: <span id="car-velocity">0</span> m/s</div>
-        <div>Distance Traveled: <span id="car-distance">0</span> m</div>
-      </div>
-      
-      <div style="margin-bottom: 10px;">
-        <h4 style="margin-bottom: 5px;">Bicycle Data:</h4>
-        <div>Mass: <span id="bicycle-mass">50</span> kg</div>
-        <div>Acceleration: <span id="bicycle-acceleration">0</span> m/s²</div>
-        <div>Velocity: <span id="bicycle-velocity">0</span> m/s</div>
-        <div>Distance Traveled: <span id="bicycle-distance">0</span> m</div>
-      </div>
-    </div>
-
     <script>
+      // Cursor Listener Component for 3D UI interactions
+      AFRAME.registerComponent('cursor-listener', {
+        init: function () {
+          this.el.addEventListener('click', this.onClick.bind(this));
+          this.el.addEventListener('mouseenter', this.onMouseEnter.bind(this));
+          this.el.addEventListener('mouseleave', this.onMouseLeave.bind(this));
+        },
+        onClick: function (evt) {
+          console.log('Element clicked:', this.el.id);
+          
+          // Handle button clicks based on element ID
+          if (this.el.id === 'force-minus') {
+            physicsSimulation3D.adjustForce(-1);
+          } else if (this.el.id === 'force-plus') {
+            physicsSimulation3D.adjustForce(1);
+          } else if (this.el.id === 'distance-minus') {
+            physicsSimulation3D.adjustDistance(-1);
+          } else if (this.el.id === 'distance-plus') {
+            physicsSimulation3D.adjustDistance(1);
+          } else if (this.el.id === 'apply-force-btn') {
+            physicsSimulation3D.applyForce();
+          } else if (this.el.id === 'reset-btn') {
+            physicsSimulation3D.reset();
+          }
+        },
+        onMouseEnter: function (evt) {
+          console.log('Mouse enter:', this.el.id);
+        },
+        onMouseLeave: function (evt) {
+          console.log('Mouse leave:', this.el.id);
+        }
+      });
+
       // Component to make one entity follow another
       AFRAME.registerComponent('follow', {
         schema: { target: { type: 'selector' } },
@@ -220,6 +635,109 @@
           this.el.object3D.position.copy(this.data.target.object3D.position);
           this.el.object3D.quaternion.copy(this.data.target.object3D.quaternion);
         },
+      });
+
+      // 3D Slider Component
+      AFRAME.registerComponent('slider-3d', {
+        schema: {
+          min: { default: 0 },
+          max: { default: 100 },
+          value: { default: 50 },
+          width: { default: 3 },
+          target: { type: 'selector' }
+        },
+        init: function () {
+          this.isDragging = false;
+          this.startPosition = new THREE.Vector3();
+          this.currentPosition = new THREE.Vector3();
+          
+          this.el.addEventListener('mousedown', this.onMouseDown.bind(this));
+          this.el.addEventListener('mouseup', this.onMouseUp.bind(this));
+          this.el.sceneEl.addEventListener('mousemove', this.onMouseMove.bind(this));
+          
+          // Set initial position based on value
+          this.updateSliderPosition();
+        },
+        onMouseDown: function (evt) {
+          this.isDragging = true;
+          this.el.object3D.getWorldPosition(this.startPosition);
+        },
+        onMouseUp: function (evt) {
+          this.isDragging = false;
+        },
+        onMouseMove: function (evt) {
+          if (!this.isDragging) return;
+          
+          const raycaster = this.el.sceneEl.systems.raycaster.raycaster;
+          const camera = this.el.sceneEl.camera;
+          
+          // Calculate intersection with slider plane
+          const slider = this.el;
+          const parent = slider.parentNode;
+          const parentPos = new THREE.Vector3();
+          parent.object3D.getWorldPosition(parentPos);
+          
+          // Calculate local X position relative to slider track
+          const halfWidth = this.data.width / 2;
+          const localX = THREE.MathUtils.clamp(
+            evt.detail.intersection.point.x - parentPos.x,
+            -halfWidth,
+            halfWidth
+          );
+          
+          // Update slider position
+          slider.setAttribute('position', `${localX} ${slider.getAttribute('position').y} ${slider.getAttribute('position').z}`);
+          
+          // Calculate value based on position
+          const normalizedPos = (localX + halfWidth) / this.data.width;
+          this.data.value = this.data.min + normalizedPos * (this.data.max - this.data.min);
+          
+          // Update display
+          this.updateDisplay();
+        },
+        updateSliderPosition: function () {
+          const normalizedValue = (this.data.value - this.data.min) / (this.data.max - this.data.min);
+          const halfWidth = this.data.width / 2;
+          const posX = -halfWidth + normalizedValue * this.data.width;
+          
+          const currentPos = this.el.getAttribute('position');
+          this.el.setAttribute('position', `${posX} ${currentPos.y} ${currentPos.z}`);
+        },
+        updateDisplay: function () {
+          if (this.data.target) {
+            this.data.target.setAttribute('value', Math.round(this.data.value).toString());
+          }
+        }
+      });
+
+      // Simple slider component for 3D interface
+      AFRAME.registerComponent('simple-slider', {
+        schema: {
+          min: { default: 0 },
+          max: { default: 100 },
+          value: { default: 50 },
+          step: { default: 10 }
+        },
+        init: function () {
+          this.el.addEventListener('click', this.onClick.bind(this));
+        },
+        onClick: function (evt) {
+          // Cycle through values on click
+          this.data.value += this.data.step;
+          if (this.data.value > this.data.max) {
+            this.data.value = this.data.min;
+          }
+          this.updatePosition();
+          this.el.emit('valuechange', { value: this.data.value });
+        },
+        updatePosition: function () {
+          const normalizedValue = (this.data.value - this.data.min) / (this.data.max - this.data.min);
+          const halfWidth = 1.5; // 3/2
+          const posX = -halfWidth + normalizedValue * 3;
+          
+          const currentPos = this.el.getAttribute('position');
+          this.el.setAttribute('position', `${posX} ${currentPos.y} ${currentPos.z}`);
+        }
       });
 
       // Player collider: stops the player from penetrating any .collidable object
@@ -371,6 +889,14 @@
           this.startPosition = new THREE.Vector3();
           this.targetDistance = 0;
           this.friction = 0.995; // Reduced friction for better movement
+          this.maxValues = {
+            acceleration: 0,
+            velocity: 0,
+            distance: 0
+          }; // Store maximum values achieved
+          this.lastForceAppliedTime = 0;
+          this.shouldKeepDisplayData = false; // Flag to keep data displayed
+          this.inputForce = 0; // Store the input force value for display
           
           // Wait for the element to be loaded before capturing start position
           this.el.addEventListener('loaded', () => {
@@ -401,13 +927,34 @@
           this.distanceTraveled = 0;
           this.targetDistance = targetDistance;
           this.captureStartPosition();
+          this.lastForceAppliedTime = Date.now();
+          this.shouldKeepDisplayData = true; // Keep data displayed until manual reset
+          
+          // Store the actual input force value for display
+          this.inputForce = force.length() / 50; // Reverse the multiplication done in PhysicsSimulation3D
+          
+          // Reset max values when new force is applied
+          this.maxValues.acceleration = 0;
+          this.maxValues.velocity = 0;
+          this.maxValues.distance = 0;
           
           console.log(`Applying force to ${this.el.id}:`, {
-            force: force,
+            inputForce: this.inputForce,
+            actualForce: force,
             mass: this.data.mass,
             acceleration: this.acceleration,
             targetDistance: targetDistance
           });
+
+          if (this.el.id === 'ferrari-body') {
+            const npc = document.getElementById('npc-pusher');
+            if (npc) {
+              npc.setAttribute('visible', true);
+            }
+          }
+          
+          // Show force and acceleration indicators immediately
+          this.updateIndicators();
         },
         tick: function (time, delta) {
           if (!this.isMoving) return;
@@ -459,35 +1006,96 @@
           if (this.distanceTraveled >= this.targetDistance || this.velocity.length() < 0.01) {
             this.isMoving = false;
             this.velocity.set(0, 0, 0);
-            // Don't reset acceleration - keep it for display until manual reset
+            // Keep acceleration and distance data for display until manual reset
             console.log(`${this.el.id} stopped. Distance traveled: ${this.distanceTraveled}`);
             console.log(`Final acceleration was: ${this.acceleration.length()}`);
+
+            if (this.el.id === 'ferrari-body') {
+              const npc = document.getElementById('npc-pusher');
+              if (npc) {
+                npc.setAttribute('visible', false);
+              }
+            }
+          }
+
+          // Update maximum values achieved during movement
+          const currentAccel = this.acceleration.length();
+          const currentVel = this.velocity.length();
+          const currentDist = this.distanceTraveled;
+          
+          if (currentAccel > this.maxValues.acceleration) {
+            this.maxValues.acceleration = currentAccel;
+          }
+          if (currentVel > this.maxValues.velocity) {
+            this.maxValues.velocity = currentVel;
+          }
+          if (currentDist > this.maxValues.distance) {
+            this.maxValues.distance = currentDist;
           }
 
           // Update UI and arrow
           this.updateUI();
           this.updateArrow();
+          this.updateIndicators();
+        },
+        updateIndicators: function () {
+          const objectType = this.el.id.includes('ferrari') ? 'car' : 'bicycle';
+          
+          // Get force and acceleration indicators
+          const forceIndicator = document.getElementById(`${objectType}-force-indicator`);
+          const accelIndicator = document.getElementById(`${objectType}-acceleration-indicator`);
+          
+          if (this.shouldKeepDisplayData && this.inputForce) {
+            // Show indicators with input values
+            if (forceIndicator) {
+              forceIndicator.setAttribute('value', `F: ${this.inputForce.toFixed(0)}N`);
+              forceIndicator.setAttribute('visible', true);
+            }
+            
+            if (accelIndicator) {
+              // Calculate theoretical acceleration: F = ma, so a = F/m
+              const theoreticalAccel = this.inputForce / this.data.mass;
+              accelIndicator.setAttribute('value', `A: ${theoreticalAccel.toFixed(2)} m/s²`);
+              accelIndicator.setAttribute('visible', true);
+            }
+          } else {
+            // Hide indicators when no force applied or after reset
+            if (forceIndicator) forceIndicator.setAttribute('visible', false);
+            if (accelIndicator) accelIndicator.setAttribute('visible', false);
+          }
         },
         updateUI: function () {
           const objectType = this.el.id.includes('ferrari') ? 'car' : 'bicycle';
           
-          // Force DOM update by using requestAnimationFrame
+          // Update 3D UI elements instead of HTML elements
           requestAnimationFrame(() => {
-            const massEl = document.getElementById(`${objectType}-mass`);
-            const accelEl = document.getElementById(`${objectType}-acceleration`);
-            const velocityEl = document.getElementById(`${objectType}-velocity`);
-            const distanceEl = document.getElementById(`${objectType}-distance`);
+            const accelEl = document.getElementById(`${objectType}-acceleration-3d`);
+            const velocityEl = document.getElementById(`${objectType}-velocity-3d`);
+            const distanceEl = document.getElementById(`${objectType}-distance-3d`);
             
-            if (massEl) massEl.textContent = this.data.mass;
-            if (accelEl) accelEl.textContent = this.acceleration.length().toFixed(2);
-            if (velocityEl) velocityEl.textContent = this.velocity.length().toFixed(2);
-            if (distanceEl) distanceEl.textContent = this.distanceTraveled.toFixed(2);
+            // If we should keep display data (not manually reset), show values based on input
+            if (this.shouldKeepDisplayData) {
+              if (accelEl && this.inputForce) {
+                // Show theoretical acceleration based on input force: a = F/m
+                const theoreticalAccel = this.inputForce / this.data.mass;
+                accelEl.setAttribute('value', `${theoreticalAccel.toFixed(2)} m/s²`);
+              }
+              if (velocityEl) velocityEl.setAttribute('value', `${this.maxValues.velocity.toFixed(2)} m/s`);
+              if (distanceEl) distanceEl.setAttribute('value', `${this.maxValues.distance.toFixed(2)} m`);
+            } else {
+              // Show zero values when reset
+              if (accelEl) accelEl.setAttribute('value', `0.00 m/s²`);
+              if (velocityEl) velocityEl.setAttribute('value', `0.00 m/s`);
+              if (distanceEl) distanceEl.setAttribute('value', `0.00 m`);
+            }
             
-            console.log(`UI Updated for ${objectType}:`, {
+            console.log(`3D UI Updated for ${objectType} (${this.el.id}):`, {
               mass: this.data.mass,
-              acceleration: this.acceleration.length().toFixed(2),
-              velocity: this.velocity.length().toFixed(2),
-              distance: this.distanceTraveled.toFixed(2)
+              inputForce: this.inputForce || 0,
+              theoreticalAcceleration: this.inputForce ? (this.inputForce / this.data.mass).toFixed(2) : '0.00',
+              maxVelocity: this.shouldKeepDisplayData ? this.maxValues.velocity.toFixed(2) : '0.00',
+              maxDistance: this.shouldKeepDisplayData ? this.maxValues.distance.toFixed(2) : '0.00',
+              keepingData: this.shouldKeepDisplayData
             });
           });
         },
@@ -506,20 +1114,20 @@
           }
           
           // Show arrow if there's any acceleration data (even when stopped)
-          if (this.acceleration.length() > 0) {
+          if (this.shouldKeepDisplayData && this.inputForce > 0) {
             arrow.setAttribute('visible', true);
             
-            // Scale arrow based on acceleration magnitude (more responsive scaling)
-            const accelerationMagnitude = this.acceleration.length();
+            // Scale arrow based on input force (more meaningful scaling)
+            const forceMagnitude = this.inputForce;
             const minScale = 0.3;
-            const maxScale = 5.0;
-            const scaleFactor = 2.0; // Increased sensitivity to acceleration
+            const maxScale = 2.0;
+            const scaleFactor = 0.01; // Scale factor for force
             
-            // More aggressive scaling based on acceleration
-            let scale = minScale + (accelerationMagnitude * scaleFactor);
+            // Scale based on input force
+            let scale = minScale + (forceMagnitude * scaleFactor);
             scale = Math.max(minScale, Math.min(maxScale, scale));
             
-            console.log(`${objectType} - Acceleration: ${accelerationMagnitude.toFixed(3)}, Scale: ${scale.toFixed(2)}`);
+            console.log(`${objectType} - Input Force: ${forceMagnitude}N, Arrow Scale: ${scale.toFixed(2)}`);
             
             arrow.setAttribute('scale', `${scale} ${scale} ${scale}`);
             
@@ -531,71 +1139,89 @@
               arrow.setAttribute('rotation', `0 ${angle} 0`);
             }
             
-            console.log(`Arrow visible for ${objectType}, scale: ${scale.toFixed(2)}, acceleration: ${accelerationMagnitude.toFixed(2)}`);
+            console.log(`Arrow visible for ${objectType}, scale: ${scale.toFixed(2)}, input force: ${forceMagnitude}N`);
           } else {
             arrow.setAttribute('visible', false);
           }
         }
       });
 
-      // Physics Simulation Manager
-      class PhysicsSimulation {
+      // 3D Physics Simulation Manager
+      class PhysicsSimulation3D {
         constructor() {
-          this.setupEventListeners();
+          this.forceValue = 100;
+          this.distanceValue = 5;
+          this.updateDisplays();
         }
 
-        setupEventListeners() {
-          document.getElementById('apply-force-btn').addEventListener('click', () => {
-            this.applyForce();
-          });
+        adjustForce(direction) {
+          this.forceValue += direction * 10; // Changed from 25 to 10 for more precise control
+          this.forceValue = Math.max(0, Math.min(1000, this.forceValue)); // Increased max to 1000
+          this.updateDisplays();
+          console.log('Force adjusted to:', this.forceValue);
+        }
 
-          document.getElementById('reset-btn').addEventListener('click', () => {
-            this.reset();
-          });
+        adjustDistance(direction) {
+          this.distanceValue += direction * 1;
+          this.distanceValue = Math.max(1, Math.min(20, this.distanceValue));
+          this.updateDisplays();
+          console.log('Distance adjusted to:', this.distanceValue);
+        }
+
+        updateDisplays() {
+          const forceDisplay = document.getElementById('force-display');
+          const distanceDisplay = document.getElementById('distance-display');
+          
+          if (forceDisplay) {
+            forceDisplay.setAttribute('value', this.forceValue.toString());
+          }
+          if (distanceDisplay) {
+            distanceDisplay.setAttribute('value', this.distanceValue.toString());
+          }
         }
 
         applyForce() {
-          const forceValue = parseFloat(document.getElementById('force-input').value) || 0;
-          const distance = parseFloat(document.getElementById('distance-input').value) || 0;
+          console.log(`Applying 3D force: ${this.forceValue}N, Distance: ${this.distanceValue}m`);
 
-          console.log(`Applying force: ${forceValue}N, Distance: ${distance}m`);
-
-          // Apply force to car (backward direction) - multiply by 50 for more visible effect
+          // Apply force to car (backward direction)
           const carBody = document.getElementById('ferrari-body');
           if (carBody && carBody.components && carBody.components['physics-object']) {
-            const carForce = new THREE.Vector3(0, 0, forceValue * 50); // Backward direction with multiplier
-            carBody.components['physics-object'].applyForce(carForce, distance);
-            console.log('Force applied to car');
+            const carForce = new THREE.Vector3(0, 0, this.forceValue * 50);
+            carBody.components['physics-object'].applyForce(carForce, this.distanceValue);
+            console.log('3D Force applied to car');
           } else {
-            console.error('Car physics object not found or not initialized');
+            console.error('Car physics object not found');
           }
 
-          // Apply force to bicycle (backward direction) - multiply by 50 for more visible effect
+          // Apply force to bicycle (backward direction)
           const bicycleBody = document.getElementById('sepeda-body');
           if (bicycleBody && bicycleBody.components && bicycleBody.components['physics-object']) {
-            const bicycleForce = new THREE.Vector3(0, 0, forceValue * 50); // Backward direction with multiplier
-            bicycleBody.components['physics-object'].applyForce(bicycleForce, distance);
-            console.log('Force applied to bicycle');
+            const bicycleForce = new THREE.Vector3(0, 0, this.forceValue * 50);
+            bicycleBody.components['physics-object'].applyForce(bicycleForce, this.distanceValue);
+            console.log('3D Force applied to bicycle');
           } else {
-            console.error('Bicycle physics object not found or not initialized');
+            console.error('Bicycle physics object not found');
           }
         }
 
         reset() {
-          console.log('Resetting simulation...');
+          console.log('Resetting 3D simulation...');
+
+          const npc = document.getElementById('npc-pusher');
+          if (npc) {
+            npc.setAttribute('visible', false);
+          }
           
           // Reset car position
           const carGroup = document.getElementById('car-group');
           if (carGroup) {
             carGroup.setAttribute('position', '0 0 2');
-            console.log('Car position reset to 0 0 2');
           }
           
           // Reset bicycle position
           const bicycleGroup = document.getElementById('sepeda-group');
           if (bicycleGroup) {
             bicycleGroup.setAttribute('position', '3 0.6 3');
-            console.log('Bicycle position reset to 3 0.6 3');
           }
 
           // Reset physics components
@@ -607,7 +1233,11 @@
               physics.acceleration.set(0, 0, 0);
               physics.isMoving = false;
               physics.distanceTraveled = 0;
+              physics.shouldKeepDisplayData = false; // Allow data to be reset
+              physics.maxValues = { acceleration: 0, velocity: 0, distance: 0 }; // Reset max values
+              physics.inputForce = 0; // Reset input force
               physics.captureStartPosition();
+              physics.updateIndicators(); // Hide indicators
             }
 
             const bicycleBody = document.getElementById('sepeda-body');
@@ -617,7 +1247,11 @@
               physics.acceleration.set(0, 0, 0);
               physics.isMoving = false;
               physics.distanceTraveled = 0;
+              physics.shouldKeepDisplayData = false; // Allow data to be reset
+              physics.maxValues = { acceleration: 0, velocity: 0, distance: 0 }; // Reset max values
+              physics.inputForce = 0; // Reset input force
               physics.captureStartPosition();
+              physics.updateIndicators(); // Hide indicators
             }
 
             // Hide arrows
@@ -626,22 +1260,58 @@
             if (carArrow) carArrow.setAttribute('visible', false);
             if (sepedaArrow) sepedaArrow.setAttribute('visible', false);
 
-            // Reset UI displays with force update
-            requestAnimationFrame(() => {
-              const elements = [
-                'car-acceleration', 'car-velocity', 'car-distance',
-                'bicycle-acceleration', 'bicycle-velocity', 'bicycle-distance'
-              ];
-              
-              elements.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                  element.textContent = '0';
-                  console.log(`Reset ${id} to 0`);
-                }
-              });
-            });
+            // Reset 3D UI displays
+            this.resetUI();
           }, 100);
+        }
+
+        resetUI() {
+          requestAnimationFrame(() => {
+            const elements = [
+              { id: 'car-acceleration-3d', value: '0 m/s²' },
+              { id: 'car-velocity-3d', value: '0 m/s' },
+              { id: 'car-distance-3d', value: '0 m' },
+              { id: 'bicycle-acceleration-3d', value: '0 m/s²' },
+              { id: 'bicycle-velocity-3d', value: '0 m/s' },
+              { id: 'bicycle-distance-3d', value: '0 m' }
+            ];
+            
+            elements.forEach(item => {
+              const element = document.getElementById(item.id);
+              if (element) {
+                element.setAttribute('value', item.value);
+                console.log(`Reset 3D UI ${item.id} to ${item.value}`);
+              }
+            });
+          });
+        }
+      }
+
+      // Global variable for the 3D physics simulation
+      let physicsSimulation3D;
+
+      // Physics Simulation Manager (Legacy - keeping for compatibility)
+      class PhysicsSimulation {
+        constructor() {
+          // This is now just a placeholder - all functionality moved to PhysicsSimulation3D
+        }
+
+        setupEventListeners() {
+          // No longer needed as we use 3D interface
+        }
+
+        applyForce() {
+          // Redirect to 3D version
+          if (physicsSimulation3D) {
+            physicsSimulation3D.applyForce();
+          }
+        }
+
+        reset() {
+          // Redirect to 3D version
+          if (physicsSimulation3D) {
+            physicsSimulation3D.reset();
+          }
         }
       }
 
@@ -657,17 +1327,26 @@
           rig.setAttribute('player-info', 'avatarSrc', modelUrl);
         }
 
-        // Wait a bit more for A-Frame to fully initialize
+        // Wait for A-Frame to fully initialize
         setTimeout(() => {
-          console.log('Initializing Physics Simulation...');
-          const simulation = new PhysicsSimulation();
+          console.log('Initializing 3D Physics Simulation...');
+          physicsSimulation3D = new PhysicsSimulation3D();
           
           // Test if elements are available
           const carBody = document.getElementById('ferrari-body');
           const bicycleBody = document.getElementById('sepeda-body');
+          const panel3D = document.getElementById('physics-panel-3d');
           console.log('Car body element:', carBody);
           console.log('Bicycle body element:', bicycleBody);
-        }, 1000);
+          console.log('3D Panel element:', panel3D);
+          
+          // Test button elements
+          const buttons = ['force-minus', 'force-plus', 'distance-minus', 'distance-plus', 'apply-force-btn', 'reset-btn'];
+          buttons.forEach(buttonId => {
+            const button = document.getElementById(buttonId);
+            console.log(`Button ${buttonId}:`, button ? 'Found' : 'Not Found');
+          });
+        }, 1500);
       });
     </script>
   </body>
