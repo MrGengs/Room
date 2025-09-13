@@ -20,6 +20,12 @@
       <!-- Assets - Conditional Loading -->
       <a-assets timeout="10000">
         <img id="thumbScene1" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" />
+        
+        <!-- Audio assets untuk efek suara -->
+        <audio id="collisionSound" crossorigin="anonymous" preload="auto">
+          <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+r1yW8iCz5/yPTMgSUFK3nO9d2ONgcXZLjr6qaUGBBIo+3zxm0hCTp+wvLNfSMDL4TP9diALgUlcs7y2W4jBy+N0PLUbCEGMYnZ8c1wJAAzdNrz0G8gBSyCzfPLdSIEO5DV79JlGgU/jNXux2EaBC+N0vHKdCMCMnPN8tV3JQQM0Pb4rFA" type="audio/wav">
+        </audio>
+        
         <!-- Fallback untuk jika GLB tidak tersedia -->
         <a-mixin id="fallback-box"
                  geometry="primitive: box; width: 2; height: 1; depth: 1"
@@ -67,6 +73,16 @@
                position="5 10 5" 
                intensity="0.6"
                shadow="cast: true; mapSize: 2048">
+      </a-light>
+      
+      <!-- Collision flash light untuk dramatic effect -->
+      <a-light id="collisionFlash"
+               type="point" 
+               position="0 1 -3" 
+               intensity="0"
+               color="#FFD700"
+               distance="10"
+               decay="2">
       </a-light>
 
       <!-- Kamera dengan gaze cursor -->
@@ -310,7 +326,8 @@
           radius="0.25" 
           color="#cc2f2f"
           material="depthTest: true"
-          shadow="cast: true">
+          shadow="cast: true"
+          ball-deformation="intensity: 0.2; duration: 300">
         </a-sphere>
         <a-text 
           id="label1" 
@@ -328,7 +345,8 @@
           radius="0.25" 
           color="#4545ff"
           material="depthTest: true"
-          shadow="cast: true">
+          shadow="cast: true"
+          ball-deformation="intensity: 0.2; duration: 300">
         </a-sphere>
         <a-text 
           id="label2" 
@@ -338,6 +356,614 @@
           color="white"
           material="depthTest: false; transparent: true">
         </a-text>
+
+        <!-- Particle system untuk efek collision -->
+        <a-entity id="collisionParticles" 
+                  position="0 1 -3" 
+                  visible="false"
+                  particle-system="preset: spark; 
+                                  particleCount: 200; 
+                                  maxAge: 1.5; 
+                                  accelerationValue: 0, -10, 0; 
+                                  velocityValue: 5 5 5; 
+                                  velocitySpread: 3 3 3;
+                                  size: 0.1, 0.01;
+                                  color: #FFD700, #FF6347, #FF0000;
+                                  opacity: 1.0, 0.0"
+                  sound="src: #collisionSound; autoplay: false; volume: 0.5; poolSize: 3">
+        </a-entity>
+
+        <!-- Trail effects untuk bola -->
+        <a-entity id="trail1" 
+                  visible="false"
+                  position="-4 1 -3"
+                  particle-system="preset: default; 
+                                  particleCount: 50; 
+                                  maxAge: 2; 
+                                  accelerationValue: 0, 0, 0; 
+                                  velocityValue: 0 0 0; 
+                                  velocitySpread: 0.1 0.1 0.1;
+                                  size: 0.05;
+                                  color: #cc2f2f, #ff6666;
+                                  opacity: 0.8, 0.0">
+        </a-entity>
+
+        <a-entity id="trail2" 
+                  visible="false"
+                  position="4 1 -3"
+                  particle-system="preset: default; 
+                                  particleCount: 50; 
+                                  maxAge: 2; 
+                                  accelerationValue: 0, 0, 0; 
+                                  velocityValue: 0 0 0; 
+                                  velocitySpread: 0.1 0.1 0.1;
+                                  size: 0.05;
+                                  color: #4545ff, #7777ff;
+                                  opacity: 0.8, 0.0">
+        </a-entity>
+
+        <!-- Physics Collision Type Selector -->
+        <a-entity position="0 3 -1" rotation="-20 0 0">
+          <a-text 
+            value="JENIS TUMBUKAN:" 
+            position="0 0.8 0" 
+            align="center" 
+            color="#FFD700" 
+            width="4"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
+          <!-- Elastic Collision Button -->
+          <a-entity position="-1.5 0.4 0">
+            <a-box 
+              id="btnElastic"
+              class="clickable"
+              depth="0.1" 
+              height="0.3" 
+              width="1.2" 
+              color="#00ff00"
+              material="depthTest: true"
+              event-set__enter="_event: mouseenter; scale:1.05 1.05 1.05; color:#44ff44"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#00ff00">
+            </a-box>
+            <a-text 
+              value="ELASTIS&#10;(e = 1)" 
+              color="#fff" 
+              align="center" 
+              width="3" 
+              position="0 0 0.06"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+          
+          <!-- Inelastic Collision Button -->
+          <a-entity position="1.5 0.4 0">
+            <a-box 
+              id="btnInelastic"
+              class="clickable"
+              depth="0.1" 
+              height="0.3" 
+              width="1.2" 
+              color="#ff6600"
+              material="depthTest: true"
+              event-set__enter="_event: mouseenter; scale:1.05 1.05 1.05; color:#ff9944"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff6600">
+            </a-box>
+            <a-text 
+              value="TIDAK ELASTIS&#10;(e = 0)" 
+              color="#fff" 
+              align="center" 
+              width="3" 
+              position="0 0 0.06"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+          
+          <!-- Physics Guide Button -->
+          <a-entity position="0 -0.2 0">
+            <a-box 
+              id="btnPhysicsGuide"
+              class="clickable"
+              depth="0.1" 
+              height="0.25" 
+              width="2" 
+              color="#4444ff"
+              material="depthTest: true"
+              event-set__enter="_event: mouseenter; scale:1.05 1.05 1.05; color:#6666ff"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#4444ff">
+            </a-box>
+            <a-text 
+              value="PANDUAN FISIKA" 
+              color="#fff" 
+              align="center" 
+              width="4" 
+              position="0 0 0.06"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+
+          <!-- Mass Demo Buttons -->
+          <a-entity position="0 -0.8 0">
+            <a-text 
+              value="DEMO MASSA:" 
+              color="#ffffff" 
+              align="center" 
+              width="3" 
+              position="0 0.3 0"
+              material="depthTest: false; transparent: true">
+            </a-text>
+            
+            <!-- Heavy vs Light Demo -->
+            <a-entity position="-1.2 0 0">
+              <a-box 
+                id="btnHeavyLight"
+                class="clickable"
+                depth="0.08" 
+                height="0.2" 
+                width="1" 
+                color="#ff6600"
+                material="depthTest: true"
+                event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff8833"
+                event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff6600">
+              </a-box>
+              <a-text 
+                value="BERAT vs RINGAN" 
+                color="#fff" 
+                align="center" 
+                width="2.5" 
+                position="0 0 0.05"
+                material="depthTest: false; transparent: true">
+              </a-text>
+            </a-entity>
+
+            <!-- Equal Mass Demo -->
+            <a-entity position="0 0 0">
+              <a-box 
+                id="btnEqualMass"
+                class="clickable"
+                depth="0.08" 
+                height="0.2" 
+                width="1" 
+                color="#00aa00"
+                material="depthTest: true"
+                event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#33cc33"
+                event-set__leave="_event: mouseleave; scale:1 1 1; color:#00aa00">
+              </a-box>
+              <a-text 
+                value="MASSA SAMA" 
+                color="#fff" 
+                align="center" 
+                width="2.5" 
+                position="0 0 0.05"
+                material="depthTest: false; transparent: true">
+              </a-text>
+            </a-entity>
+
+            <!-- Light vs Heavy Demo -->
+            <a-entity position="1.2 0 0">
+              <a-box 
+                id="btnLightHeavy"
+                class="clickable"
+                depth="0.08" 
+                height="0.2" 
+                width="1" 
+                color="#aa00aa"
+                material="depthTest: true"
+                event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#cc33cc"
+                event-set__leave="_event: mouseleave; scale:1 1 1; color:#aa00aa">
+              </a-box>
+              <a-text 
+                value="RINGAN vs BERAT" 
+                color="#fff" 
+                align="center" 
+                width="2.5" 
+                position="0 0 0.05"
+                material="depthTest: false; transparent: true">
+              </a-text>
+            </a-entity>
+          </a-entity>
+        </a-entity>
+
+        <!-- Kontrol untuk Bola 1 (Merah) - Input Ketik -->
+        <a-entity id="UImerahWrapper" position="-3 0.5 0" rotation="-15 20 0">
+          <a-text 
+            value="BOLA MERAH" 
+            position="0 0.8 0" 
+            align="center" 
+            color="#ff4444" 
+            width="4"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
+          <!-- Kontrol Massa Bola 1 -->
+          <a-text 
+            value="Massa (kg): Klik kotak untuk input" 
+            position="0 0.5 0" 
+            align="center" 
+            color="white" 
+            width="2.5"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
+          <!-- Input field untuk massa bola 1 -->
+          <a-entity position="0 0.3 0">
+            <a-box 
+              id="inputM1Box"
+              class="clickable"
+              depth="0.05" 
+              height="0.2" 
+              width="1.2" 
+              color="#2a2a2a"
+              material="depthTest: true"
+              event-set__enter="_event: mouseenter; scale:1.05 1.05 1.05; color:#3a3a3a"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#2a2a2a">
+            </a-box>
+            <a-text 
+              id="inputM1Text"
+              value="1.0" 
+              color="#fff" 
+              align="center" 
+              width="3" 
+              position="0 0 0.03"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+          
+          <!-- Kontrol Kecepatan Bola 1 -->
+          <a-text 
+            value="Kecepatan (m/s): Klik kotak untuk input" 
+            position="0 0.0 0" 
+            align="center" 
+            color="white" 
+            width="2.5"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
+          <!-- Input field untuk kecepatan bola 1 -->
+          <a-entity position="0 -0.2 0">
+            <a-box 
+              id="inputV1Box"
+              class="clickable"
+              depth="0.05" 
+              height="0.2" 
+              width="1.2" 
+              color="#2a2a2a"
+              material="depthTest: true"
+              event-set__enter="_event: mouseenter; scale:1.05 1.05 1.05; color:#3a3a3a"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#2a2a2a">
+            </a-box>
+            <a-text 
+              id="inputV1Text"
+              value="1.0" 
+              color="#fff" 
+              align="center" 
+              width="3" 
+              position="0 0 0.03"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+        </a-entity>
+          
+          <!-- Tombol kontrol input massa -->
+          <a-entity position="-0.7 0.1 0">
+            <a-box 
+              id="btnM1Minus5"
+              class="clickable"
+              depth="0.05" 
+              height="0.1" 
+              width="0.15" 
+              color="#ff6666"
+              material="depthTest: true"
+              event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff9999"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff6666">
+            </a-box>
+            <a-text 
+              value="-5" 
+              color="#fff" 
+              align="center" 
+              width="5" 
+              position="0 0 0.03"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+          
+          <a-entity position="-0.5 0.1 0">
+            <a-box 
+              id="btnM1Minus"
+              class="clickable"
+              depth="0.05" 
+              height="0.12" 
+              width="0.2" 
+              color="#ff4444"
+              material="depthTest: true"
+              event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff7777"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff4444">
+            </a-box>
+            <a-text 
+              value="-0.5" 
+              color="#fff" 
+              align="center" 
+              width="4" 
+              position="0 0 0.03"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+          
+          <a-entity position="0.5 0.1 0">
+            <a-box 
+              id="btnM1Plus"
+              class="clickable"
+              depth="0.05" 
+              height="0.12" 
+              width="0.2" 
+              color="#44ff44"
+              material="depthTest: true"
+              event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#77ff77"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#44ff44">
+            </a-box>
+            <a-text 
+              value="+0.5" 
+              color="#fff" 
+              align="center" 
+              width="4" 
+              position="0 0 0.03"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+          
+          <a-entity position="0.7 0.1 0">
+            <a-box 
+              id="btnM1Plus5"
+              class="clickable"
+              depth="0.05" 
+              height="0.1" 
+              width="0.15" 
+              color="#66ff66"
+              material="depthTest: true"
+              event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#99ff99"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#66ff66">
+            </a-box>
+            <a-text 
+              value="+5" 
+              color="#fff" 
+              align="center" 
+              width="5" 
+              position="0 0 0.03"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+          
+          <!-- Kontrol Kecepatan Bola 1 -->
+          <a-text 
+            value="Kecepatan (m/s):" 
+            position="0 -0.1 0" 
+            align="center" 
+            color="white" 
+            width="3"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
+          <!-- Input field untuk kecepatan bola 1 -->
+          <a-entity position="0 -0.3 0">
+            <a-box 
+              id="inputV1Box"
+              depth="0.05" 
+              height="0.2" 
+              width="0.8" 
+              color="#2a2a2a"
+              material="depthTest: true">
+            </a-box>
+            <a-text 
+              id="inputV1Text"
+              value="1.0" 
+              color="#fff" 
+              align="center" 
+              width="3" 
+              position="0 0 0.03"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+          
+          <!-- Tombol kontrol input kecepatan -->
+          <a-entity position="-0.7 -0.5 0">
+            <a-box 
+              id="btnV1Minus5"
+              class="clickable"
+              depth="0.05" 
+              height="0.1" 
+              width="0.15" 
+              color="#ff6666"
+              material="depthTest: true"
+              event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff9999"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff6666">
+            </a-box>
+            <a-text 
+              value="-5" 
+              color="#fff" 
+              align="center" 
+              width="5" 
+              position="0 0 0.03"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+          
+          <a-entity position="-0.5 -0.5 0">
+            <a-box 
+              id="btnV1Minus"
+              class="clickable"
+              depth="0.05" 
+              height="0.12" 
+              width="0.2" 
+              color="#ff4444"
+              material="depthTest: true"
+              event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff7777"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff4444">
+            </a-box>
+            <a-text 
+              value="-0.5" 
+              color="#fff" 
+              align="center" 
+              width="4" 
+              position="0 0 0.03"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+          
+          <a-entity position="0.5 -0.5 0">
+            <a-box 
+              id="btnV1Plus"
+              class="clickable"
+              depth="0.05" 
+              height="0.12" 
+              width="0.2" 
+              color="#44ff44"
+              material="depthTest: true"
+              event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#77ff77"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#44ff44">
+            </a-box>
+            <a-text 
+              value="+0.5" 
+              color="#fff" 
+              align="center" 
+              width="4" 
+              position="0 0 0.03"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+          
+          <a-entity position="0.7 -0.5 0">
+            <a-box 
+              id="btnV1Plus5"
+              class="clickable"
+              depth="0.05" 
+              height="0.1" 
+              width="0.15" 
+              color="#66ff66"
+              material="depthTest: true"
+              event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#99ff99"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#66ff66">
+            </a-box>
+            <a-text 
+              value="+5" 
+              color="#fff" 
+              align="center" 
+              width="5" 
+              position="0 0 0.03"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+        </a-entity>
+
+        <!-- Kontrol untuk Bola 2 (Biru) -->
+        <a-entity id="UIbiruWrapper" position="3 0.5 0" rotation="-15 -20 0">
+          <a-text 
+            value="BOLA BIRU" 
+            position="0 0.8 0" 
+            align="center" 
+            color="#4444ff" 
+            width="4"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
+          <!-- Kontrol Massa Bola 2 -->
+          <a-text 
+            value="Massa (kg): Klik kotak untuk input" 
+            position="0 0.5 0" 
+            align="center" 
+            color="white" 
+            width="2.5"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
+          <!-- Input field untuk massa bola 2 -->
+          <a-entity position="0 0.3 0">
+            <a-box 
+              id="inputM2Box"
+              class="clickable"
+              depth="0.05" 
+              height="0.2" 
+              width="1.2" 
+              color="#2a2a2a"
+              material="depthTest: true"
+              event-set__enter="_event: mouseenter; scale:1.05 1.05 1.05; color:#3a3a3a"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#2a2a2a">
+            </a-box>
+            <a-text 
+              id="inputM2Text"
+              value="1.0" 
+              color="#fff" 
+              align="center" 
+              width="3" 
+              position="0 0 0.03"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+          
+          <!-- Kontrol Kecepatan Bola 2 -->
+          <a-text 
+            value="Kecepatan (m/s): Klik kotak untuk input" 
+            position="0 0.0 0" 
+            align="center" 
+            color="white" 
+            width="2.5"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
+          <!-- Input field untuk kecepatan bola 2 -->
+          <a-entity position="0 -0.2 0">
+            <a-box 
+              id="inputV2Box"
+              class="clickable"
+              depth="0.05" 
+              height="0.2" 
+              width="1.2" 
+              color="#2a2a2a"
+              material="depthTest: true"
+              event-set__enter="_event: mouseenter; scale:1.05 1.05 1.05; color:#3a3a3a"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#2a2a2a">
+            </a-box>
+            <a-text 
+              id="inputV2Text"
+              value="-1.0" 
+              color="#fff" 
+              align="center" 
+              width="3" 
+              position="0 0 0.03"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+          
+          <!-- Kontrol Kecepatan Bola 2 -->
+          <a-text 
+            value="Kecepatan (m/s):" 
+            position="0 -0.1 0" 
+            align="center" 
+            color="white" 
+            width="3"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
+          <!-- Input field untuk kecepatan bola 2 -->
+          <a-entity position="0 -0.3 0">
+            <a-box 
+              id="inputV2Box"
+              depth="0.05" 
+              height="0.2" 
+              width="0.8" 
+              color="#2a2a2a"
+              material="depthTest: true">
+            </a-box>
+            <a-text 
+              id="inputV2Text"
+              value="-1.0" 
+              color="#fff" 
+              align="center" 
+              width="3" 
+              position="0 0 0.03"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+        </a-entity>
 
         <!-- Tombol Play/Reset dan Kembali -->
         <a-entity position="1 1 1.5" rotation="-10 -30 0">
@@ -384,6 +1010,79 @@
             material="depthTest: false; transparent: true">
           </a-text>
         </a-entity>
+
+        <!-- Panel informasi untuk Bab 3 (mirip dengan scene1.html) -->
+        <a-entity position="4 2 -6" rotation="-15 -30 0" id="infoPanelBab3" visible="false">
+          <a-box 
+            depth="0.05" 
+            height="3.5" 
+            width="4.5" 
+            color="#222"
+            material="depthTest: true; transparent: true; opacity: 0.9">
+          </a-box>
+          <a-text 
+            id="titleTextBab3"
+            value="HASIL TUMBUKAN" 
+            position="0 1.6 0.03"
+            align="center" 
+            color="#ffaa00" 
+            width="5"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          <a-text 
+            id="displayTextBab3"
+            value="Hasil tumbukan akan ditampilkan di sini." 
+            position="0 -0.2 0.03"
+            align="left" 
+            color="white" 
+            width="2.2"
+            material="depthTest: false; transparent: true">
+          </a-text>
+        </a-entity>
+
+        <!-- AR Physics Guide Panel -->
+        <a-entity position="-4 2.5 -5" rotation="-10 30 0" id="physicsGuidePanel" visible="false">
+          <a-box 
+            depth="0.05" 
+            height="5" 
+            width="7" 
+            color="#0a0a2a"
+            material="depthTest: true; opacity: 0.98; transparent: true">
+          </a-box>
+          <a-text 
+            id="physicsGuideText"
+            value="AR Physics Collision Solver Guide" 
+            position="0 0 0.03" 
+            align="center" 
+            color="#ffffff" 
+            width="1.5"
+            wrap-count="80"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
+          <!-- Close Guide Button -->
+          <a-entity position="3 2.2 0.1">
+            <a-box 
+              id="btnCloseGuide"
+              class="clickable"
+              depth="0.05" 
+              height="0.3" 
+              width="0.6" 
+              color="#ff4444"
+              material="depthTest: true"
+              event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff6666"
+              event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff4444">
+            </a-box>
+            <a-text 
+              value="✕" 
+              color="#fff" 
+              align="center" 
+              width="8" 
+              position="0 0 0.03"
+              material="depthTest: false; transparent: true">
+            </a-text>
+          </a-entity>
+        </a-entity>
       </a-entity>
     </a-scene>
 
@@ -392,18 +1091,508 @@
       let modelsLoaded = false;
       let blockAnimationState = 'idle';
       
-      // Variabel global
-      const statusText = document.querySelector('#statusText');
-      const ball1 = document.querySelector("#ball1");
-      const ball2 = document.querySelector("#ball2");
-      const label1 = document.querySelector("#label1");
-      const label2 = document.querySelector("#label2");
-      const btnPlay = document.querySelector("#btnPlay");
-      
+      // Variabel global - diinisialisasi setelah DOM loaded
+      let statusText, ball1, ball2, label1, label2, btnPlay, displayTextBab3;
       let m1 = 1, v1 = 1;
       let m2 = 1, v2 = -1;
       let animating = false;
       let done = false;
+      
+      // Physics collision solver variables
+      let collisionType = 'elastic'; // 'elastic' or 'inelastic'
+      let coefficientOfRestitution = 1.0; // e = 1 for elastic, e = 0 for inelastic
+      let physicsGuideVisible = false;
+
+      // Inisialisasi setelah DOM loaded
+      document.addEventListener('DOMContentLoaded', () => {
+        statusText = document.querySelector('#statusText');
+        ball1 = document.querySelector("#ball1");
+        ball2 = document.querySelector("#ball2");
+        label1 = document.querySelector("#label1");
+        label2 = document.querySelector("#label2");
+        btnPlay = document.querySelector("#btnPlay");
+        displayTextBab3 = document.querySelector("#displayTextBab3");
+        
+        // Setup event listeners setelah elemen tersedia
+        setupEventListeners();
+        setupInputHandlers();
+        
+        // Panggil inisialisasi
+        updateInputDisplays();
+        updateLabel();
+        updateCollisionTypeDisplay(); // Initialize collision type display
+        
+        console.log('DOM loaded, elements found:', {
+          ball1: !!ball1, 
+          ball2: !!ball2, 
+          btnPlay: !!btnPlay,
+          label1: !!label1,
+          label2: !!label2,
+          displayTextBab3: !!displayTextBab3
+        });
+      });
+
+      function setupEventListeners() {
+        // Event listeners untuk kontrol massa dan kecepatan (input fields)
+        // Massa Bola 1
+        document.querySelector('#btnM1Plus').addEventListener('click', () => {
+          m1 += 0.5;
+          if (m1 > 30) m1 = 30; // Batas maksimal
+          updateInputDisplays();
+          updateLabel();
+        });
+
+        document.querySelector('#btnM1Minus').addEventListener('click', () => {
+          m1 -= 0.5;
+          if (m1 < 0.5) m1 = 0.5; // Batas minimal
+          updateInputDisplays();
+          updateLabel();
+        });
+
+        document.querySelector('#btnM1Plus5').addEventListener('click', () => {
+          m1 += 5;
+          if (m1 > 30) m1 = 30; // Batas maksimal
+          updateInputDisplays();
+          updateLabel();
+        });
+
+        document.querySelector('#btnM1Minus5').addEventListener('click', () => {
+          m1 -= 5;
+          if (m1 < 0.5) m1 = 0.5; // Batas minimal
+          updateInputDisplays();
+          updateLabel();
+        });
+
+        // Kecepatan Bola 1
+        document.querySelector('#btnV1Plus').addEventListener('click', () => {
+          v1 += 0.5;
+          if (v1 > 30) v1 = 30; // Batas maksimal
+          updateInputDisplays();
+          updateLabel();
+        });
+
+        document.querySelector('#btnV1Minus').addEventListener('click', () => {
+          v1 -= 0.5;
+          if (v1 < -30) v1 = -30; // Batas minimal
+          updateInputDisplays();
+          updateLabel();
+        });
+
+        document.querySelector('#btnV1Plus5').addEventListener('click', () => {
+          v1 += 5;
+          if (v1 > 30) v1 = 30; // Batas maksimal
+          updateInputDisplays();
+          updateLabel();
+        });
+
+        document.querySelector('#btnV1Minus5').addEventListener('click', () => {
+          v1 -= 5;
+          if (v1 < -30) v1 = -30; // Batas minimal
+          updateInputDisplays();
+          updateLabel();
+        });
+
+        // Event listener untuk input field kecepatan bola 2
+        document.querySelector('#inputV2Box').addEventListener('click', () => {
+          const newValue = promptForValue("Masukkan kecepatan bola biru (m/s):", v2);
+          if (newValue !== null) {
+            v2 = newValue;
+            updateInputDisplays();
+            updateLabel();
+          }
+        });
+
+        // Event listener untuk massa bola 2 
+        document.querySelector('#inputM2Box').addEventListener('click', () => {
+          const newValue = promptForValue("Masukkan massa bola biru (kg):", m2);
+          if (newValue !== null) {
+            m2 = newValue;
+            updateInputDisplays();
+            updateLabel();
+          }
+        });
+
+        // Event listener untuk tombol Play/Reset
+        btnPlay.addEventListener("click", () => {
+          if (done) {
+            resetBab3();
+            // Aktifkan kembali semua kontrol
+            document.querySelector("#btnM1Plus").classList.add("clickable"); 
+            document.querySelector("#btnM1Minus").classList.add("clickable"); 
+            document.querySelector("#btnM1Plus5").classList.add("clickable"); 
+            document.querySelector("#btnM1Minus5").classList.add("clickable"); 
+            document.querySelector("#btnV1Plus").classList.add("clickable"); 
+            document.querySelector("#btnV1Minus").classList.add("clickable"); 
+            document.querySelector("#btnV1Plus5").classList.add("clickable"); 
+            document.querySelector("#btnV1Minus5").classList.add("clickable"); 
+            document.querySelector("#btnPlay").classList.add("clickable"); 
+            return;
+          }
+
+          if (animating) return;
+          
+          animating = true;
+          
+          // Nonaktifkan semua kontrol selama animasi
+          document.querySelector("#UImerahWrapper").setAttribute("visible", "false");
+          document.querySelector("#UIbiruWrapper").setAttribute("visible", "false");
+          document.querySelector("#btnPlay").classList.remove("clickable"); 
+          
+          console.log(`Starting collision simulation with m1=${m1}, v1=${v1}, m2=${m2}, v2=${v2}`);
+          
+          // Hitung kecepatan setelah tumbukan
+          const [v1p, v2p] = hitungKecepatan(m1, v1, m2, v2);
+          console.log(`\n=== HASIL TUMBUKAN ===`);
+          console.log(`Input: m1=${m1}kg, v1=${v1}m/s, m2=${m2}kg, v2=${v2}m/s`);
+          console.log(`Output: v1'=${v1p.toFixed(3)}m/s, v2'=${v2p.toFixed(3)}m/s`);
+          console.log(`Momentum: ${(m1*v1 + m2*v2).toFixed(3)} → ${(m1*v1p + m2*v2p).toFixed(3)} kg⋅m/s`);
+          
+          // Update panel informasi
+          updateInfoPanelBab3(m1, v1, m2, v2, v1p, v2p);
+          
+          // Activate trails untuk pre-collision movement
+          showPreCollisionTrail('trail1', ball1.getAttribute('position'));
+          showPreCollisionTrail('trail2', ball2.getAttribute('position'));
+          
+          // Set animasi menuju collision point dengan smooth easing
+          ball1.setAttribute("animation__go", {
+            property: "position", 
+            to: "0 1 -3", 
+            dur: 2000, 
+            easing: "easeInCubic" // Accelerating towards collision
+          });
+          
+          ball2.setAttribute("animation__go", {
+            property: "position", 
+            to: "0 1 -3", 
+            dur: 2000, 
+            easing: "easeInCubic" // Accelerating towards collision
+          });
+          
+          // Set animasi setelah collision
+          setTimeout(() => {
+            console.log('Setting post-collision animations...');
+            console.log(`Post-collision velocities: v1'=${v1p.toFixed(2)}, v2'=${v2p.toFixed(2)}`);
+            
+            // TRIGGER COLLISION EFFECTS
+            triggerCollisionEffects();
+            
+            // Animasi berdasarkan kecepatan akhir dengan skala yang lebih realistic
+            // Jarak yang ditempuh = kecepatan * waktu, dengan faktor skala untuk tampilan
+            const timeScale = 1.5; // Faktor skala untuk durasi animasi
+            const distanceScale = 0.8; // Faktor skala untuk jarak
+            
+            // Ball 1 post-collision animation dengan easing yang smooth
+            if (Math.abs(v1p) > 0.01) {
+              const finalPos1 = v1p * distanceScale;
+              
+              // Slight bounce effect untuk realisme
+              ball1.setAttribute("animation__bounce", {
+                property: "scale", 
+                to: "1.15 0.85 1.15", 
+                dur: 100,
+                easing: "easeOutElastic"
+              });
+              
+              setTimeout(() => {
+                ball1.setAttribute("animation__bounce-back", {
+                  property: "scale", 
+                  to: "1 1 1", 
+                  dur: 200,
+                  easing: "easeOutBounce"
+                });
+              }, 100);
+              
+              // Smooth movement dengan trail
+              showTrail('trail1', ball1.getAttribute('position'));
+              ball1.setAttribute("animation__after", {
+                property: "position", 
+                to: `${finalPos1} 1 -3`, 
+                dur: Math.abs(v1p) * 300 + 1500, // Durasi lebih panjang untuk smooth
+                easing: "easeOutCubic" // Easing yang lebih smooth
+              });
+              console.log(`Ball1 moving to position: ${finalPos1}`);
+            } else {
+              ball1.setAttribute("position", "0 1 -3");
+              console.log('Ball1 staying at collision point (v1p ≈ 0)');
+            }
+            
+            // Ball 2 post-collision animation dengan easing yang smooth
+            if (Math.abs(v2p) > 0.01) {
+              const finalPos2 = v2p * distanceScale;
+              
+              // Slight bounce effect untuk realisme
+              ball2.setAttribute("animation__bounce", {
+                property: "scale", 
+                to: "1.15 0.85 1.15", 
+                dur: 100,
+                easing: "easeOutElastic"
+              });
+              
+              setTimeout(() => {
+                ball2.setAttribute("animation__bounce-back", {
+                  property: "scale", 
+                  to: "1 1 1", 
+                  dur: 200,
+                  easing: "easeOutBounce"
+                });
+              }, 100);
+              
+              // Smooth movement dengan trail
+              showTrail('trail2', ball2.getAttribute('position'));
+              ball2.setAttribute("animation__after", {
+                property: "position", 
+                to: `${finalPos2} 1 -3`, 
+                dur: Math.abs(v2p) * 300 + 1500, // Durasi lebih panjang untuk smooth
+                easing: "easeOutCubic" // Easing yang lebih smooth
+              });
+              console.log(`Ball2 moving to position: ${finalPos2}`);
+            } else {
+              ball2.setAttribute("position", "0 1 -3");
+              console.log('Ball2 staying at collision point (v2p ≈ 0)');
+            }
+
+            animating = false;
+            done = true;
+            document.querySelector("#btnPlayText").setAttribute("value", "Reset");
+          }, 2100);
+        });
+
+        // Event listeners untuk menu navigation
+        document.querySelector('#btnSkema1').addEventListener('click', () => {
+          if (modelsLoaded) {
+            // Gunakan animasi GLB jika tersedia
+            const modelEntity = document.querySelector('#myModel a-entity[gltf-model]');
+            if (modelEntity) {
+              modelEntity.setAttribute('animation-mixer', 'clip: Skema1; loop: repeat');
+            }
+          } else {
+            // Gunakan animasi fallback
+            animateBlock('skema1');
+          }
+          
+          statusText.setAttribute('value', 'Kamu tarik perlahan. tetapi balok masih diam karena ada fs yang menahan');
+          document.querySelector("#btnSkema2Wrapper").setAttribute("visible", "true");
+          document.querySelector("#btnSkema2").classList.add("clickable"); 
+        });
+
+        document.querySelector('#btnSkema2').addEventListener('click', () => {
+          if (modelsLoaded) {
+            const modelEntity = document.querySelector('#myModel a-entity[gltf-model]');
+            if (modelEntity) {
+              modelEntity.setAttribute('animation-mixer', 'clip: Skema2; loop: repeat');
+            }
+          } else {
+            animateBlock('skema2');
+          }
+          
+          statusText.setAttribute('value', 'Semakin kamu tarik. fs yang menahan akan semakin besar');
+          document.querySelector("#btnSkema3Wrapper").setAttribute("visible", "true");
+          document.querySelector("#btnSkema3").classList.add("clickable"); 
+        });
+
+        document.querySelector('#btnSkema3').addEventListener('click', () => {
+          if (modelsLoaded) {
+            const modelEntity = document.querySelector('#myModel a-entity[gltf-model]');
+            if (modelEntity) {
+              modelEntity.setAttribute('animation-mixer', 'clip: Skema3; loop: repeat');
+            }
+          } else {
+            animateBlock('skema3');
+          }
+          
+          statusText.setAttribute('value', 'Kamu menarik sangat kuat. Balok akan ikut tertarik karena fs sudah berubah menjadi fk karena sudah mencapai maksimum');
+        });
+
+        document.querySelector('#btnReset2').addEventListener('click', () => {
+          if (modelsLoaded) {
+            const modelEntity = document.querySelector('#myModel a-entity[gltf-model]');
+            if (modelEntity) {
+              modelEntity.setAttribute('animation-mixer', 'clip: Idle; loop: repeat');
+            }
+          } else {
+            animateBlock('idle');
+          }
+          
+          statusText.setAttribute('value', 'Ada sebuah balok di permukaan kasar');
+          document.querySelector("#btnSkema2Wrapper").setAttribute("visible", "false");
+          document.querySelector("#btnSkema2").classList.remove("clickable"); 
+          document.querySelector("#btnSkema3Wrapper").setAttribute("visible", "false");
+          document.querySelector("#btnSkema3").classList.remove("clickable"); 
+        });
+
+        document.querySelector('#btnSkema1').addEventListener('click', () => {
+          document.querySelector("#skema1").setAttribute("visible", true);
+          document.querySelector("#mainmenu").setAttribute("visible", false);
+          document.querySelector("#btnBab2").classList.remove("clickable"); 
+          document.querySelector("#btnBab3").classList.remove("clickable"); 
+          document.querySelector("#btnKembali1").classList.add("clickable"); 
+        });
+
+        document.querySelector('#btnSkema2').addEventListener('click', () => {
+          document.querySelector("#skema2").setAttribute("visible", true);
+          document.querySelector("#mainmenu").setAttribute("visible", false);
+          document.querySelector("#btnBab2").classList.remove("clickable"); 
+          document.querySelector("#btnBab3").classList.remove("clickable"); 
+          document.querySelector("#btnKembali1").classList.add("clickable"); 
+        });
+
+        document.querySelector('#btnSkema3').addEventListener('click', () => {
+          document.querySelector("#skema3").setAttribute("visible", true);
+          document.querySelector("#mainmenu").setAttribute("visible", false);
+          document.querySelector("#btnBab2").classList.remove("clickable"); 
+          document.querySelector("#btnBab3").classList.remove("clickable"); 
+          document.querySelector("#btnKembali1").classList.add("clickable"); 
+        });
+
+        document.querySelector('#btnReset2').addEventListener('click', () => {
+          // Reset Bab 2 functionality
+          resetBab2();
+          document.querySelector("#btnPlay2").classList.add("clickable"); 
+          document.querySelector("#btnSkema2").classList.add("clickable"); 
+          document.querySelector("#btnSkema3").classList.add("clickable"); 
+          removeAllBab3Clickables();
+        });
+
+        document.querySelector('#btnBab2').addEventListener('click', () => {
+          document.querySelector("#bab2").setAttribute("visible", true);
+          document.querySelector("#mainmenu").setAttribute("visible", false);
+          document.querySelector("#btnBab2").classList.remove("clickable"); 
+          document.querySelector("#btnBab3").classList.remove("clickable"); 
+          document.querySelector("#btnKembali2").classList.add("clickable"); 
+          document.querySelector("#btnPlay2").classList.add("clickable"); 
+          document.querySelector("#btnReset2").classList.add("clickable"); 
+          document.querySelector("#btnSkema2").classList.add("clickable"); 
+          document.querySelector("#btnSkema3").classList.add("clickable"); 
+          removeAllBab3Clickables();
+        });
+        document.querySelector('#btnSkema1').addEventListener('click', () => {
+          document.querySelector("#skema1").setAttribute("visible", true);
+          document.querySelector("#mainmenu").setAttribute("visible", false);
+          document.querySelector("#btnBab2").classList.remove("clickable"); 
+          document.querySelector("#btnBab3").classList.remove("clickable"); 
+          document.querySelector("#btnKembali1").classList.add("clickable"); 
+        });
+
+        document.querySelector('#btnSkema2').addEventListener('click', () => {
+          document.querySelector("#skema2").setAttribute("visible", true);
+          document.querySelector("#mainmenu").setAttribute("visible", false);
+          document.querySelector("#btnBab2").classList.remove("clickable"); 
+          document.querySelector("#btnBab3").classList.remove("clickable"); 
+          document.querySelector("#btnKembali1").classList.add("clickable"); 
+        });
+
+        document.querySelector('#btnSkema3').addEventListener('click', () => {
+          document.querySelector("#skema3").setAttribute("visible", true);
+          document.querySelector("#mainmenu").setAttribute("visible", false);
+          document.querySelector("#btnBab2").classList.remove("clickable"); 
+          document.querySelector("#btnBab3").classList.remove("clickable"); 
+          document.querySelector("#btnKembali1").classList.add("clickable"); 
+        });
+
+        document.querySelector('#btnReset2').addEventListener('click', () => {
+          // Reset Bab 2 functionality
+          resetBab2();
+          document.querySelector("#btnPlay2").classList.add("clickable"); 
+          document.querySelector("#btnSkema2").classList.add("clickable"); 
+          document.querySelector("#btnSkema3").classList.add("clickable"); 
+          removeAllBab3Clickables();
+        });
+
+        document.querySelector('#btnBab2').addEventListener('click', () => {
+          document.querySelector("#bab2").setAttribute("visible", true);
+          document.querySelector("#mainmenu").setAttribute("visible", false);
+          document.querySelector("#btnBab2").classList.remove("clickable"); 
+          document.querySelector("#btnBab3").classList.remove("clickable"); 
+          document.querySelector("#btnKembali2").classList.add("clickable"); 
+          document.querySelector("#btnPlay2").classList.add("clickable"); 
+          document.querySelector("#btnReset2").classList.add("clickable"); 
+          document.querySelector("#btnSkema2").classList.add("clickable"); 
+          document.querySelector("#btnSkema3").classList.add("clickable"); 
+          removeAllBab3Clickables();
+        });
+
+        document.querySelector('#btnBab3').addEventListener('click', () => {
+          document.querySelector("#bab3").setAttribute("visible", true);
+          document.querySelector("#mainmenu").setAttribute("visible", false);
+          document.querySelector("#btnBab2").classList.remove("clickable"); 
+          document.querySelector("#btnBab3").classList.remove("clickable"); 
+          document.querySelector("#btnKembali3").classList.add("clickable"); 
+          document.querySelector("#btnPlay").classList.add("clickable"); 
+          
+          // Aktifkan semua tombol kontrol baru
+          document.querySelector("#btnM1Plus").classList.add("clickable"); 
+          document.querySelector("#btnM1Minus").classList.add("clickable"); 
+          document.querySelector("#btnM1Plus5").classList.add("clickable"); 
+          document.querySelector("#btnM1Minus5").classList.add("clickable"); 
+          document.querySelector("#btnV1Plus").classList.add("clickable"); 
+          document.querySelector("#btnV1Minus").classList.add("clickable"); 
+          document.querySelector("#btnV1Plus5").classList.add("clickable"); 
+          document.querySelector("#btnV1Minus5").classList.add("clickable"); 
+          updateInputDisplays();
+          updateLabel();
+        });
+
+        document.querySelector('#btnKembali2').addEventListener('click', () => {
+          document.querySelector("#bab2").setAttribute("visible", false);
+          document.querySelector("#mainmenu").setAttribute("visible", true);
+          document.querySelector("#btnBab2").classList.add("clickable"); 
+          document.querySelector("#btnBab3").classList.add("clickable"); 
+          document.querySelector("#btnKembali2").classList.remove("clickable"); 
+          document.querySelector("#btnPlay2").classList.remove("clickable"); 
+          document.querySelector("#btnReset2").classList.remove("clickable"); 
+          document.querySelector("#btnSkema2").classList.remove("clickable"); 
+          document.querySelector("#btnSkema3").classList.remove("clickable"); 
+        });
+
+        document.querySelector('#btnKembali3').addEventListener('click', () => {
+          document.querySelector("#bab3").setAttribute("visible", false);
+          document.querySelector("#mainmenu").setAttribute("visible", true);
+          document.querySelector("#btnBab2").classList.add("clickable"); 
+          document.querySelector("#btnBab3").classList.add("clickable"); 
+          removeAllBab3Clickables();
+        });
+
+        // Event listeners for collision type selection
+        document.querySelector('#btnElastic').addEventListener('click', () => {
+          collisionType = 'elastic';
+          coefficientOfRestitution = 1.0;
+          updateCollisionTypeDisplay();
+          console.log('Collision type set to elastic');
+        });
+
+        document.querySelector('#btnInelastic').addEventListener('click', () => {
+          collisionType = 'inelastic';
+          coefficientOfRestitution = 0.0;
+          updateCollisionTypeDisplay();
+          console.log('Collision type set to inelastic');
+        });
+
+        // Event listener for physics guide
+        document.querySelector('#btnPhysicsGuide').addEventListener('click', () => {
+          showPhysicsGuide();
+        });
+
+        document.querySelector('#btnCloseGuide').addEventListener('click', () => {
+          hidePhysicsGuide();
+        });
+
+        // Mass demo event listeners
+        document.querySelector('#btnHeavyLight').addEventListener('click', () => {
+          setMassDemo(10, 1, 2, -2); // Heavy ball 1, Light ball 2
+          console.log('Demo set: Heavy (10kg) vs Light (1kg)');
+        });
+
+        document.querySelector('#btnEqualMass').addEventListener('click', () => {
+          setMassDemo(5, 5, 2, -2); // Equal masses
+          console.log('Demo set: Equal masses (5kg each)');
+        });
+
+        document.querySelector('#btnLightHeavy').addEventListener('click', () => {
+          setMassDemo(1, 10, 2, -2); // Light ball 1, Heavy ball 2
+          console.log('Demo set: Light (1kg) vs Heavy (10kg)');
+        });
+      }
 
       // Coba load model GLB secara opsional
       function loadGLBModels() {
@@ -894,15 +2083,12 @@
         document.querySelector("#btnKembali3").classList.add("clickable"); 
         document.querySelector("#btnPlay").classList.add("clickable"); 
         
-        // Aktifkan semua tombol kontrol
-        document.querySelector("#btnM11").classList.add("clickable"); 
-        document.querySelector("#btnM12").classList.add("clickable"); 
-        document.querySelector("#btnV11").classList.add("clickable"); 
-        document.querySelector("#btnV12").classList.add("clickable"); 
-        document.querySelector("#btnM21").classList.add("clickable"); 
-        document.querySelector("#btnM22").classList.add("clickable"); 
-        document.querySelector("#btnV21").classList.add("clickable"); 
-        document.querySelector("#btnV22").classList.add("clickable"); 
+        // Aktifkan semua tombol kontrol baru
+        document.querySelector("#btnM1Plus").classList.add("clickable"); 
+        document.querySelector("#btnM1Minus").classList.add("clickable"); 
+        document.querySelector("#btnV1Plus").classList.add("clickable"); 
+        document.querySelector("#btnV1Minus").classList.add("clickable"); 
+        updateInputDisplays();
         updateLabel();
       });
 
@@ -941,57 +2127,386 @@
         removeAllBab3Clickables();
       });
 
-      // Event listeners untuk kontrol massa dan kecepatan
-      document.querySelector('#btnM11').addEventListener('click', () => {
-        m1 = 1;
+      // Event listeners untuk kontrol massa dan kecepatan (input fields)
+      // Massa Bola 1
+      document.querySelector('#btnM1Plus').addEventListener('click', () => {
+        m1 += 0.5;
+        if (m1 > 30) m1 = 30; // Batas maksimal
+        updateInputDisplays();
         updateLabel();
       });
 
-      document.querySelector('#btnM12').addEventListener('click', () => {
-        m1 = 2;
+      document.querySelector('#btnM1Minus').addEventListener('click', () => {
+        m1 -= 0.5;
+        if (m1 < 0.5) m1 = 0.5; // Batas minimal
+        updateInputDisplays();
         updateLabel();
       });
 
-      document.querySelector('#btnV11').addEventListener('click', () => {
-        v1 = 1;
+      // Kecepatan Bola 1
+      document.querySelector('#btnV1Plus').addEventListener('click', () => {
+        v1 += 0.5;
+        if (v1 > 30) v1 = 30; // Batas maksimal
+        updateInputDisplays();
         updateLabel();
       });
 
-      document.querySelector('#btnV12').addEventListener('click', () => {
-        v1 = 2;
-        updateLabel();
-      });
-
-      document.querySelector('#btnM21').addEventListener('click', () => {
-        m2 = 1;
-        updateLabel();
-      });
-
-      document.querySelector('#btnM22').addEventListener('click', () => {
-        m2 = 2;
-        updateLabel();
-      });
-
-      document.querySelector('#btnV21').addEventListener('click', () => {
-        v2 = -1;
-        updateLabel();
-      });
-
-      document.querySelector('#btnV22').addEventListener('click', () => {
-        v2 = -2;
+      document.querySelector('#btnV1Minus').addEventListener('click', () => {
+        v1 -= 0.5;
+        if (v1 < -30) v1 = -30; // Batas minimal
+        updateInputDisplays();
         updateLabel();
       });
 
       // Fungsi helper
       function hitungKecepatan(m1, v1, m2, v2) {
-        const v1p = ((m1 - m2) * v1 + 2 * m2 * v2) / (m1 + m2);
-        const v2p = ((m2 - m1) * v2 + 2 * m1 * v1) / (m1 + m2);
+        let v1p, v2p;
+        
+        if (collisionType === 'elastic') {
+          // Rumus tumbukan elastis
+          v1p = ((m1 - m2) * v1 + 2 * m2 * v2) / (m1 + m2);
+          v2p = ((m2 - m1) * v2 + 2 * m1 * v1) / (m1 + m2);
+        } else {
+          // Rumus tumbukan inelastis (perfectly inelastic)
+          const vFinal = (m1 * v1 + m2 * v2) / (m1 + m2);
+          v1p = vFinal;
+          v2p = vFinal;
+        }
+        
+        // Debug: Verifikasi kekekalan momentum
+        const momentumBefore = m1 * v1 + m2 * v2;
+        const momentumAfter = m1 * v1p + m2 * v2p;
+        console.log(`\n=== MASS EFFECT ANALYSIS ===`);
+        console.log(`Collision Type: ${collisionType}`);
+        console.log(`Input: m1=${m1}kg@${v1}m/s, m2=${m2}kg@${v2}m/s`);
+        console.log(`Output: v1'=${v1p.toFixed(3)}m/s, v2'=${v2p.toFixed(3)}m/s`);
+        
+        // Mass effect analysis
+        const massRatio = m1 / m2;
+        const velocityChange1 = Math.abs(v1p - v1);
+        const velocityChange2 = Math.abs(v2p - v2);
+        
+        console.log(`Mass Ratio (m1/m2): ${massRatio.toFixed(3)}`);
+        console.log(`Velocity Change: Ball1=${velocityChange1.toFixed(3)}m/s, Ball2=${velocityChange2.toFixed(3)}m/s`);
+        
+        if (massRatio > 3) {
+          console.log(`MASS EFFECT: Heavy Ball1 dominates - small velocity change`);
+        } else if (massRatio < 0.33) {
+          console.log(`MASS EFFECT: Light Ball1 bounces hard - large velocity change`);
+        } else {
+          console.log(`MASS EFFECT: Similar masses - moderate velocity exchange`);
+        }
+        
+        console.log(`Momentum check: before=${momentumBefore.toFixed(3)}, after=${momentumAfter.toFixed(3)}, diff=${(momentumAfter-momentumBefore).toFixed(6)}`);
+        
+        // Calculate kinetic energy
+        const keBefore = 0.5 * m1 * v1 * v1 + 0.5 * m2 * v2 * v2;
+        const keAfter = 0.5 * m1 * v1p * v1p + 0.5 * m2 * v2p * v2p;
+        console.log(`Kinetic Energy: before=${keBefore.toFixed(3)}J, after=${keAfter.toFixed(3)}J, lost=${(keBefore-keAfter).toFixed(3)}J`);
+        
         return [v1p, v2p];
+      }
+
+      // Fungsi untuk efek collision yang dramatis
+      function triggerCollisionEffects() {
+        // Play collision sound
+        const soundEntity = document.querySelector('#collisionParticles');
+        soundEntity.components.sound.playSound();
+        
+        // Ball deformation effects
+        const ball1 = document.querySelector('#ball1');
+        const ball2 = document.querySelector('#ball2');
+        ball1.components['ball-deformation'].deform('impact');
+        ball2.components['ball-deformation'].deform('impact');
+        
+        // Dramatic lighting flash
+        const flashLight = document.querySelector('#collisionFlash');
+        flashLight.setAttribute('animation__flash', {
+          property: 'light.intensity',
+          to: '3.0',
+          dur: 80,
+          easing: 'easeOutQuad'
+        });
+        
+        setTimeout(() => {
+          flashLight.setAttribute('animation__fade', {
+            property: 'light.intensity',
+            to: '0',
+            dur: 400,
+            easing: 'easeOutCubic'
+          });
+        }, 80);
+        
+        // Show particle explosion at collision point
+        const particles = document.querySelector('#collisionParticles');
+        particles.setAttribute('visible', true);
+        particles.setAttribute('position', '0 1 -3'); // Collision point
+        
+        // Start particle emission
+        particles.setAttribute('particle-system', {
+          preset: 'spark',
+          particleCount: 400,
+          maxAge: 3,
+          accelerationValue: '0, -18, 0',
+          velocityValue: '12 12 12',
+          velocitySpread: '6 6 6',
+          size: '0.25, 0.01',
+          color: '#FFD700, #FF6347, #FF0000, #FFFFFF, #FFA500, #FF1493',
+          opacity: '1.0, 0.0'
+        });
+        
+        // Screen shake effect untuk drama dengan multiple pulses
+        const camera = document.querySelector('[camera]');
+        
+        // First shake
+        camera.setAttribute('animation__shake1', {
+          property: 'rotation',
+          to: '1.0 1.0 1.0',
+          dur: 60,
+          easing: 'easeInOutQuad'
+        });
+        
+        setTimeout(() => {
+          camera.setAttribute('animation__shake2', {
+            property: 'rotation',
+            to: '-0.5 -0.5 -0.5',
+            dur: 40,
+            easing: 'easeInOutQuad'
+          });
+        }, 60);
+        
+        setTimeout(() => {
+          camera.setAttribute('animation__shake-back', {
+            property: 'rotation',
+            to: '0 0 0',
+            dur: 350,
+            easing: 'easeOutBounce'
+          });
+        }, 100);
+        
+        // Hide particles after effect
+        setTimeout(() => {
+          particles.setAttribute('visible', false);
+        }, 3000);
+      }
+
+      // Fungsi untuk menampilkan trail bola
+      function showTrail(trailId, startPosition) {
+        const trail = document.querySelector(`#${trailId}`);
+        trail.setAttribute('visible', true);
+        trail.setAttribute('position', startPosition);
+        
+        // Configure trail particle system
+        trail.setAttribute('particle-system', {
+          preset: 'default',
+          particleCount: 80,
+          maxAge: 3,
+          accelerationValue: '0, -2, 0',
+          velocityValue: '0 0 0',
+          velocitySpread: '0.3 0.3 0.3',
+          size: '0.08, 0.02',
+          color: trailId === 'trail1' ? '#cc2f2f, #ff8888' : '#4545ff, #8888ff',
+          opacity: '0.9, 0.0'
+        });
+        
+        // Hide trail after some time
+        setTimeout(() => {
+          trail.setAttribute('visible', false);
+        }, 3000);
+      }
+
+      // Fungsi untuk trail pre-collision yang lebih intens
+      function showPreCollisionTrail(trailId, startPosition) {
+        const trail = document.querySelector(`#${trailId}`);
+        trail.setAttribute('visible', true);
+        trail.setAttribute('position', startPosition);
+        
+        // Configure intense pre-collision trail
+        trail.setAttribute('particle-system', {
+          preset: 'default',
+          particleCount: 120,
+          maxAge: 2.5,
+          accelerationValue: '0, -1, 0',
+          velocityValue: '0 0 -2',
+          velocitySpread: '0.2 0.2 0.5',
+          size: '0.12, 0.03',
+          color: trailId === 'trail1' ? '#cc2f2f, #ff4444, #ffaaaa' : '#4545ff, #6666ff, #aaaaff',
+          opacity: '1.0, 0.0'
+        });
+        
+        // Keep trail active during movement
+        setTimeout(() => {
+          trail.setAttribute('visible', false);
+        }, 2200);
       }
 
       function updateLabel() {
         label1.setAttribute("value", `m1 = ${m1}kg\nv1 = ${v1}m/s`);
         label2.setAttribute("value", `m2 = ${m2}kg\nv2 = ${v2}m/s`);
+        
+        // Update ukuran bola saat label berubah
+        updateBallSizes();
+      }
+
+      function updateInputDisplays() {
+        // Update display text di input fields
+        document.querySelector('#inputM1Text').setAttribute('value', m1.toFixed(1));
+        document.querySelector('#inputV1Text').setAttribute('value', v1.toFixed(1));
+        document.querySelector('#inputM2Text').setAttribute('value', m2.toFixed(1));
+        document.querySelector('#inputV2Text').setAttribute('value', v2.toFixed(1));
+        
+        // Update ukuran bola berdasarkan massa (radius proporsional dengan massa)
+        updateBallSizes();
+      }
+
+      function updateBallSizes() {
+        // Radius base = 0.15, ditambah proporsional dengan massa
+        const radius1 = 0.15 + (m1 * 0.02);  // 0.15 + (massa * 0.02)
+        const radius2 = 0.15 + (m2 * 0.02);
+        
+        ball1.setAttribute('radius', radius1.toFixed(3));
+        ball2.setAttribute('radius', radius2.toFixed(3));
+        
+        console.log(`Updated ball sizes: ball1 radius=${radius1.toFixed(3)} (m=${m1}), ball2 radius=${radius2.toFixed(3)} (m=${m2})`);
+      }
+
+      // Fungsi untuk menangani input nilai dari prompt
+      function promptForValue(currentValue, paramName, ballName) {
+        const newValue = prompt(`${ballName} - ${paramName}:\nMasukkan nilai (0.5 - 30):`, currentValue);
+        
+        if (newValue === null) return currentValue; // User cancelled
+        
+        const numValue = parseFloat(newValue);
+        
+        // Validasi input
+        if (isNaN(numValue)) {
+          alert('Input harus berupa angka!');
+          return currentValue;
+        }
+        
+        if (numValue < 0.5 || numValue > 30) {
+          alert('Nilai harus antara 0.5 hingga 30!');
+          return currentValue;
+        }
+        
+        return numValue;
+      }
+
+      // Event handlers untuk input boxes
+      function setupInputHandlers() {
+        // Input massa bola 1
+        document.querySelector('#inputM1Box').addEventListener('click', () => {
+          const newValue = promptForValue(m1, 'Massa (kg)', 'Bola Merah');
+          if (newValue !== m1) {
+            m1 = newValue;
+            updateInputDisplays();
+            updateLabel();
+          }
+        });
+
+        // Input kecepatan bola 1
+        document.querySelector('#inputV1Box').addEventListener('click', () => {
+          const newValue = promptForValue(v1, 'Kecepatan (m/s)', 'Bola Merah');
+          if (newValue !== v1) {
+            v1 = newValue;
+            updateInputDisplays();
+            updateLabel();
+          }
+        });
+
+        // Input massa bola 2
+        document.querySelector('#inputM2Box').addEventListener('click', () => {
+          const newValue = promptForValue(m2, 'Massa (kg)', 'Bola Biru');
+          if (newValue !== m2) {
+            m2 = newValue;
+            updateInputDisplays();
+            updateLabel();
+          }
+        });
+
+        // Input kecepatan bola 2
+        document.querySelector('#inputV2Box').addEventListener('click', () => {
+          const newValue = promptForValue(v2, 'Kecepatan (m/s)', 'Bola Biru');
+          if (newValue !== v2) {
+            v2 = newValue;
+            updateInputDisplays();
+            updateLabel();
+          }
+        });
+      }
+
+      function updateInfoPanelBab3(m1, v1, m2, v2, v1p, v2p) {
+        if (displayTextBab3) {
+          // Hitung momentum sebelum dan sesudah
+          const momentumBefore = m1 * v1 + m2 * v2;
+          const momentumAfter = m1 * v1p + m2 * v2p;
+          
+          // Hitung energi kinetik sebelum dan sesudah
+          const ekBefore = 0.5 * m1 * v1 * v1 + 0.5 * m2 * v2 * v2;
+          const ekAfter = 0.5 * m1 * v1p * v1p + 0.5 * m2 * v2p * v2p;
+          const energyLost = ekBefore - ekAfter;
+          
+          let text;
+          if (collisionType === 'elastic') {
+            text = `HASIL PERHITUNGAN TUMBUKAN ELASTIS
+
+SEBELUM TUMBUKAN:
+• Bola 1: m₁ = ${m1}kg, v₁ = ${v1}m/s
+• Bola 2: m₂ = ${m2}kg, v₂ = ${v2}m/s
+• Momentum total: ${momentumBefore.toFixed(2)} kg⋅m/s
+• Energi kinetik: ${ekBefore.toFixed(2)} J
+
+RUMUS TUMBUKAN ELASTIS:
+v₁' = ((m₁-m₂)v₁ + 2m₂v₂)/(m₁+m₂)
+v₂' = ((m₂-m₁)v₂ + 2m₁v₁)/(m₁+m₂)
+
+PERHITUNGAN:
+v₁' = ((${m1}-${m2})×${v1} + 2×${m2}×${v2})/(${m1}+${m2})
+    = ${((m1-m2)*v1 + 2*m2*v2).toFixed(2)}/${(m1+m2).toFixed(2)} = ${v1p.toFixed(2)} m/s
+
+v₂' = ((${m2}-${m1})×${v2} + 2×${m1}×${v1})/(${m1}+${m2})
+    = ${((m2-m1)*v2 + 2*m1*v1).toFixed(2)}/${(m1+m2).toFixed(2)} = ${v2p.toFixed(2)} m/s
+
+SETELAH TUMBUKAN:
+• Bola 1: v₁' = ${v1p.toFixed(2)} m/s
+• Bola 2: v₂' = ${v2p.toFixed(2)} m/s
+• Momentum total: ${momentumAfter.toFixed(2)} kg⋅m/s
+• Energi kinetik: ${ekAfter.toFixed(2)} J
+
+VERIFIKASI:
+✓ Momentum kekal: ${Math.abs(momentumAfter - momentumBefore) < 0.001 ? 'YA' : 'TIDAK'}
+✓ Energi kekal: ${Math.abs(ekAfter - ekBefore) < 0.001 ? 'YA' : 'TIDAK'}`;
+          } else {
+            text = `HASIL PERHITUNGAN TUMBUKAN INELASTIS
+
+SEBELUM TUMBUKAN:
+• Bola 1: m₁ = ${m1}kg, v₁ = ${v1}m/s
+• Bola 2: m₂ = ${m2}kg, v₂ = ${v2}m/s
+• Momentum total: ${momentumBefore.toFixed(2)} kg⋅m/s
+• Energi kinetik: ${ekBefore.toFixed(2)} J
+
+RUMUS TUMBUKAN INELASTIS:
+v' = (m₁v₁ + m₂v₂)/(m₁ + m₂)
+
+PERHITUNGAN:
+v' = (${m1}×${v1} + ${m2}×${v2})/(${m1}+${m2})
+   = ${(m1*v1 + m2*v2).toFixed(2)}/${(m1+m2).toFixed(2)} = ${v1p.toFixed(2)} m/s
+
+SETELAH TUMBUKAN:
+• Bola 1: v₁' = ${v1p.toFixed(2)} m/s
+• Bola 2: v₂' = ${v2p.toFixed(2)} m/s
+• Momentum total: ${momentumAfter.toFixed(2)} kg⋅m/s
+• Energi kinetik: ${ekAfter.toFixed(2)} J
+• Energi hilang: ${energyLost.toFixed(2)} J
+
+VERIFIKASI:
+✓ Momentum kekal: ${Math.abs(momentumAfter - momentumBefore) < 0.001 ? 'YA' : 'TIDAK'}
+✓ Energi hilang: ${energyLost > 0 ? 'YA' : 'TIDAK'} (normal untuk inelastis)`;
+          }
+          
+          displayTextBab3.setAttribute('value', text);
+          document.querySelector('#infoPanelBab3').setAttribute('visible', 'true');
+        }
       }
 
       function resetBab3() {
@@ -1005,128 +2520,311 @@
         ball1.removeAttribute("animation__bounce");
         ball2.removeAttribute("animation__bounce");
         
+        // Hide panel informasi
+        document.querySelector('#infoPanelBab3').setAttribute('visible', 'false');
+        
         // Reset trails
         console.log('Resetting all effects...');
         
         done = false;
         m1 = 1, v1 = 1;
         m2 = 1, v2 = -1;
+        
+        // Update displays dan ukuran bola
+        updateInputDisplays();
+        updateLabel();
+        
         document.querySelector("#UImerahWrapper").setAttribute("visible", "true");
         document.querySelector("#UIbiruWrapper").setAttribute("visible", "true");
         document.querySelector("#btnPlayText").setAttribute("value", "Start");
+        updateInputDisplays(); // Update input displays
         updateLabel();
       }
 
       function removeAllBab3Clickables() {
         document.querySelector("#btnKembali3").classList.remove("clickable"); 
         document.querySelector("#btnPlay").classList.remove("clickable"); 
-        document.querySelector("#btnM11").classList.remove("clickable"); 
-        document.querySelector("#btnM12").classList.remove("clickable"); 
-        document.querySelector("#btnV11").classList.remove("clickable"); 
-        document.querySelector("#btnV12").classList.remove("clickable"); 
-        document.querySelector("#btnM21").classList.remove("clickable"); 
-        document.querySelector("#btnM22").classList.remove("clickable"); 
-        document.querySelector("#btnV21").classList.remove("clickable"); 
-        document.querySelector("#btnV22").classList.remove("clickable"); 
+        document.querySelector("#btnM1Plus").classList.remove("clickable"); 
+        document.querySelector("#btnM1Minus").classList.remove("clickable"); 
+        document.querySelector("#btnM1Plus5").classList.remove("clickable"); 
+        document.querySelector("#btnM1Minus5").classList.remove("clickable"); 
+        document.querySelector("#btnV1Plus").classList.remove("clickable"); 
+        document.querySelector("#btnV1Minus").classList.remove("clickable"); 
+        document.querySelector("#btnV1Plus5").classList.remove("clickable"); 
+        document.querySelector("#btnV1Minus5").classList.remove("clickable"); 
       }
 
-      // Event listener untuk tombol Play/Reset
-      btnPlay.addEventListener("click", () => {
-        if (done) {
-          resetBab3();
-          // Aktifkan kembali semua kontrol
-          document.querySelector("#btnM11").classList.add("clickable"); 
-          document.querySelector("#btnM12").classList.add("clickable"); 
-          document.querySelector("#btnV11").classList.add("clickable"); 
-          document.querySelector("#btnV12").classList.add("clickable"); 
-          document.querySelector("#btnM21").classList.add("clickable"); 
-          document.querySelector("#btnM22").classList.add("clickable"); 
-          document.querySelector("#btnV21").classList.add("clickable"); 
-          document.querySelector("#btnV22").classList.add("clickable"); 
-        } else {
-          // Nonaktifkan kontrol saat animasi berjalan
-          document.querySelector("#btnM11").classList.remove("clickable"); 
-          document.querySelector("#btnM12").classList.remove("clickable"); 
-          document.querySelector("#btnV11").classList.remove("clickable"); 
-          document.querySelector("#btnV12").classList.remove("clickable"); 
-          document.querySelector("#btnM21").classList.remove("clickable"); 
-          document.querySelector("#btnM22").classList.remove("clickable"); 
-          document.querySelector("#btnV21").classList.remove("clickable"); 
-          document.querySelector("#btnV22").classList.remove("clickable"); 
-          document.querySelector("#UIbiruWrapper").setAttribute("visible", "false");
-          document.querySelector("#UImerahWrapper").setAttribute("visible", "false");
+      // Clickable component for VR interactions
+      AFRAME.registerComponent('clickable', {
+        init: function () {
+          // Handle VR cursor/controller clicks and mouse clicks
+          this.el.addEventListener('click', (evt) => {
+            const id = this.el.id;
+            console.log('Clickable element clicked:', id);
+            
+            // Trigger button specific actions
+            switch(id) {
+              // Input boxes untuk ketik langsung
+              case 'inputM1Box':
+                const newM1 = promptForValue(m1, 'Massa (kg)', 'Bola Merah');
+                if (newM1 !== m1) {
+                  m1 = newM1;
+                  updateInputDisplays();
+                  updateLabel();
+                }
+                break;
+              case 'inputV1Box':
+                const newV1 = promptForValue(v1, 'Kecepatan (m/s)', 'Bola Merah');
+                if (newV1 !== v1) {
+                  v1 = newV1;
+                  updateInputDisplays();
+                  updateLabel();
+                }
+                break;
+              case 'inputM2Box':
+                const newM2 = promptForValue(m2, 'Massa (kg)', 'Bola Biru');
+                if (newM2 !== m2) {
+                  m2 = newM2;
+                  updateInputDisplays();
+                  updateLabel();
+                }
+                break;
+              case 'inputV2Box':
+                const newV2 = promptForValue(v2, 'Kecepatan (m/s)', 'Bola Biru');
+                if (newV2 !== v2) {
+                  v2 = newV2;
+                  updateInputDisplays();
+                  updateLabel();
+                }
+                break;
+                
+              // Tombol Play/Reset
+              case 'btnPlay':
+                console.log('Play button clicked, done =', done);
+                if (done) {
+                  resetBab3();
+                  return;
+                }
+
+                if (animating) return;
+                
+                animating = true;
+                done = false;
+                document.querySelector("#UImerahWrapper").setAttribute("visible", "false");
+                document.querySelector("#UIbiruWrapper").setAttribute("visible", "false");
+                document.querySelector("#btnPlay").classList.remove("clickable"); 
+                
+                console.log(`\n=== HASIL TUMBUKAN ===`);
+                console.log(`Input: m1=${m1}kg, v1=${v1}m/s, m2=${m2}kg, v2=${v2}m/s`);
+                
+                // Hitung kecepatan setelah tumbukan
+                const [v1p, v2p] = hitungKecepatan(m1, v1, m2, v2);
+                console.log(`Output: v1'=${v1p.toFixed(3)}m/s, v2'=${v2p.toFixed(3)}m/s`);
+                console.log(`Momentum: ${(m1*v1 + m2*v2).toFixed(3)} → ${(m1*v1p + m2*v2p).toFixed(3)} kg⋅m/s`);
+                
+                // Update panel informasi
+                updateInfoPanelBab3(m1, v1, m2, v2, v1p, v2p);
+                
+                // Set animasi menuju collision point
+                ball1.setAttribute("animation__go", {
+                  property: "position", 
+                  to: "0 1 -3", 
+                  dur: 2000, 
+                  easing: "linear"
+                });
+                
+                ball2.setAttribute("animation__go", {
+                  property: "position", 
+                  to: "0 1 -3", 
+                  dur: 2000, 
+                  easing: "linear"
+                });
+                
+                // Set animasi setelah collision
+                setTimeout(() => {
+                  console.log('Setting post-collision animations...');
+                  console.log(`Post-collision velocities: v1'=${v1p.toFixed(2)}, v2'=${v2p.toFixed(2)}`);
+                  
+                  // Animasi berdasarkan kecepatan akhir dengan skala yang lebih realistic
+                  const distanceScale = 0.8; // Faktor skala untuk jarak
+                  
+                  if (Math.abs(v1p) > 0.01) {
+                    const finalPos1 = v1p * distanceScale;
+                    ball1.setAttribute("animation__after", {
+                      property: "position", 
+                      to: `${finalPos1} 1 -3`, 
+                      dur: Math.abs(v1p) * 200 + 1000, // Durasi proporsional dengan kecepatan
+                      easing: "easeOutQuad"
+                    });
+                    console.log(`Ball1 moving to position: ${finalPos1}`);
+                  } else {
+                    ball1.setAttribute("position", "0 1 -3");
+                    console.log('Ball1 staying at collision point (v1p ≈ 0)');
+                  }
+                  
+                  if (Math.abs(v2p) > 0.01) {
+                    const finalPos2 = v2p * distanceScale;
+                    ball2.setAttribute("animation__after", {
+                      property: "position", 
+                      to: `${finalPos2} 1 -3`, 
+                      dur: Math.abs(v2p) * 200 + 1000, // Durasi proporsional dengan kecepatan
+                      easing: "easeOutQuad"
+                    });
+                    console.log(`Ball2 moving to position: ${finalPos2}`);
+                  } else {
+                    ball2.setAttribute("position", "0 1 -3");
+                    console.log('Ball2 staying at collision point (v2p ≈ 0)');
+                  }
+
+                  animating = false;
+                  done = true;
+                  document.querySelector("#btnPlayText").setAttribute("value", "Reset");
+                  document.querySelector("#btnPlay").classList.add("clickable"); 
+                }, 2100);
+                break;
+              default:
+                // For other buttons, try to trigger existing event listeners
+                const button = document.querySelector(`#${id}`);
+                if (button && button.click) {
+                  button.click();
+                }
+                break;
+            }
+          });
           
-          if (animating) return;
-          animating = true;
-
-          const [v1p, v2p] = hitungKecepatan(m1, v1, m2, v2);
-
-          // Tampilkan speed trails jika kecepatan tinggi
-          showSpeedTrails(1, v1, ball1.getAttribute('position'));
-          showSpeedTrails(2, v2, ball2.getAttribute('position'));
-
-          // Gerak mendekat
-          ball1.setAttribute("animation__go", {
-            property: "position", 
-            to: "0 1 -3", 
-            dur: 2000, 
-            easing: "linear"
+          // Add visual feedback on hover (for VR cursor)
+          this.el.addEventListener('mouseenter', () => {
+            this.el.setAttribute('scale', '1.1 1.1 1.1');
           });
-          ball2.setAttribute("animation__go", {
-            property: "position", 
-            to: "0 1 -3", 
-            dur: 2000, 
-            easing: "linear"
+          
+          this.el.addEventListener('mouseleave', () => {
+            this.el.setAttribute('scale', '1 1 1');
           });
-
-          setTimeout(() => {
-            // Efek memantul saat tabrakan
-            const impactIntensity = Math.sqrt(v1*v1 + v2*v2) / 3; // Intensitas berdasarkan kecepatan
-            createBounceEffect(ball1, impactIntensity);
-            createBounceEffect(ball2, impactIntensity);
-
-            // Update label setelah tabrakan
-            label1.setAttribute("value", `m1 = ${m1}kg\nv1' = ${v1p.toFixed(2)}m/s`);
-            label2.setAttribute("value", `m2 = ${m2}kg\nv2' = ${v2p.toFixed(2)}m/s`);
-
-            // Tampilkan speed trails setelah tabrakan jika kecepatan tinggi
-            setTimeout(() => {
-              showSpeedTrails(1, v1p, {x: 0, y: 1, z: -3});
-              showSpeedTrails(2, v2p, {x: 0, y: 1, z: -3});
-            }, 300);
-
-            // Gerak menjauh
-            if (Math.abs(v1p) > 0.01) {
-              ball1.setAttribute("animation__after", {
-                property: "position", 
-                to: `${-2 + v1p} 1 -3`, 
-                dur: 2000, 
-                easing: "linear"
-              });
-            } else {
-              ball1.setAttribute("position", "0 1 -4");
-            }
-
-            if (Math.abs(v2p) > 0.01) {
-              ball2.setAttribute("animation__after", {
-                property: "position", 
-                to: `${2 + v2p} 1 -3`, 
-                dur: 2000, 
-                easing: "linear"
-              });
-            } else {
-              ball2.setAttribute("position", "0 1 -3");
-            }
-
-            animating = false;
-            done = true;
-            document.querySelector("#btnPlayText").setAttribute("value", "Reset");
-          }, 2100);
         }
       });
 
-      // Inisialisasi
-      updateLabel();
+      // Smooth movement component untuk animasi yang lebih fluid
+      AFRAME.registerComponent('smooth-movement', {
+        schema: {
+          targetPosition: { type: 'vec3' },
+          duration: { default: 1000 },
+          easing: { default: 'easeOutCubic' }
+        },
+        init: function () {
+          this.startPosition = new THREE.Vector3();
+          this.currentPosition = new THREE.Vector3();
+          this.targetPosition = new THREE.Vector3();
+          this.animationProgress = 0;
+          this.isAnimating = false;
+        },
+        
+        update: function () {
+          if (this.data.targetPosition) {
+            this.startPosition.copy(this.el.object3D.position);
+            this.targetPosition.copy(this.data.targetPosition);
+            this.animationProgress = 0;
+            this.isAnimating = true;
+            this.startTime = Date.now();
+          }
+        },
+        
+        tick: function () {
+          if (!this.isAnimating) return;
+          
+          const elapsed = Date.now() - this.startTime;
+          const progress = Math.min(elapsed / this.data.duration, 1);
+          
+          // Apply easing function
+          let easedProgress;
+          switch (this.data.easing) {
+            case 'easeOutCubic':
+              easedProgress = 1 - Math.pow(1 - progress, 3);
+              break;
+            case 'easeInCubic':
+              easedProgress = progress * progress * progress;
+              break;
+            case 'easeInOutCubic':
+              easedProgress = progress < 0.5 ? 
+                4 * progress * progress * progress : 
+                1 - Math.pow(-2 * progress + 2, 3) / 2;
+              break;
+            case 'easeOutBounce':
+              const n1 = 7.5625;
+              const d1 = 2.75;
+              if (progress < 1 / d1) {
+                easedProgress = n1 * progress * progress;
+              } else if (progress < 2 / d1) {
+                easedProgress = n1 * (progress -= 1.5 / d1) * progress + 0.75;
+              } else if (progress < 2.5 / d1) {
+                easedProgress = n1 * (progress -= 2.25 / d1) * progress + 0.9375;
+              } else {
+                easedProgress = n1 * (progress -= 2.625 / d1) * progress + 0.984375;
+              }
+              break;
+            default:
+              easedProgress = progress;
+          }
+          
+          // Interpolate position
+          this.currentPosition.lerpVectors(this.startPosition, this.targetPosition, easedProgress);
+          this.el.object3D.position.copy(this.currentPosition);
+          
+          if (progress >= 1) {
+            this.isAnimating = false;
+            this.el.emit('smooth-movement-complete');
+          }
+        }
+      });
+
+      // Ball deformation component untuk efek realistis
+      AFRAME.registerComponent('ball-deformation', {
+        schema: {
+          intensity: { default: 0.15 },
+          duration: { default: 200 }
+        },
+        
+        init: function () {
+          this.originalScale = this.el.getAttribute('scale') || { x: 1, y: 1, z: 1 };
+        },
+        
+        deform: function (direction = 'impact') {
+          const intensity = this.data.intensity;
+          let deformScale;
+          
+          if (direction === 'impact') {
+            // Compression effect on impact
+            deformScale = {
+              x: 1 + intensity,
+              y: 1 - intensity,
+              z: 1 + intensity
+            };
+          } else {
+            // Stretch effect during movement
+            deformScale = {
+              x: 1 - intensity * 0.5,
+              y: 1,
+              z: 1 + intensity
+            };
+          }
+          
+          this.el.setAttribute('animation__deform', {
+            property: 'scale',
+            to: `${deformScale.x} ${deformScale.y} ${deformScale.z}`,
+            dur: this.data.duration / 2,
+            easing: 'easeOutElastic'
+          });
+          
+          // Return to normal
+          setTimeout(() => {
+            this.el.setAttribute('animation__reform', {
+              property: 'scale',
+              to: `${this.originalScale.x} ${this.originalScale.y} ${this.originalScale.z}`,
+              dur: this.data.duration,
+              easing: 'easeOutBounce'
+            });
+          }, this.data.duration / 2);
+        }
+      });
 
       // Player collider: stops the player from penetrating any .collidable object
       AFRAME.registerComponent('collider', {
@@ -1191,6 +2889,124 @@
           }
         },
       });
+
+      // Physics Guide Functions
+      function updateCollisionTypeDisplay() {
+        const elasticBtn = document.querySelector('#btnElastic');
+        const inelasticBtn = document.querySelector('#btnInelastic');
+        
+        if (collisionType === 'elastic') {
+          elasticBtn.setAttribute('color', '#00ff88');
+          elasticBtn.setAttribute('material', 'depthTest: true; color: #00ff88');
+          inelasticBtn.setAttribute('color', '#4444ff');
+          inelasticBtn.setAttribute('material', 'depthTest: true; color: #4444ff');
+        } else {
+          elasticBtn.setAttribute('color', '#0088ff');
+          elasticBtn.setAttribute('material', 'depthTest: true; color: #0088ff');
+          inelasticBtn.setAttribute('color', '#ff4444');
+          inelasticBtn.setAttribute('material', 'depthTest: true; color: #ff4444');
+        }
+      }
+
+      function showPhysicsGuide() {
+        const guidePanel = document.querySelector('#physicsGuidePanel');
+        const guideText = document.querySelector('#physicsGuideText');
+        
+        const physicsContent = generatePhysicsGuideContent();
+        guideText.setAttribute('value', physicsContent);
+        guidePanel.setAttribute('visible', 'true');
+        physicsGuideVisible = true;
+      }
+
+      function hidePhysicsGuide() {
+        const guidePanel = document.querySelector('#physicsGuidePanel');
+        guidePanel.setAttribute('visible', 'false');
+        physicsGuideVisible = false;
+      }
+
+      function generatePhysicsGuideContent() {
+        // Add mass effect examples
+        const heavyVsLight = calculateMassEffect(10, 1, 1, -1); // Heavy vs Light
+        const equalMass = calculateMassEffect(5, 5, 1, -1);    // Equal masses
+        const lightVsHeavy = calculateMassEffect(1, 10, 1, -1); // Light vs Heavy
+        
+        return `AR Physics Collision Solver Guide
+
+ELASTIC COLLISIONS:
+• Kinetic energy is conserved
+• Objects bounce apart completely
+• Formula: v1' = ((m1-m2)v1 + 2m2v2)/(m1+m2)
+          v2' = ((m2-m1)v2 + 2m1v1)/(m1+m2)
+
+INELASTIC COLLISIONS:
+• Kinetic energy is not conserved
+• Objects may stick together
+• Formula: v' = (m1v1 + m2v2)/(m1+m2)
+
+MASS EFFECT DEMONSTRATIONS:
+Heavy (10kg) hits Light (1kg):
+  Before: v1=1m/s, v2=-1m/s
+  After: v1'=${heavyVsLight[0].toFixed(2)}m/s, v2'=${heavyVsLight[1].toFixed(2)}m/s
+  
+Equal Mass (5kg each):
+  Before: v1=1m/s, v2=-1m/s  
+  After: v1'=${equalMass[0].toFixed(2)}m/s, v2'=${equalMass[1].toFixed(2)}m/s
+  
+Light (1kg) hits Heavy (10kg):
+  Before: v1=1m/s, v2=-1m/s
+  After: v1'=${lightVsHeavy[0].toFixed(2)}m/s, v2'=${lightVsHeavy[1].toFixed(2)}m/s
+
+MOMENTUM CONSERVATION:
+• Always applies: p_initial = p_final
+• p = mv (momentum = mass × velocity)
+
+ENERGY CALCULATIONS:
+• KE = ½mv² (kinetic energy)
+• Elastic: KE_initial = KE_final
+• Inelastic: KE_initial > KE_final
+
+Current Type: ${collisionType.toUpperCase()}
+Coefficient of Restitution: ${coefficientOfRestitution}
+
+Notice how mass dramatically affects outcomes!
+Heavy objects barely change velocity.
+Light objects experience huge velocity changes.`;
+      }
+
+      function calculateMassEffect(m1, m2, v1, v2) {
+        if (collisionType === 'elastic') {
+          const v1p = ((m1 - m2) * v1 + 2 * m2 * v2) / (m1 + m2);
+          const v2p = ((m2 - m1) * v2 + 2 * m1 * v1) / (m1 + m2);
+          return [v1p, v2p];
+        } else {
+          const vFinal = (m1 * v1 + m2 * v2) / (m1 + m2);
+          return [vFinal, vFinal];
+        }
+      }
+
+      function setMassDemo(newM1, newM2, newV1, newV2) {
+        // Set the demo values
+        m1 = newM1;
+        m2 = newM2;
+        v1 = newV1;
+        v2 = newV2;
+        
+        // Update displays
+        updateInputDisplays();
+        updateLabel();
+        
+        // Show prediction in console
+        const [predictedV1, predictedV2] = calculateMassEffect(m1, m2, v1, v2);
+        console.log(`\n=== MASS DEMO PREDICTION ===`);
+        console.log(`Before: m1=${m1}kg at ${v1}m/s, m2=${m2}kg at ${v2}m/s`);
+        console.log(`After: v1'=${predictedV1.toFixed(2)}m/s, v2'=${predictedV2.toFixed(2)}m/s`);
+        console.log(`Mass Effect: ${m1 > m2 ? 'Heavy ball 1 barely moves' : m1 < m2 ? 'Light ball 1 bounces hard' : 'Equal masses exchange velocities'}`);
+        
+        // Reset simulation state
+        if (done) {
+          resetBab3();
+        }
+      }
 
       // Info untuk pengguna
       console.log('VR Fisika loaded successfully!');
