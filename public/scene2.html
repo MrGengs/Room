@@ -20,6 +20,12 @@
       <!-- Assets - Conditional Loading -->
       <a-assets timeout="10000">
         <img id="thumbScene1" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" />
+        
+        <!-- Audio assets untuk efek suara -->
+        <audio id="collisionSound" crossorigin="anonymous" preload="auto">
+          <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+r1yW8iCz5/yPTMgSUFK3nO9d2ONgcXZLjr6qaUGBBIo+3zxm0hCTp+wvLNfSMDL4TP9diALgUlcs7y2W4jBy+N0PLUbCEGMYnZ8c1wJAAzdNrz0G8gBSyCzfPLdSIEO5DV79JlGgU/jNXux2EaBC+N0vHKdCMCMnPN8tV3JQQM0Pb4rFA" type="audio/wav">
+        </audio>
+        
         <!-- Fallback untuk jika GLB tidak tersedia -->
         <a-mixin id="fallback-box"
                  geometry="primitive: box; width: 2; height: 1; depth: 1"
@@ -28,11 +34,6 @@
                  geometry="primitive: plane; width: 20; height: 20"
                  material="color: #228B22"
                  rotation="-90 0 0"></a-mixin>
-                 
-        <!-- Ball material mixin -->
-        <a-mixin id="ball-material"
-          material="metalness: 0.2; roughness: 0.3"
-          geometry="primitive: sphere; segmentsWidth: 32; segmentsHeight: 16"></a-mixin>
       </a-assets>
 
       <a-entity id="environment"></a-entity>
@@ -104,103 +105,6 @@
             animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.2 0.2 0.2; dur: 1200; easing: linear"
             animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120">
           </a-entity>
-      </a-entity>
-
-      <!-- Ball Selection Menu -->
-      <a-entity id="ball-selector" position="0 1.5 -2" visible="false"
-        animation="property: position; from: 0 0.5 -2; to: 0 1.5 -2; dur: 500; startEvents: menuopen">
-        <a-entity geometry="primitive: plane; width: 5.5; height: 4" material="color: #2a2a2a; opacity: 0.95; transparent: true" position="0 0 0">
-          <a-text id="ball-selector-title" value="PILIH BOLA" position="0 1.6 0.1" align="center" color="white" width="5" scale="1.2 1.2 1"></a-text>
-          <a-text id="ball-preview-text" value="Pilih model bola yang diinginkan" position="0 1.3 0.1" align="center" color="#aaa" width="4.5" scale="0.7 0.7 1"></a-text>
-          
-          <!-- Ball Previews Grid -->
-          <a-entity id="ball-previews" position="0 0.4 0">
-            <!-- Row 1 -->
-            <a-entity position="-1.5 0.7 0.1" class="ball-option" data-ball="soccer">
-              <a-entity gltf-model="#soccer-ball" scale="0.15 0.15 0.15" class="clickable"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear">
-              </a-entity>
-              <a-text value="Sepak Bola" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
-            </a-entity>
-            
-            <a-entity position="-0.5 0.7 0.1" class="ball-option" data-ball="basketball">
-              <a-entity gltf-model="#basketball" scale="0.15 0.15 0.15" class="clickable"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear">
-              </a-entity>
-              <a-text value="Basket" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
-            </a-entity>
-            
-            <a-entity position="0.5 0.7 0.1" class="ball-option" data-ball="tennis">
-              <a-entity gltf-model="#tennis-ball" scale="0.15 0.15 0.15" class="clickable"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear">
-              </a-entity>
-              <a-text value="Tenis" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
-            </a-entity>
-            
-            <!-- Row 2 -->
-            <a-entity position="-1.5 0 0.1" class="ball-option" data-ball="bowling">
-              <a-entity gltf-model="#bowling-ball" scale="0.15 0.15 0.15" class="clickable"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 15000; easing: linear">
-              </a-entity>
-              <a-text value="Bowling" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
-            </a-entity>
-            
-            <a-entity position="-0.5 0 0.1" class="ball-option" data-ball="beach">
-              <a-entity gltf-model="#beach-ball" scale="0.15 0.15 0.15" class="clickable"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 7000; easing: linear">
-              </a-entity>
-              <a-text value="Pantai" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
-            </a-entity>
-            
-            <a-entity position="0.5 0 0.1" class="ball-option" data-ball="earth">
-              <a-entity gltf-model="#earth-ball" scale="0.15 0.15 0.15" class="clickable"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 20000; easing: linear">
-              </a-entity>
-              <a-text value="Bumi" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
-            </a-entity>
-            
-            <!-- Row 3 -->
-            <a-entity position="-1.5 -0.7 0.1" class="ball-option" data-ball="eight">
-              <a-entity gltf-model="#eight-ball" scale="0.15 0.15 0.15" class="clickable"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear">
-              </a-entity>
-              <a-text value="Bola 8" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
-            </a-entity>
-            
-            <a-entity position="-0.5 -0.7 0.1" class="ball-option" data-ball="volleyball">
-              <a-entity gltf-model="#volleyball" scale="0.15 0.15 0.15" class="clickable"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 9000; easing: linear">
-              </a-entity>
-              <a-text value="Voli" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
-            </a-entity>
-            
-            <a-entity position="0.5 -0.7 0.1" class="ball-option" data-ball="golf">
-              <a-entity gltf-model="#golf-ball" scale="0.15 0.15 0.15" class="clickable"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 6000; easing: linear">
-              </a-entity>
-              <a-text value="Golf" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
-            </a-entity>
-            
-            <!-- Row 4 - Default Ball -->
-            <a-entity position="0 -1.4 0.1" class="ball-option" data-ball="default">
-              <a-sphere radius="0.15" color="#ffffff" class="clickable"
-                material="metalness: 0.3; roughness: 0.2"
-                animation="property: scale; dir: alternate; dur: 1500; loop: true; to: 1.1 1.1 1.1; easing: easeInOutQuad">
-              </a-sphere>
-              <a-text value="Bola Default" position="0 -0.4 0" align="center" color="white" width="2" scale="0.5 0.5 1"></a-text>
-            </a-entity>
-          </a-entity>
-          
-          <!-- Close Button -->
-          <a-entity position="0 -2 0.1">
-            <a-plane color="#d32f2f" width="2" height="0.6" class="clickable" id="close-ball-selector"
-              event-set__mouseenter="material.opacity: 0.8; scale: 1.05 1.05 1"
-              event-set__mouseleave="material.opacity: 1; scale: 1 1 1"
-              animation="property: scale; dir: alternate; dur: 2000; loop: true; to: 1.02 1.02 1.02; easing: easeInOutSine">
-              <a-text value="TUTUP" position="0 0 0.1" align="center" color="white" width="3" scale="0.8 0.8 1"></a-text>
-            </a-plane>
-          </a-entity>
-        </a-entity>
       </a-entity>
       
       <!-- Main Menu -->
@@ -427,19 +331,20 @@
       <!-- Bab 3 - Tumbukan -->
       <a-entity id="bab3" visible="false">
         <!-- Bola-bola untuk simulasi tumbukan -->
-        <a-entity 
+        <a-sphere 
           id="ball1" 
           class="collidable"
           position="-4 1 -3" 
           radius="0.25" 
           color="#cc2f2f"
           material="depthTest: true"
-          shadow="cast: true">
+          shadow="cast: true"
+          ball-deformation="intensity: 0.2; duration: 300">
         </a-sphere>
         <a-text 
           id="label1" 
           value="m1 = 1kg&#10;v1 = 1m/s" 
-          position="-2 2 -3" 
+          position="-4 2 -3" 
           align="center"
           color="white"
           material="depthTest: false; transparent: true">
@@ -452,7 +357,8 @@
           radius="0.25" 
           color="#4545ff"
           material="depthTest: true"
-          shadow="cast: true">
+          shadow="cast: true"
+          ball-deformation="intensity: 0.2; duration: 300">
         </a-sphere>
         <a-text 
           id="label2" 
@@ -565,28 +471,6 @@
             </a-text>
           </a-entity>
           
-          <!-- Physics Guide Button -->
-          <a-entity position="0 -0.2 0">
-            <a-box 
-              id="btnPhysicsGuide"
-              class="clickable"
-              depth="0.1" 
-              height="0.25" 
-              width="2" 
-              color="#4444ff"
-              material="depthTest: true"
-              event-set__enter="_event: mouseenter; scale:1.05 1.05 1.05; color:#6666ff"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#4444ff">
-            </a-box>
-            <a-text 
-              value="PANDUAN FISIKA" 
-              color="#fff" 
-              align="center" 
-              width="4" 
-              position="0 0 0.06"
-              material="depthTest: false; transparent: true">
-            </a-text>
-          </a-entity>
 
           <!-- Mass Demo Buttons -->
           <a-entity position="0 -0.8 0">
@@ -1200,7 +1084,7 @@
         </a-entity>
 
         <!-- Tombol Play/Reset dan Kembali -->
-        <a-entity position="1 1 1.5" rotation="-10 -30 0">
+        <a-entity position="1 1 1.5" rotation="-10 -30 0" visible="false">
           <a-box 
             id="btnPlay"
             class="clickable"
@@ -1223,7 +1107,7 @@
           </a-text>
         </a-entity>
         
-        <a-entity position="-1 1 1.5" rotation="-10 30 0">
+        <a-entity position="-1 1 1.5" rotation="-10 30 0" visible="false">
           <a-box 
             id="btnKembali3"
             class="clickable"
@@ -1274,49 +1158,6 @@
           </a-text>
         </a-entity>
 
-        <!-- AR Physics Guide Panel -->
-        <a-entity position="-4 2.5 -5" rotation="-10 30 0" id="physicsGuidePanel" visible="false">
-          <a-box 
-            depth="0.05" 
-            height="5" 
-            width="7" 
-            color="#0a0a2a"
-            material="depthTest: true; opacity: 0.98; transparent: true">
-          </a-box>
-          <a-text 
-            id="physicsGuideText"
-            value="AR Physics Collision Solver Guide" 
-            position="0 0 0.03" 
-            align="center" 
-            color="#ffffff" 
-            width="1.5"
-            wrap-count="80"
-            material="depthTest: false; transparent: true">
-          </a-text>
-          
-          <!-- Close Guide Button -->
-          <a-entity position="3 2.2 0.1">
-            <a-box 
-              id="btnCloseGuide"
-              class="clickable"
-              depth="0.05" 
-              height="0.3" 
-              width="0.6" 
-              color="#ff4444"
-              material="depthTest: true"
-              event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff6666"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff4444">
-            </a-box>
-            <a-text 
-              value="✕" 
-              color="#fff" 
-              align="center" 
-              width="8" 
-              position="0 0 0.03"
-              material="depthTest: false; transparent: true">
-            </a-text>
-          </a-entity>
-        </a-entity>
       </a-entity>
     </a-scene>
 
@@ -1335,7 +1176,6 @@
       // Physics collision solver variables
       let collisionType = 'elastic'; // 'elastic' or 'inelastic'
       let coefficientOfRestitution = 1.0; // e = 1 for elastic, e = 0 for inelastic
-      let physicsGuideVisible = false;
 
       // Inisialisasi setelah DOM loaded
       document.addEventListener('DOMContentLoaded', () => {
@@ -1560,14 +1400,14 @@
           // Set animasi menuju collision point dengan smooth easing
           ball1.setAttribute("animation__go", {
             property: "position", 
-            to: "0 1 -3", 
+            to: "-0.15 1 -3", // Collision point sedikit ke kiri
             dur: 2000, 
             easing: "easeInCubic" // Accelerating towards collision
           });
           
           ball2.setAttribute("animation__go", {
             property: "position", 
-            to: "0 1 -3", 
+            to: "0.15 1 -3", // Collision point sedikit ke kanan
             dur: 2000, 
             easing: "easeInCubic" // Accelerating towards collision
           });
@@ -1583,7 +1423,7 @@
             // Animasi berdasarkan kecepatan akhir dengan skala yang lebih realistic
             // Jarak yang ditempuh = kecepatan * waktu, dengan faktor skala untuk tampilan
             const timeScale = 1.5; // Faktor skala untuk durasi animasi
-            const distanceScale = 0.8; // Faktor skala untuk jarak
+            const distanceScale = 1.2; // Skala jarak diperbesar agar lebih terlihat
             
             // Hitung posisi akhir dengan anti-overlap logic
             let finalPos1 = v1p * distanceScale;
@@ -1852,6 +1692,10 @@
           document.querySelector("#UImerahWrapper").setAttribute("visible", "true");
           document.querySelector("#UIbiruWrapper").setAttribute("visible", "true");
           
+          // Tampilkan tombol-tombol Tumbukan (btnPlay dan btnKembali3)
+          document.querySelector("#btnPlay").parentElement.setAttribute("visible", "true");
+          document.querySelector("#btnKembali3").parentElement.setAttribute("visible", "true");
+          
           document.querySelector("#btnBab2").classList.remove("clickable"); 
           document.querySelector("#btnBab3").classList.remove("clickable"); 
           document.querySelector("#btnKembali3").classList.add("clickable"); 
@@ -1892,6 +1736,11 @@
         document.querySelector('#btnKembali3').addEventListener('click', () => {
           document.querySelector("#bab3").setAttribute("visible", false);
           document.querySelector("#mainmenu").setAttribute("visible", true);
+          
+          // Sembunyikan tombol-tombol Tumbukan saat kembali ke menu utama
+          document.querySelector("#btnPlay").parentElement.setAttribute("visible", "false");
+          document.querySelector("#btnKembali3").parentElement.setAttribute("visible", "false");
+          
           document.querySelector("#btnBab2").classList.add("clickable"); 
           document.querySelector("#btnBab3").classList.add("clickable"); 
           removeAllBab3Clickables();
@@ -1912,14 +1761,6 @@
           console.log('Collision type set to inelastic');
         });
 
-        // Event listener for physics guide
-        document.querySelector('#btnPhysicsGuide').addEventListener('click', () => {
-          showPhysicsGuide();
-        });
-
-        document.querySelector('#btnCloseGuide').addEventListener('click', () => {
-          hidePhysicsGuide();
-        });
 
         // Mass demo event listeners
         document.querySelector('#btnHeavyLight').addEventListener('click', () => {
@@ -2941,9 +2782,15 @@ VERIFIKASI:
       }
 
       function resetBab3() {
+        console.log('resetBab3() called from:', new Error().stack);
         animating = false;
+        done = false;
+        
+        // Reset posisi bola
         ball1.setAttribute("position", "-2 1 -3");
         ball2.setAttribute("position", "2 1 -3");
+        
+        // Hapus semua animasi
         ball1.removeAttribute("animation__go");
         ball2.removeAttribute("animation__go");
         ball1.removeAttribute("animation__after");
@@ -2964,15 +2811,53 @@ VERIFIKASI:
         console.log('Resetting all effects...');
         hideTrailEffects();
         
-        done = false;
+        // Reset nilai default
         m1 = 1, v1 = 1;
         m2 = 1, v2 = -1;
+        
+        // Update displays dan ukuran bola
+        updateInputDisplays();
+        updateLabel();
+        
+        // Pastikan kontrol UI tetap terlihat setelah reset (jangan disembunyikan)
         document.querySelector("#UImerahWrapper").setAttribute("visible", "true");
         document.querySelector("#UIbiruWrapper").setAttribute("visible", "true");
         
-        // Reset tombol text dan aktifkan kembali
+        // Aktifkan kembali semua tombol kontrol massa dan kecepatan
+        document.querySelector("#btnM1Plus").classList.add("clickable");
+        document.querySelector("#btnM1Minus").classList.add("clickable");
+        document.querySelector("#btnV1Plus").classList.add("clickable");
+        document.querySelector("#btnV1Minus").classList.add("clickable");
+        document.querySelector("#btnM2Plus").classList.add("clickable");
+        document.querySelector("#btnM2Minus").classList.add("clickable");
+        document.querySelector("#btnV2Plus").classList.add("clickable");
+        document.querySelector("#btnV2Minus").classList.add("clickable");
+        
+        // Reset tombol text
         document.querySelector("#btnPlayText").setAttribute("value", "Start");
-        updateLabel();
+        
+        console.log('Reset complete - returned to main menu');
+      }
+
+      function hideTrailEffects() {
+        // Hide all trail effects
+        document.querySelector('#trail1').setAttribute('visible', 'false');
+        document.querySelector('#trail2').setAttribute('visible', 'false');
+        document.querySelector('#collisionParticles').setAttribute('visible', 'false');
+        
+        // Reset collision flash light
+        const flashLight = document.querySelector('#collisionFlash');
+        if (flashLight) {
+          flashLight.setAttribute('light', 'intensity: 0');
+        }
+        
+        // Hide any trail segments
+        for (let i = 0; i < 12; i++) {
+          const segment1 = document.querySelector(`#trail1_${i}`);
+          const segment2 = document.querySelector(`#trail2_${i}`);
+          if (segment1) segment1.setAttribute('visible', 'false');
+          if (segment2) segment2.setAttribute('visible', 'false');
+        }
       }
 
       function removeAllBab3Clickables() {
@@ -3289,6 +3174,58 @@ VERIFIKASI:
           }
         },
       });
+
+      // Physics Guide Functions
+      function updateCollisionTypeDisplay() {
+        const elasticBtn = document.querySelector('#btnElastic');
+        const inelasticBtn = document.querySelector('#btnInelastic');
+        
+        if (collisionType === 'elastic') {
+          elasticBtn.setAttribute('color', '#00ff88');
+          elasticBtn.setAttribute('material', 'depthTest: true; color: #00ff88');
+          inelasticBtn.setAttribute('color', '#4444ff');
+          inelasticBtn.setAttribute('material', 'depthTest: true; color: #4444ff');
+        } else {
+          elasticBtn.setAttribute('color', '#0088ff');
+          elasticBtn.setAttribute('material', 'depthTest: true; color: #0088ff');
+          inelasticBtn.setAttribute('color', '#ff4444');
+          inelasticBtn.setAttribute('material', 'depthTest: true; color: #ff4444');
+        }
+      }
+
+
+      function calculateMassEffect(m1, m2, v1, v2) {
+        if (collisionType === 'elastic') {
+          const v1p = ((m1 - m2) * v1 + 2 * m2 * v2) / (m1 + m2);
+          const v2p = ((m2 - m1) * v2 + 2 * m1 * v1) / (m1 + m2);
+          return [v1p, v2p];
+        } else {
+          const vFinal = (m1 * v1 + m2 * v2) / (m1 + m2);
+          return [vFinal, vFinal];
+        }
+      }
+
+      function setMassDemo(newM1, newM2, newV1, newV2) {
+        // Set the demo values
+        m1 = newM1;
+        m2 = newM2;
+        v1 = newV1;
+        v2 = newV2;
+        
+        // Update displays
+        updateInputDisplays();
+        updateLabel();
+        
+        // Show prediction in console
+        const [predictedV1, predictedV2] = calculateMassEffect(m1, m2, v1, v2);
+        console.log(`\n=== MASS DEMO PREDICTION ===`);
+        console.log(`Before: m1=${m1}kg at ${v1}m/s, m2=${m2}kg at ${v2}m/s`);
+        console.log(`After: v1'=${predictedV1.toFixed(2)}m/s, v2'=${predictedV2.toFixed(2)}m/s`);
+        console.log(`Mass Effect: ${m1 > m2 ? 'Heavy ball 1 barely moves' : m1 < m2 ? 'Light ball 1 bounces hard' : 'Equal masses exchange velocities'}`);
+        
+        // Tidak auto-reset, biarkan user mengklik tombol reset manual
+        console.log('Demo values set. Click Reset button to clear animation if needed.');
+      }
 
       // Info untuk pengguna
       console.log('VR Fisika loaded successfully!');
