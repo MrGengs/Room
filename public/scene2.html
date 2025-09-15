@@ -3,54 +3,12 @@
   <head>
     <meta charset="utf-8">
     <title>VR Fisika</title>
-    <style>
-      #joystick {
-        width: 100px;
-        height: 100px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 50%;
-        position: relative;
-        overflow: hidden;
-        display: none;
-        position: fixed;
-        bottom: 30px;
-        left: 30px;
-        z-index: 1000;
-      }
-      #joystick-knob {
-        width: 50px;
-        height: 50px;
-        background: rgba(255, 255, 255, 0.5);
-        border-radius: 50%;
-        position: absolute;
-        left: 25px;
-        top: 25px;
-        transition: transform 0.1s ease-out;
-      }
-      #mobile-controls {
-        position: fixed;
-        bottom: 30px;
-        left: 20px;
-        z-index: 1000;
-        pointer-events: none;
-      }
-    </style>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
     <script src="https://unpkg.com/aframe-event-set-component/dist/aframe-event-set-component.min.js"></script>
     <script src="https://unpkg.com/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js"></script>
   </head>
   <body>
-    <!-- Virtual Gamepad for Mobile -->
-    <div id="mobile-controls">
-      <!-- Joystick Control -->
-      <div style="width: 120px; height: 120px; position: relative; pointer-events: auto;">
-        <div id="joystick">
-          <div id="joystick-knob"></div>
-        </div>
-      </div>
-    </div>
-
     <a-scene 
       vr-mode-ui="enabled: false" 
       embedded 
@@ -221,7 +179,7 @@
         border-radius: 10px;
         font-family: sans-serif;
         width: 320px;
-        display: none; /* Awalnya disembunyikan */
+        display: none;
       }
       .input-group {
         margin-bottom: 10px;
@@ -1302,26 +1260,36 @@
       // Fungsi untuk animasi fallback (jika GLB tidak ada)
       // Modifikasi: Buat fungsi ini lebih fleksibel
       function animateBlock(state, acceleration = 0) {
-        // Hapus animasi sebelumnya jika ada
-        if (blockModel) {
-          blockModel.removeAttribute('animation');
+        // Prioritaskan model GLB jika sudah dimuat, jika tidak, gunakan fallback box
+        const modelToAnimate = document.querySelector('#myModel').querySelector('#glbBlockModel') || document.querySelector('#blockModel');
 
-          // Reset posisi
-          blockModel.setAttribute('position', '0 0 0');
+        if (modelToAnimate) {
+          // Hapus animasi sebelumnya jika ada
+          modelToAnimate.removeAttribute('animation');
+
+          // Tentukan posisi awal berdasarkan model mana yang aktif
+          const isGlb = modelToAnimate.id === 'glbBlockModel';
+          const initialPosition = isGlb ? { x: 1.5, y: 0, z: 0 } : { x: 0, y: 0, z: 0 };
+
+          // Reset posisi ke posisi awal
+          modelToAnimate.setAttribute('position', initialPosition);
 
           if (state === 'move') {
             // Durasi animasi berbanding terbalik dengan percepatan
-            // Semakin besar percepatan, semakin cepat animasinya
             const duration = Math.max(1000, 5000 / (1 + acceleration));
-            // Jarak tempuh bisa dibuat proporsional dengan percepatan
+            // Jarak tempuh proporsional dengan percepatan
             const distance = 1 + acceleration * 0.5;
 
-            const animationString = `property: position; to: ${distance} 0 0; dur: ${duration}; easing: easeInOutQuad; startEvents: start-animation`;
+            // Posisi target adalah posisi awal ditambah jarak pergerakan
+            // Karena parentnya dirotasi -90 derajat pada sumbu Y, pergerakan di sumbu X lokal menjadi pergerakan di sumbu Z global.
+            const targetPosition = `${initialPosition.x} ${initialPosition.y} ${initialPosition.z - distance}`;
+
+            const animationString = `property: position; to: ${targetPosition}; dur: ${duration}; easing: easeInOutQuad; startEvents: start-animation`;
     
-            blockModel.setAttribute('animation', animationString);
+            modelToAnimate.setAttribute('animation', animationString);
 
             // Memicu event untuk memulai animasi
-            blockModel.emit('start-animation');
+            modelToAnimate.emit('start-animation');
           }
         }
       }
@@ -1816,6 +1784,7 @@
         
         // Coba load model bab2.glb
         const bab2Model = document.createElement('a-entity');
+        bab2Model.setAttribute('id', 'glbBlockModel'); // ID ditambahkan untuk target animasi
         bab2Model.setAttribute('gltf-model', 'assets/scene2/balok.glb');
         bab2Model.setAttribute('position', '1.5 0 0');
         bab2Model.setAttribute('rotation', '0 90 0');
@@ -1991,19 +1960,11 @@
           }
         }
         
-        // Show joystick based on device selection in localStorage
+        // Show joystick for mobile devices
         function checkDeviceType() {
-          const deviceType = localStorage.getItem('deviceType');
           const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-          
-          // Tampilkan joystick jika:
-          // 1. Pengguna memilih 'mobile' di localStorage, ATAU
-          // 2. Perangkat terdeteksi sebagai mobile dan tidak ada pilihan di localStorage
-          if (deviceType === 'mobile' || (isMobile && !deviceType)) {
+          if (isMobile) {
             joystick.style.display = 'block';
-            console.log('Joystick enabled for mobile device');
-          } else {
-            joystick.style.display = 'none';
           }
         }
         
@@ -2026,9 +1987,6 @@
       document.addEventListener('DOMContentLoaded', () => {
         loadGLBModels();
         createSpeedTrails();
-        setupEventListeners();
-        setupInputHandlers();
-        setupMobileControls();
       });
 
       // Fungsi untuk membuat efek garis kecepatan
@@ -2431,7 +2389,7 @@
       }
 
       function updateBallSizes() {
-        if (!ball1 || !ball2) return;
+        if (!ball1 || !ball2) return; 
         
         // Radius base = 0.15, ditambah proporsional dengan massa
         const radius1 = 0.15 + (m1 * 0.02);  // 0.15 + (massa * 0.02)
