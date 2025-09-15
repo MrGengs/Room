@@ -5,10 +5,6 @@
   <meta charset="utf-8" />
   <title>AR-Room</title>
   <meta name="description" content="AR">
-  <a-entity id="sepeda-arrow" gltf-model="url(assets/scene1/arrow.glb)" position="0 2.5 0" rotation="0 0 0"
-    scale="0.5 0.5 0.5" visible="false">
-  </a-entity>
-
   <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js"></script>
@@ -592,7 +588,8 @@
           material="shader: flat; opacity: 0.9" cursor="fuse: true; fuseTimeout: 1200"
           raycaster="objects: .clickable; far: 20;"
           animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.2 0.2 0.2; dur: 1200; easing: linear"
-          animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120">
+          animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120"
+          id="main-cursor">
         </a-entity>
       </a-entity>
       <a-entity id="left-hand" networked-hand-controls="hand: left" laser-controls="hand: left"></a-entity>
@@ -605,25 +602,56 @@
     AFRAME.registerComponent('cursor-listener', {
       init: function () {
         this.el.addEventListener('click', this.onClick.bind(this));
+        this.el.addEventListener('fuse', this.onClick.bind(this)); // Add fuse event support
         this.el.addEventListener('mouseenter', this.onMouseEnter.bind(this));
         this.el.addEventListener('mouseleave', this.onMouseLeave.bind(this));
+        console.log('Cursor listener initialized for element:', this.el.id);
       },
       onClick: function (evt) {
+        console.log('=== BUTTON CLICKED ===');
         console.log('Element clicked:', this.el.id);
+        console.log('Event details:', evt);
+        console.log('physicsSimulation3D available:', !!physicsSimulation3D);
+        console.log('physicsSimulation3D:', physicsSimulation3D);
 
         // Handle button clicks based on element ID
         if (this.el.id === 'force-minus') {
-          physicsSimulation3D.adjustForce(-1);
+          console.log('Processing force-minus click...');
+          if (physicsSimulation3D) {
+            physicsSimulation3D.adjustForce(-1);
+          } else {
+            console.error('physicsSimulation3D not initialized');
+          }
         } else if (this.el.id === 'force-plus') {
-          physicsSimulation3D.adjustForce(1);
+          if (physicsSimulation3D) {
+            physicsSimulation3D.adjustForce(1);
+          } else {
+            console.error('physicsSimulation3D not initialized');
+          }
         } else if (this.el.id === 'distance-minus') {
-          physicsSimulation3D.adjustDistance(-1);
+          if (physicsSimulation3D) {
+            physicsSimulation3D.adjustDistance(-1);
+          } else {
+            console.error('physicsSimulation3D not initialized');
+          }
         } else if (this.el.id === 'distance-plus') {
-          physicsSimulation3D.adjustDistance(1);
+          if (physicsSimulation3D) {
+            physicsSimulation3D.adjustDistance(1);
+          } else {
+            console.error('physicsSimulation3D not initialized');
+          }
         } else if (this.el.id === 'apply-force-btn') {
-          physicsSimulation3D.applyForce();
+          if (physicsSimulation3D) {
+            physicsSimulation3D.applyForce();
+          } else {
+            console.error('physicsSimulation3D not initialized');
+          }
         } else if (this.el.id === 'reset-btn') {
-          physicsSimulation3D.reset();
+          if (physicsSimulation3D) {
+            physicsSimulation3D.reset();
+          } else {
+            console.error('physicsSimulation3D not initialized');
+          }
         }
       },
       onMouseEnter: function (evt) {
@@ -1192,7 +1220,10 @@
       constructor() {
         this.forceValue = 100;
         this.distanceValue = 5;
-        this.updateDisplays();
+        // Delay initial display update to ensure DOM is ready
+        setTimeout(() => {
+          this.updateDisplays();
+        }, 1000);
       }
 
       adjustForce(direction) {
@@ -1210,14 +1241,20 @@
       }
 
       updateDisplays() {
+        console.log('updateDisplays called, force:', this.forceValue, 'distance:', this.distanceValue);
         const forceDisplay = document.getElementById('force-display');
         const distanceDisplay = document.getElementById('distance-display');
 
+        console.log('forceDisplay element found:', !!forceDisplay);
+        console.log('distanceDisplay element found:', !!distanceDisplay);
+
         if (forceDisplay) {
           forceDisplay.setAttribute('value', this.forceValue.toString());
+          console.log('Force display updated to:', this.forceValue);
         }
         if (distanceDisplay) {
           distanceDisplay.setAttribute('value', this.distanceValue.toString());
+          console.log('Distance display updated to:', this.distanceValue);
         }
       }
 
@@ -1379,6 +1416,60 @@
         }
       }
     }
+
+    // Initialize PhysicsSimulation3D immediately when script loads
+    physicsSimulation3D = new PhysicsSimulation3D();
+    console.log('PhysicsSimulation3D initialized immediately');
+
+    // Debug: Log all elements with cursor-listener after scene loads
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(() => {
+        const listenedElements = document.querySelectorAll('[cursor-listener]');
+        console.log('Elements with cursor-listener:', listenedElements.length);
+        listenedElements.forEach(el => {
+          console.log('- Element:', el.id, 'has cursor-listener');
+        });
+
+        const clickableElements = document.querySelectorAll('.clickable');
+        console.log('Clickable elements:', clickableElements.length);
+        clickableElements.forEach(el => {
+          console.log('- Clickable element:', el.id);
+        });
+
+        // Test physicsSimulation3D
+        console.log('Testing physicsSimulation3D:', physicsSimulation3D);
+        if (physicsSimulation3D) {
+          console.log('physicsSimulation3D methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(physicsSimulation3D)));
+        }
+
+        // Add additional click event to test
+        const forceMinusButton = document.getElementById('force-minus');
+        if (forceMinusButton) {
+          console.log('Found force-minus button, adding test click listener');
+          forceMinusButton.addEventListener('click', function(evt) {
+            console.log('DIRECT click on force-minus detected!');
+            evt.stopPropagation();
+          });
+        } else {
+          console.error('force-minus button not found!');
+        }
+
+        // Debug cursor events
+        const cursor = document.getElementById('main-cursor');
+        if (cursor) {
+          console.log('Found cursor, adding debug events');
+          cursor.addEventListener('raycaster-intersection', function(evt) {
+            console.log('Cursor intersecting with:', evt.detail.els.map(el => el.id));
+          });
+          cursor.addEventListener('raycaster-intersection-cleared', function(evt) {
+            console.log('Cursor intersection cleared');
+          });
+          cursor.addEventListener('click', function(evt) {
+            console.log('Cursor click event triggered');
+          });
+        }
+      }, 2000); // Wait 2 seconds for A-Frame to fully initialize
+    });
 
     // Panggil setupMobileControls saat DOM selesai dimuat
     document.addEventListener('DOMContentLoaded', function () {
