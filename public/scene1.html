@@ -1029,23 +1029,49 @@
           this.el.addEventListener('click', this.onClick.bind(this));
           this.el.addEventListener('mouseenter', this.onMouseEnter.bind(this));
           this.el.addEventListener('mouseleave', this.onMouseLeave.bind(this));
+          console.log('Cursor listener initialized for element:', this.el.id);
         },
         onClick: function (evt) {
           console.log('Element clicked:', this.el.id);
+          console.log('physicsSimulation3D available:', !!physicsSimulation3D);
           
           // Handle button clicks based on element ID
           if (this.el.id === 'force-minus') {
-            physicsSimulation3D.adjustForce(-1);
+            if (physicsSimulation3D) {
+              physicsSimulation3D.adjustForce(-1);
+            } else {
+              console.error('physicsSimulation3D not initialized');
+            }
           } else if (this.el.id === 'force-plus') {
-            physicsSimulation3D.adjustForce(1);
+            if (physicsSimulation3D) {
+              physicsSimulation3D.adjustForce(1);
+            } else {
+              console.error('physicsSimulation3D not initialized');
+            }
           } else if (this.el.id === 'distance-minus') {
-            physicsSimulation3D.adjustDistance(-1);
+            if (physicsSimulation3D) {
+              physicsSimulation3D.adjustDistance(-1);
+            } else {
+              console.error('physicsSimulation3D not initialized');
+            }
           } else if (this.el.id === 'distance-plus') {
-            physicsSimulation3D.adjustDistance(1);
+            if (physicsSimulation3D) {
+              physicsSimulation3D.adjustDistance(1);
+            } else {
+              console.error('physicsSimulation3D not initialized');
+            }
           } else if (this.el.id === 'apply-force-btn') {
-            physicsSimulation3D.applyForce();
+            if (physicsSimulation3D) {
+              physicsSimulation3D.applyForce();
+            } else {
+              console.error('physicsSimulation3D not initialized');
+            }
           } else if (this.el.id === 'reset-btn') {
-            physicsSimulation3D.reset();
+            if (physicsSimulation3D) {
+              physicsSimulation3D.reset();
+            } else {
+              console.error('physicsSimulation3D not initialized');
+            }
           }
         },
         onMouseEnter: function (evt) {
@@ -1805,6 +1831,20 @@
       // Panggil setupMobileControls saat DOM selesai dimuat
       document.addEventListener('DOMContentLoaded', function() {
         setupMobileControls();
+        
+        // Inisialisasi PhysicsSimulation3D setelah scene dimuat
+        const scene = document.querySelector('a-scene');
+        if (scene.hasLoaded) {
+          // Scene sudah dimuat, inisialisasi langsung
+          physicsSimulation3D = new PhysicsSimulation3D();
+          console.log('PhysicsSimulation3D initialized successfully (scene already loaded)');
+        } else {
+          // Tunggu scene dimuat
+          scene.addEventListener('loaded', function() {
+            physicsSimulation3D = new PhysicsSimulation3D();
+            console.log('PhysicsSimulation3D initialized successfully (after scene loaded)');
+          });
+        }
         
         // Inisialisasi karakter yang dipilih
         const selectedCharacter = localStorage.getItem('selectedCharacter');
