@@ -3,6 +3,26 @@
   <head>
     <meta charset="utf-8" />
     <title>AR-Room</title>
+    <style>
+      #joystick {
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        position: relative;
+        overflow: hidden;
+      }
+      #joystick-knob {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        position: absolute;
+        left: 25px;
+        top: 25px;
+        transition: transform 0.1s ease-out;
+      }
+    </style>
     <meta name="description" content="AR">
           <a-entity id="sepeda-arrow" 
             gltf-model="url(assets/scene1/arrow.glb)"
@@ -10,7 +30,7 @@
             rotation="0 0 0"
             scale="0.5 0.5 0.5"
             visible="false">
-          </a-entity>>
+          </a-entity>
 
     <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
 
@@ -30,6 +50,16 @@
   </head>
 
   <body>
+    <!-- Virtual Gamepad for Mobile -->
+    <div id="mobile-controls" style="display: none; position: fixed; bottom: 30px; left: 20px; z-index: 1000; pointer-events: none;">
+      <!-- Joystick Control -->
+      <div style="width: 120px; height: 120px; position: relative; pointer-events: auto;">
+        <div id="joystick">
+          <div id="joystick-knob"></div>
+        </div>
+      </div>
+    </div>
+
     <a-scene
       light="defaultLightsEnabled:false"
       renderer="stencil:true"
@@ -1401,6 +1431,13 @@
 
       // Initialize physics simulation when scene and DOM are loaded
       document.addEventListener('DOMContentLoaded', () => {
+        // Check if mobile controls should be shown
+        const deviceType = localStorage.getItem('deviceType');
+        const mobileControls = document.getElementById('mobile-controls');
+        if (deviceType === 'mobile' && mobileControls) {
+          mobileControls.style.display = 'block';
+          setupMobileControls();
+        }
         const selectedCharacter = localStorage.getItem('selectedCharacter');
         if (selectedCharacter) {
           const rig = document.getElementById('rig');
