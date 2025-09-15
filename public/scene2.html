@@ -8,8 +8,102 @@
     <script src="https://unpkg.com/aframe-event-set-component/dist/aframe-event-set-component.min.js"></script>
     <script src="https://unpkg.com/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js"></script>
     <script src="/js/joystick.js"></script>
+
+    <!-- CSS for Bab 2 UI -->
+    <style>
+      #ui-container {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 10;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        font-family: sans-serif;
+        width: 320px;
+        display: none;
+      }
+
+      .input-group {
+        margin-bottom: 10px;
+      }
+
+      .input-group label {
+        display: inline-block;
+        width: 150px;
+      }
+
+      .input-group input {
+        width: 100px;
+        padding: 5px;
+        border-radius: 5px;
+        border: none;
+      }
+
+      #result-container {
+        margin-top: 15px;
+        padding-top: 10px;
+        border-top: 1px solid #555;
+        font-family: 'Courier New', Courier, monospace;
+      }
+
+      #result-container h3 {
+        margin-top: 0;
+      }
+
+      button {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+
+      #btnCalculate {
+        background-color: #2e88ff;
+        color: white;
+      }
+
+      #btnCalculate:hover {
+        background-color: #7bdcff;
+      }
+    </style>
   </head>
   <body>
+    <!-- UI Container for Bab 2 - Gaya Gesek -->
+    <div id="ui-container">
+      <h3>Input Simulasi Gaya Gesek</h3>
+      <div class="input-group">
+        <label for="massa">Massa Balok (kg):</label>
+        <input type="number" id="massa" value="10">
+      </div>
+      <div class="input-group">
+        <label for="gaya-tarik">Gaya Tarik (N):</label>
+        <input type="number" id="gaya-tarik" value="20">
+      </div>
+      <div class="input-group">
+        <label for="koef-statis">Koefisien Statis (μs):</label>
+        <input type="number" id="koef-statis" value="0.5" step="0.1">
+      </div>
+      <div class="input-group">
+        <label for="koef-kinetis">Koefisien Kinetis (μk):</label>
+        <input type="number" id="koef-kinetis" value="0.3" step="0.1">
+      </div>
+
+      <button id="btnCalculate">Kalkulasi & Animasikan</button>
+
+      <div id="result-container" style="display: none;">
+        <h3>Hasil Kalkulasi:</h3>
+        <p id="result-normal"></p>
+        <p id="result-fsmax"></p>
+        <p id="result-fk"></p>
+        <p id="result-kesimpulan"></p>
+        <p id="result-percepatan"></p>
+      </div>
+    </div>
+
     <!-- Virtual Gamepad for Mobile -->
     <div id="mobile-controls" style="position: fixed; bottom: 30px; left: 20px; z-index: 1000; display: none; touch-action: none; -webkit-tap-highlight-color: transparent;">
       <!-- Joystick Control -->
@@ -1211,7 +1305,7 @@
       let blockAnimationState = 'idle';
       
       // Variabel global - diinisialisasi setelah DOM loaded
-      let statusText, ball1, ball2, label1, label2, btnPlay;
+      let statusText, ball1, ball2, label1, label2, btnPlay, uiContainer;
       let m1 = 1, v1 = 1;
       let m2 = 1, v2 = -1;
       let animating = false;
@@ -1243,6 +1337,7 @@
         label1 = document.querySelector("#label1");
         label2 = document.querySelector("#label2");
         btnPlay = document.querySelector("#btnPlay");
+        uiContainer = document.querySelector('#ui-container');
         
         // Inisialisasi elemen panel hasil
         resultPanel = document.querySelector('#resultPanel');
@@ -1365,6 +1460,100 @@
 
       function setupEventListeners() {
         /* Event listeners untuk Bab3 dan kontrol lain akan ada di sini */
+
+        // Event listener untuk tombol Kalkulasi (Bab 2)
+        const btnCalculate = document.querySelector('#btnCalculate');
+        if (btnCalculate) {
+          btnCalculate.addEventListener('click', () => {
+            // 1. Ambil nilai input dari user
+            const massa = parseFloat(document.querySelector('#massa').value);
+            const F_tarik = parseFloat(document.querySelector('#gaya-tarik').value);
+            const mu_s = parseFloat(document.querySelector('#koef-statis').value);
+            const mu_k = parseFloat(document.querySelector('#koef-kinetis').value);
+            const g = 9.8; // Konstanta gravitasi (m/s^2)
+
+            // Validasi input
+            if (isNaN(massa) || isNaN(F_tarik) || isNaN(mu_s) || isNaN(mu_k)) {
+              alert("Pastikan semua input terisi dengan angka yang valid.");
+              return;
+            }
+            if (mu_k > mu_s) {
+              alert("Koefisien Kinetis (μk) tidak boleh lebih besar dari Koefisien Statis (μs).");
+              return;
+            }
+
+            // 2. Lakukan kalkulasi fisika
+            const N = massa * g; // Gaya Normal (N)
+            const Fs_max = mu_s * N; // Gaya Gesek Statis Maksimum (N)
+            const Fk = mu_k * N; // Gaya Gesek Kinetis (N)
+
+            let kesimpulan = "";
+            let percepatan = 0;
+            let statusInfo = "";
+
+            // 3. Tentukan kondisi balok (diam atau bergerak)
+            if (F_tarik <= Fs_max) {
+              // Balok tetap diam
+              percepatan = 0;
+              kesimpulan = `Gaya tarik (${F_tarik.toFixed(2)} N) <= Fs,max (${Fs_max.toFixed(2)} N).`;
+              statusInfo = "BALOK TETAP DIAM! Gaya tarik tidak cukup untuk mengatasi gaya gesek statis.";
+
+              // Animasikan model 3D
+              animateBlock('idle');
+
+            } else {
+              // Balok bergerak
+              percepatan = (F_tarik - Fk) / massa; // a = (F_tarik - Fk) / m
+              kesimpulan = `Gaya tarik (${F_tarik.toFixed(2)} N) > Fs,max (${Fs_max.toFixed(2)} N).`;
+              statusInfo = `BALOK BERGERAK! Dengan percepatan ${percepatan.toFixed(2)} m/s².`;
+
+              // Animasikan model 3D
+              animateBlock('move', percepatan);
+            }
+
+            // 4. Tampilkan hasil di panel UI dan di scene
+            const statusText = document.querySelector('#statusText');
+            const resultContainer = document.querySelector('#result-container');
+            if (statusText) statusText.setAttribute('value', statusInfo);
+            if (resultContainer) resultContainer.style.display = 'block';
+
+            const resultElements = [
+              { selector: '#result-normal', text: `Gaya Normal (N) = m * g = ${N.toFixed(2)} N` },
+              { selector: '#result-fsmax', text: `Fs,max = μs * N = ${Fs_max.toFixed(2)} N` },
+              { selector: '#result-fk', text: `Fk = μk * N = ${Fk.toFixed(2)} N` },
+              { selector: '#result-kesimpulan', text: `<b>Kesimpulan: ${kesimpulan}</b>` },
+              { selector: '#result-percepatan', text: `<b>Percepatan (a) = ${percepatan.toFixed(2)} m/s²</b>` }
+            ];
+
+            resultElements.forEach(({ selector, text }) => {
+              const element = document.querySelector(selector);
+              if (element) element.innerHTML = text;
+            });
+          });
+        }
+
+        // Event listener untuk tombol Reset (Bab 2)
+        const btnReset2 = document.querySelector('#btnReset2');
+        if (btnReset2) {
+          btnReset2.addEventListener('click', () => {
+            // Reset animasi model
+            animateBlock('idle');
+
+            // Reset teks status
+            const statusText = document.querySelector('#statusText');
+            if (statusText) statusText.setAttribute('value', 'Masukkan nilai pada panel di kiri untuk memulai simulasi.');
+
+            // Sembunyikan dan kosongkan hasil kalkulasi
+            const resultContainer = document.querySelector('#result-container');
+            if (resultContainer) resultContainer.style.display = 'none';
+
+            const resultSelectors = ['#result-normal', '#result-fsmax', '#result-fk', '#result-kesimpulan', '#result-percepatan'];
+            resultSelectors.forEach(selector => {
+              const element = document.querySelector(selector);
+              if (element) element.innerHTML = '';
+            });
+          });
+        }
 
         // Event listeners untuk kontrol massa dan kecepatan (input fields)
         // Massa Bola 1
