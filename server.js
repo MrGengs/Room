@@ -4,6 +4,7 @@ const path = require("path");
 const express = require("express");           // web framework external module
 const socketIo = require("socket.io");        // web socket external module
 const easyrtc = require("open-easyrtc");      // EasyRTC external module
+const cors = require("cors");                 // CORS middleware
 // To generate a certificate for local development with https, you can run
 // `npm run dev2`, it will create the node_modules/.cache/webpack-dev-server/server.pem file.
 // Then stop it, change the lines here and run `npm start`.
@@ -24,6 +25,12 @@ const port = process.env.PORT || 8080;
 // Setup and configure Express http server.
 const app = express();
 
+// Enable CORS for all routes
+app.use(cors());
+
+// Trust proxy for Vercel
+app.set('trust proxy', true);
+
 // Serve the bundle in-memory in development (needs to be before the express.static)
 if (process.env.NODE_ENV === "development") {
   const webpackDevMiddleware = require("webpack-dev-middleware");
@@ -42,11 +49,15 @@ app.use(express.static("public"));
 
 // Start Express http server
 const webServer = http.createServer(app);
-// To enable https on the node server, comment the line above and uncomment the line below
-// const webServer = https.createServer(credentials, app);
 
-// Start Socket.io so it attaches itself to Express server
-const socketServer = socketIo(webServer, { "log level": 1 });
+// Start Socket.io with CORS enabled
+const socketServer = socketIo(webServer, {
+  cors: {
+    origin: process.env.VERCEL_URL || "http://localhost:3000",
+    methods: ["GET", "POST"]
+  },
+  path: "/socket.io/"
+});
 const myIceServers = [
   { urls: "stun:stun1.l.google.com:19302" },
   { urls: "stun:stun2.l.google.com:19302" },
