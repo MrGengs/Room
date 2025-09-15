@@ -50,6 +50,25 @@
     .vr-mode .ui-buttons:not(.vr-visible) {
       display: none;
     }
+
+    
+    button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    #btnCalculate {
+        background-color: #2e88ff;
+        color: white;
+    }
+
+    #btnCalculate:hover {
+        background-color: #7bdcff;
+    }
   </style>
   <script>
     // Device Toggle Functionality
@@ -105,9 +124,9 @@
         document.body.classList.remove('vr-mode');
       }
     }
-    </script>
-  </head>
-  <body>
+  </script>
+</head>
+<body>
     <!-- UI Container for Bab 2 - Gaya Gesek -->
     <div id="ui-container">
       <h3>Input Simulasi Gaya Gesek</h3>
