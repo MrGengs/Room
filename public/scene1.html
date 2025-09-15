@@ -206,238 +206,591 @@
         ></a-entity>
         </a-entity>
         
-        <!-- Compact 3D Physics Control Panel -->
-        <a-entity id="physics-panel-3d" position="-2 3.5 6" rotation="0 90 0">
-          <!-- Main Panel Frame with Depth -->
-          <a-box 
+        <!-- Modern 3D Physics Control Panel -->
+        <a-entity id="physics-panel-3d" position="-2 3.5 6" rotation="0 90 0" class="collidable">
+          <!-- Holographic Background -->
+          <a-plane
+            width="4.0"
+            height="5.5"
+            color="#001122"
+            opacity="0.15"
+            position="0 0 -0.2"
+            material="transparent: true; shader: flat">
+            <a-animation
+              attribute="material.opacity"
+              to="0.25"
+              dur="2000"
+              direction="alternate"
+              repeat="indefinite">
+            </a-animation>
+          </a-plane>
+
+          <!-- Main Panel Frame with Glass Effect -->
+          <a-box
             id="panel-frame"
-            width="3.5" 
-            height="5.0" 
-            depth="0.15" 
-            color="#2a2a2a" 
-            opacity="0.95"
-            shadow="cast: true; receive: true"
-            class="clickable">
-          </a-box>
-          
-          <!-- Panel Border for 3D Effect -->
-          <a-box 
-            width="3.7" 
-            height="5.2" 
-            depth="0.1" 
-            color="#1a1a1a" 
+            width="3.5"
+            height="5.0"
+            depth="0.2"
+            color="#0a1f2e"
             opacity="0.8"
-            position="0 0 -0.05">
+            material="transparent: true; roughness: 0.1; metalness: 0.8"
+            shadow="cast: true; receive: true"
+            class="clickable collidable">
+            <!-- Neon Border Glow -->
+            <a-animation
+              attribute="material.emissive"
+              from="#000000"
+              to="#00e676"
+              dur="3000"
+              direction="alternate"
+              repeat="indefinite">
+            </a-animation>
+          </a-box>
+
+          <!-- Glowing Edge Lines -->
+          <a-box
+            width="3.7"
+            height="0.05"
+            depth="0.25"
+            color="#00e676"
+            opacity="0.9"
+            position="0 2.5 0"
+            material="emissive: #00e676; emissiveIntensity: 0.3">
+          </a-box>
+          <a-box
+            width="3.7"
+            height="0.05"
+            depth="0.25"
+            color="#00e676"
+            opacity="0.9"
+            position="0 -2.5 0"
+            material="emissive: #00e676; emissiveIntensity: 0.3">
+          </a-box>
+          <a-box
+            width="0.05"
+            height="5.2"
+            depth="0.25"
+            color="#00e676"
+            opacity="0.9"
+            position="1.75 0 0"
+            material="emissive: #00e676; emissiveIntensity: 0.3">
+          </a-box>
+          <a-box
+            width="0.05"
+            height="5.2"
+            depth="0.25"
+            color="#00e676"
+            opacity="0.9"
+            position="-1.75 0 0"
+            material="emissive: #00e676; emissiveIntensity: 0.3">
           </a-box>
           
-          <!-- Panel Title -->
-          <a-text 
-            value="PHYSICS CONTROL" 
-            position="0 2.2 0.08" 
-            align="center" 
-            color="#00E676" 
-            font="kelsonsans" 
-            width="6">
+          <!-- Panel Title with Holographic Effect -->
+          <a-text
+            value="⚡ PHYSICS CONTROL ⚡"
+            position="0 2.2 0.15"
+            align="center"
+            color="#00ffff"
+            font="kelsonsans"
+            width="7"
+            material="emissive: #00ffff; emissiveIntensity: 0.5">
+            <a-animation
+              attribute="material.emissive"
+              from="#00ffff"
+              to="#00e676"
+              dur="1500"
+              direction="alternate"
+              repeat="indefinite">
+            </a-animation>
+          </a-text>
+
+          <!-- Subtitle -->
+          <a-text
+            value="INTERACTIVE PHYSICS ENGINE"
+            position="0 1.95 0.12"
+            align="center"
+            color="#64b5f6"
+            font="kelsonsans"
+            width="4"
+            opacity="0.8">
           </a-text>
           
-          <!-- Input Controls Section -->
-          <a-box 
-            width="3.2" 
-            height="1.3" 
-            depth="0.05" 
-            color="#333333" 
-            opacity="0.9"
-            position="0 1.4 0.08">
+          <!-- Input Controls Section with Glass Effect -->
+          <a-box
+            width="3.2"
+            height="1.4"
+            depth="0.08"
+            color="#1a2332"
+            opacity="0.7"
+            position="0 1.4 0.12"
+            material="transparent: true; roughness: 0.2; metalness: 0.6"
+            class="collidable">
+            <!-- Glow effect -->
+            <a-animation
+              attribute="material.emissive"
+              from="#000000"
+              to="#0d47a1"
+              dur="4000"
+              direction="alternate"
+              repeat="indefinite">
+            </a-animation>
+          </a-box>
+
+          <!-- Control Section Border -->
+          <a-box
+            width="3.3"
+            height="1.5"
+            depth="0.02"
+            color="#00e676"
+            opacity="0.6"
+            position="0 1.4 0.08"
+            material="emissive: #00e676; emissiveIntensity: 0.2">
           </a-box>
           
           <!-- Force Controls -->
-          <a-text 
-            value="Force (N)" 
-            position="0 1.8 0.12" 
-            align="center" 
-            color="#FFC107" 
-            font="kelsonsans" 
-            width="5">
+          <a-text
+            value="⚡ FORCE (N) ⚡"
+            position="0 1.8 0.15"
+            align="center"
+            color="#ffc107"
+            font="kelsonsans"
+            width="5"
+            material="emissive: #ffc107; emissiveIntensity: 0.3">
+            <a-animation
+              attribute="rotation"
+              to="0 0 1"
+              dur="5000"
+              repeat="indefinite">
+            </a-animation>
           </a-text>
-          
+
           <!-- Force Control Row -->
-          <a-box 
-            id="force-minus" 
-            width="0.25" 
-            height="0.25" 
-            depth="0.08" 
-            color="#FF5722" 
-            position="-1.0 1.5 0.12"
-            class="clickable"
-            cursor-listener
-            event-set__mouseenter="color: #FF7043"
-            event-set__mouseleave="color: #FF5722"
-            shadow="cast: true">
-            <a-text 
-              value="-" 
-              position="0 0 0.05" 
-              align="center" 
-              color="white" 
-              font="kelsonsans" 
-              width="10">
-            </a-text>
-          </a-box>
+          <a-entity>
+            <!-- Minus Button with High Visibility -->
+            <a-box
+              id="force-minus"
+              width="0.4"
+              height="0.4"
+              depth="0.15"
+              color="#ff0000"
+              position="-1.0 1.5 0.3"
+              class="clickable"
+              cursor-listener
+              material="emissive: #ff0000; emissiveIntensity: 0.8; roughness: 0.0; metalness: 0.9"
+              shadow="cast: true"
+              opacity="1.0">
+              <!-- Bright background -->
+              <a-box
+                width="0.38"
+                height="0.38"
+                depth="0.14"
+                color="#ffffff"
+                position="0 0 0.01"
+                opacity="0.3">
+              </a-box>
+              <!-- Dark background for minus icon -->
+              <a-box
+                width="0.25"
+                height="0.08"
+                depth="0.02"
+                color="#000000"
+                position="0 0 0.08"
+                material="emissive: #000000; emissiveIntensity: 0.5">
+              </a-box>
+              <!-- Large visible minus icon -->
+              <a-text
+                value="−"
+                position="0 0 0.09"
+                align="center"
+                color="#ffffff"
+                font="kelsonsans"
+                width="20"
+                material="emissive: #ffffff; emissiveIntensity: 2.0">
+              </a-text>
+              <!-- Strong pulse effect -->
+              <a-animation
+                attribute="material.emissiveIntensity"
+                from="0.8"
+                to="1.2"
+                dur="800"
+                direction="alternate"
+                repeat="indefinite">
+              </a-animation>
+              <!-- Outer glow -->
+              <a-box
+                width="0.5"
+                height="0.5"
+                depth="0.05"
+                color="#ff0000"
+                position="0 0 -0.1"
+                opacity="0.8"
+                material="emissive: #ff0000; emissiveIntensity: 0.6">
+              </a-box>
+            </a-box>
           
-          <a-box 
-            width="1.0" 
-            height="0.25" 
-            depth="0.05" 
-            color="#1e1e1e" 
-            position="0 1.5 0.1">
-            <a-text 
-              id="force-display" 
-              value="100" 
-              position="0 0 0.03" 
-              align="center" 
-              color="#4CAF50" 
-              font="kelsonsans" 
-              width="6">
-            </a-text>
-          </a-box>
-          
-          <a-box 
-            id="force-plus" 
-            width="0.25" 
-            height="0.25" 
-            depth="0.08" 
-            color="#4CAF50" 
-            position="1.0 1.5 0.12"
-            class="clickable"
-            cursor-listener
-            event-set__mouseenter="color: #66BB6A"
-            event-set__mouseleave="color: #4CAF50"
-            shadow="cast: true">
-            <a-text 
-              value="+" 
-              position="0 0 0.05" 
-              align="center" 
-              color="white" 
-              font="kelsonsans" 
-              width="10">
-            </a-text>
-          </a-box>
+            <!-- Digital Display -->
+            <a-box
+              width="1.2"
+              height="0.3"
+              depth="0.08"
+              color="#000a1a"
+              position="0 1.5 0.12"
+              material="roughness: 0.8; metalness: 0.2"
+              shadow="receive: true"
+              class="collidable">
+              <a-text
+                id="force-display"
+                value="100"
+                position="0 0 0.05"
+                align="center"
+                color="#00ff41"
+                font="kelsonsans"
+                width="6"
+                material="emissive: #00ff41; emissiveIntensity: 0.6">
+                <a-animation
+                  attribute="material.emissive"
+                  from="#00ff41"
+                  to="#39ff14"
+                  dur="800"
+                  direction="alternate"
+                  repeat="indefinite">
+                </a-animation>
+              </a-text>
+              <!-- Digital screen scanlines -->
+              <a-box
+                width="1.15"
+                height="0.02"
+                depth="0.001"
+                color="#00ff41"
+                position="0 0.05 0.04"
+                opacity="0.3">
+              </a-box>
+            </a-box>
+
+            <!-- Plus Button with High Visibility (Match Minus) -->
+            <a-box
+              id="force-plus"
+              width="0.4"
+              height="0.4"
+              depth="0.15"
+              color="#00e676"
+              position="1.0 1.5 0.3"
+              class="clickable"
+              cursor-listener
+              material="emissive: #00e676; emissiveIntensity: 0.8; roughness: 0.0; metalness: 0.9"
+              shadow="cast: true"
+              opacity="1.0">
+              <!-- Bright background -->
+              <a-box
+                width="0.38"
+                height="0.38"
+                depth="0.14"
+                color="#ffffff"
+                position="0 0 0.01"
+                opacity="0.3">
+              </a-box>
+              <!-- Dark background vertical bar for plus icon -->
+              <a-box
+                width="0.08"
+                height="0.25"
+                depth="0.02"
+                color="#000000"
+                position="0 0 0.08"
+                material="emissive: #000000; emissiveIntensity: 0.5">
+              </a-box>
+              <!-- Dark background horizontal bar for plus icon -->
+              <a-box
+                width="0.25"
+                height="0.08"
+                depth="0.02"
+                color="#000000"
+                position="0 0 0.08"
+                material="emissive: #000000; emissiveIntensity: 0.5">
+              </a-box>
+              <!-- Strong pulse effect -->
+              <a-animation
+                attribute="material.emissiveIntensity"
+                from="0.8"
+                to="1.2"
+                dur="800"
+                direction="alternate"
+                repeat="indefinite">
+              </a-animation>
+              <!-- Outer glow -->
+              <a-box
+                width="0.5"
+                height="0.5"
+                depth="0.05"
+                color="#00e676"
+                position="0 0 -0.1"
+                opacity="0.8"
+                material="emissive: #00e676; emissiveIntensity: 0.6">
+              </a-box>
+            </a-box>
+          </a-entity>
           
           <!-- Distance Controls -->
-          <a-text 
-            value="Distance (m)" 
-            position="0 1.2 0.12" 
-            align="center" 
-            color="#FFC107" 
-            font="kelsonsans" 
-            width="5">
+          <a-text
+            value="📏 DISTANCE (m) 📏"
+            position="0 1.2 0.15"
+            align="center"
+            color="#ff9800"
+            font="kelsonsans"
+            width="5"
+            material="emissive: #ff9800; emissiveIntensity: 0.3">
+            <a-animation
+              attribute="position"
+              from="0 1.2 0.15"
+              to="0 1.25 0.15"
+              dur="2000"
+              direction="alternate"
+              repeat="indefinite">
+            </a-animation>
           </a-text>
           
           <!-- Distance Control Row -->
-          <a-box 
-            id="distance-minus" 
-            width="0.25" 
-            height="0.25" 
-            depth="0.08" 
-            color="#FF5722" 
-            position="-1.0 0.9 0.12"
-            class="clickable"
-            cursor-listener
-            event-set__mouseenter="color: #FF7043"
-            event-set__mouseleave="color: #FF5722"
-            shadow="cast: true">
-            <a-text 
-              value="-" 
-              position="0 0 0.05" 
-              align="center" 
-              color="white" 
-              font="kelsonsans" 
-              width="10">
-            </a-text>
-          </a-box>
-          
-          <a-box 
-            width="1.0" 
-            height="0.25" 
-            depth="0.05" 
-            color="#1e1e1e" 
-            position="0 0.9 0.1">
-            <a-text 
-              id="distance-display" 
-              value="5" 
-              position="0 0 0.03" 
-              align="center" 
-              color="#4CAF50" 
-              font="kelsonsans" 
-              width="6">
-            </a-text>
-          </a-box>
-          
-          <a-box 
-            id="distance-plus" 
-            width="0.25" 
-            height="0.25" 
-            depth="0.08" 
-            color="#4CAF50" 
-            position="1.0 0.9 0.12"
-            class="clickable"
-            cursor-listener
-            event-set__mouseenter="color: #66BB6A"
-            event-set__mouseleave="color: #4CAF50"
-            shadow="cast: true">
-            <a-text 
-              value="+" 
-              position="0 0 0.05" 
-              align="center" 
-              color="white" 
-              font="kelsonsans" 
-              width="10">
-            </a-text>
-          </a-box>
+          <a-entity>
+            <!-- Distance Minus Button with High Visibility -->
+            <a-box
+              id="distance-minus"
+              width="0.4"
+              height="0.4"
+              depth="0.15"
+              color="#ff6600"
+              position="-1.0 0.9 0.3"
+              class="clickable"
+              cursor-listener
+              material="emissive: #ff6600; emissiveIntensity: 0.8; roughness: 0.0; metalness: 0.9"
+              shadow="cast: true"
+              opacity="1.0">
+              <!-- Bright background -->
+              <a-box
+                width="0.38"
+                height="0.38"
+                depth="0.14"
+                color="#ffffff"
+                position="0 0 0.01"
+                opacity="0.3">
+              </a-box>
+              <!-- Dark background for minus icon -->
+              <a-box
+                width="0.25"
+                height="0.08"
+                depth="0.02"
+                color="#000000"
+                position="0 0 0.08"
+                material="emissive: #000000; emissiveIntensity: 0.5">
+              </a-box>
+              <!-- Large visible minus icon -->
+              <a-text
+                value="−"
+                position="0 0 0.09"
+                align="center"
+                color="#ffffff"
+                font="kelsonsans"
+                width="20"
+                material="emissive: #ffffff; emissiveIntensity: 2.0">
+              </a-text>
+              <a-animation
+                attribute="rotation"
+                to="0 0 360"
+                dur="2000"
+                repeat="indefinite">
+              </a-animation>
+              <!-- Strong outer glow -->
+              <a-box
+                width="0.5"
+                height="0.5"
+                depth="0.05"
+                color="#ff6600"
+                position="0 0 -0.1"
+                opacity="0.8"
+                material="emissive: #ff6600; emissiveIntensity: 0.6">
+              </a-box>
+            </a-box>
+
+            <!-- Digital Display -->
+            <a-box
+              width="1.2"
+              height="0.3"
+              depth="0.08"
+              color="#001a0a"
+              position="0 0.9 0.12"
+              material="roughness: 0.8; metalness: 0.2"
+              shadow="receive: true"
+              class="collidable">
+              <a-text
+                id="distance-display"
+                value="5"
+                position="0 0 0.05"
+                align="center"
+                color="#00ff80"
+                font="kelsonsans"
+                width="6"
+                material="emissive: #00ff80; emissiveIntensity: 0.6">
+                <a-animation
+                  attribute="material.emissiveIntensity"
+                  from="0.6"
+                  to="0.9"
+                  dur="1000"
+                  direction="alternate"
+                  repeat="indefinite">
+                </a-animation>
+              </a-text>
+              <!-- Digital screen effect -->
+              <a-box
+                width="1.15"
+                height="0.02"
+                depth="0.001"
+                color="#00ff80"
+                position="0 -0.05 0.04"
+                opacity="0.4">
+              </a-box>
+            </a-box>
+
+            <!-- Distance Plus Button with High Visibility (Match Minus) -->
+            <a-box
+              id="distance-plus"
+              width="0.4"
+              height="0.4"
+              depth="0.15"
+              color="#4caf50"
+              position="1.0 0.9 0.3"
+              class="clickable"
+              cursor-listener
+              material="emissive: #4caf50; emissiveIntensity: 0.8; roughness: 0.0; metalness: 0.9"
+              shadow="cast: true"
+              opacity="1.0">
+              <!-- Bright background -->
+              <a-box
+                width="0.38"
+                height="0.38"
+                depth="0.14"
+                color="#ffffff"
+                position="0 0 0.01"
+                opacity="0.3">
+              </a-box>
+              <!-- Dark background vertical bar for plus icon -->
+              <a-box
+                width="0.08"
+                height="0.25"
+                depth="0.02"
+                color="#000000"
+                position="0 0 0.08"
+                material="emissive: #000000; emissiveIntensity: 0.5">
+              </a-box>
+              <!-- Dark background horizontal bar for plus icon -->
+              <a-box
+                width="0.25"
+                height="0.08"
+                depth="0.02"
+                color="#000000"
+                position="0 0 0.08"
+                material="emissive: #000000; emissiveIntensity: 0.5">
+              </a-box>
+              <a-animation
+                attribute="rotation"
+                to="0 0 -360"
+                dur="2500"
+                repeat="indefinite">
+              </a-animation>
+              <!-- Strong outer glow -->
+              <a-box
+                width="0.5"
+                height="0.5"
+                depth="0.05"
+                color="#4caf50"
+                position="0 0 -0.1"
+                opacity="0.8"
+                material="emissive: #4caf50; emissiveIntensity: 0.6">
+              </a-box>
+            </a-box>
+          </a-entity>
           
           <!-- Action Buttons -->
-          <a-box 
-            id="apply-force-btn" 
-            width="1.3" 
-            height="0.3" 
-            depth="0.1" 
-            color="#4CAF50" 
-            position="-0.8 0.4 0.12"
-            class="clickable"
-            cursor-listener
-            event-set__mouseenter="color: #66BB6A"
-            event-set__mouseleave="color: #4CAF50"
-            shadow="cast: true">
-            <a-text 
-              value="APPLY" 
-              position="0 0 0.06" 
-              align="center" 
-              color="white" 
-              font="kelsonsans" 
-              width="5">
-            </a-text>
-          </a-box>
-          
-          <a-box 
-            id="reset-btn" 
-            width="1.3" 
-            height="0.3" 
-            depth="0.1" 
-            color="#f44336" 
-            position="0.8 0.4 0.12"
-            class="clickable"
-            cursor-listener
-            event-set__mouseenter="color: #EF5350"
-            event-set__mouseleave="color: #f44336"
-            shadow="cast: true">
-            <a-text 
-              value="RESET" 
-              position="0 0 0.06" 
-              align="center" 
-              color="white" 
-              font="kelsonsans" 
-              width="5">
-            </a-text>
-          </a-box>
+          <a-entity>
+            <!-- Apply Button with Holographic Design -->
+            <a-box
+              id="apply-force-btn"
+              width="1.4"
+              height="0.4"
+              depth="0.15"
+              color="#1b5e20"
+              position="-0.8 0.4 0.15"
+              class="clickable"
+              cursor-listener
+              material="emissive: #1b5e20; emissiveIntensity: 0.4; roughness: 0.1; metalness: 0.9"
+              shadow="cast: true">
+              <!-- Button border glow -->
+              <a-box
+                width="1.5"
+                height="0.45"
+                depth="0.02"
+                color="#00e676"
+                position="0 0 -0.08"
+                opacity="0.7"
+                material="emissive: #00e676; emissiveIntensity: 0.3">
+                <a-animation
+                  attribute="material.emissiveIntensity"
+                  from="0.3"
+                  to="0.7"
+                  dur="1500"
+                  direction="alternate"
+                  repeat="indefinite">
+                </a-animation>
+              </a-box>
+              <a-text
+                value="🚀 APPLY 🚀"
+                position="0 0 0.08"
+                align="center"
+                color="white"
+                font="kelsonsans"
+                width="5"
+                material="emissive: white; emissiveIntensity: 0.8">
+              </a-text>
+            </a-box>
+
+            <!-- Reset Button with Holographic Design -->
+            <a-box
+              id="reset-btn"
+              width="1.4"
+              height="0.4"
+              depth="0.15"
+              color="#b71c1c"
+              position="0.8 0.4 0.15"
+              class="clickable"
+              cursor-listener
+              material="emissive: #b71c1c; emissiveIntensity: 0.4; roughness: 0.1; metalness: 0.9"
+              shadow="cast: true">
+              <!-- Button border glow -->
+              <a-box
+                width="1.5"
+                height="0.45"
+                depth="0.02"
+                color="#ff1744"
+                position="0 0 -0.08"
+                opacity="0.7"
+                material="emissive: #ff1744; emissiveIntensity: 0.3">
+                <a-animation
+                  attribute="material.emissiveIntensity"
+                  from="0.3"
+                  to="0.7"
+                  dur="1800"
+                  direction="alternate"
+                  repeat="indefinite">
+                </a-animation>
+              </a-box>
+              <a-text
+                value="🔄 RESET 🔄"
+                position="0 0 0.08"
+                align="center"
+                color="white"
+                font="kelsonsans"
+                width="5"
+                material="emissive: white; emissiveIntensity: 0.8">
+              </a-text>
+            </a-box>
+          </a-entity>
           
           <!-- Separator -->
           <a-box 
@@ -449,13 +802,14 @@
           </a-box>
           
           <!-- Data Display Section -->
-          <a-box 
-            width="3.2" 
-            height="2.0" 
-            depth="0.05" 
-            color="#1e1e1e" 
+          <a-box
+            width="3.2"
+            height="2.0"
+            depth="0.05"
+            color="#1e1e1e"
             opacity="0.9"
-            position="0 -0.9 0.08">
+            position="0 -0.9 0.08"
+            class="collidable">
           </a-box>
           
           <!-- Car Data -->
