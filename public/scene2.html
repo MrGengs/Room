@@ -1991,11 +1991,19 @@
           }
         }
         
-        // Show joystick for mobile devices
+        // Show joystick based on device selection in localStorage
         function checkDeviceType() {
+          const deviceType = localStorage.getItem('deviceType');
           const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-          if (isMobile) {
+          
+          // Tampilkan joystick jika:
+          // 1. Pengguna memilih 'mobile' di localStorage, ATAU
+          // 2. Perangkat terdeteksi sebagai mobile dan tidak ada pilihan di localStorage
+          if (deviceType === 'mobile' || (isMobile && !deviceType)) {
             joystick.style.display = 'block';
+            console.log('Joystick enabled for mobile device');
+          } else {
+            joystick.style.display = 'none';
           }
         }
         
