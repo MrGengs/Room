@@ -53,10 +53,31 @@ const webServer = http.createServer(app);
 // Start Socket.io with CORS enabled
 const socketServer = socketIo(webServer, {
   cors: {
-    origin: process.env.VERCEL_URL || "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST"]
   },
   path: "/socket.io/"
+});
+
+// Configure Networked-Aframe
+easyrtc.setOption('appIceServers', [
+  { urls: 'stun:stun.l.google.com:19302' },
+  { urls: 'stun:stun1.l.google.com:19302' },
+  { urls: 'stun:stun2.l.google.com:19302' }
+]);
+
+easyrtc.events.on('roomCreate', function(appObj, creatorConnectionObj, roomName, roomOptions, callback) {
+  console.log('Room created:', roomName);
+  if (callback) {
+    callback(null, roomName);
+  }
+});
+
+easyrtc.events.on('roomJoin', function(connectionObj, roomName, roomParameter, callback) {
+  console.log('User joined room:', roomName);
+  if (callback) {
+    callback(null);
+  }
 });
 const myIceServers = [
   { urls: "stun:stun1.l.google.com:19302" },

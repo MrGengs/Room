@@ -6,8 +6,8 @@
   <title>AR-Room</title>
   <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js"></script>
-  <script src="/easyrtc/easyrtc.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/networked-aframe@0.14.0/dist/networked-aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/networked-aframe@0.14.0/dist/easyrtc-adapter.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.0/dist/aframe-extras.min.js"></script>
   <script
     src="https://cdn.jsdelivr.net/npm/aframe-environment-component@1.5.0/dist/aframe-environment-component.min.js"></script>
@@ -175,6 +175,40 @@
       </div>
     </div>
   </div>
+
+  <script>
+    // Initialize Networked-Aframe
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const serverUrl = isLocalhost ? 'http://localhost:8080' : window.location.origin;
+    
+    // Configure NAF
+    NAF.schemas.add({
+      template: '#avatar-template',
+      components: [
+        'position',
+        'rotation',
+        'scale',
+        'player-info',
+        'model',
+        'nametag',
+        'camera'
+      ]
+    });
+
+    // Configure WebRTC
+    NAF.connection.adapter.setServerUrl(serverUrl);
+    NAF.connection.adapter.setApp('default');
+    NAF.connection.adapter.setRoom('lobby');
+    NAF.connection.adapter.setConnectOnLoad(false);
+    NAF.connection.adapter.setServerConnectListeners({
+      connect: (clientId) => {
+        console.log('Connected to server with ID:', clientId);
+      },
+      disconnect: () => {
+        console.log('Disconnected from server');
+      }
+    });
+  </script>
 
   <a-scene style="display: none;" light="defaultLightsEnabled:false" renderer="stencil:true; antialias: true;" vr-mode-ui="enabled: false" webxr="requiredFeatures: local-floor; referenceSpaceType: local-floor;" networked-scene="
         connectOnLoad: false;
