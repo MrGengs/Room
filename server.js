@@ -45,39 +45,98 @@ if (process.env.NODE_ENV === "development") {
   );
 }
 
-app.use(express.static("public"));
+// Serve static files from the public directory
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Start Express http server
+// Start Express http server with increased timeout
 const webServer = http.createServer(app);
 
-// Start Socket.io with CORS enabled
-const socketServer = socketIo(webServer, {
+// Increase server timeout to handle long-polling
+webServer.keepAliveTimeout = 60000;
+webServer.headersTimeout = 65000;
+
+// Configure Socket.IO with proper settings
+const io = socketIo(webServer, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
+    origin: '*',
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type'],
+    credentials: true
   },
-  path: "/socket.io/"
+  path: '/socket.io/',
+  serveClient: false,
+  transports: ['websocket', 'polling'],
+  pingTimeout: 60000,
+  pingInterval: 25000
 });
 
-// Configure Networked-Aframe
-easyrtc.setOption('appIceServers', [
-  { urls: 'stun:stun.l.google.com:19302' },
-  { urls: 'stun:stun1.l.google.com:19302' },
-  { urls: 'stun:stun2.l.google.com:19302' }
-]);
+// Handle connection events
+io.on('connection', (socket) => {
+  console.log('New client connected:', socket.id);
+  
+  socket.on('disconnect', (reason) => {
+    console.log(`Client disconnected (${socket.id}):`, reason);
+  });
+  
+  socket.on('error', (error) => {
+    console.error('Socket error:', error);
+  });
+  
+  // Log all events for debugging
+  const originalEmit = socket.emit;
+  socket.emit = function(event, ...args) {
+    if (event !== 'pong' && event !== 'ping') {
+      console.log(`Emitting event: ${event}`, args);
+    }
+    return originalEmit.apply(socket, [event, ...args]);
+  };
+});
 
-easyrtc.events.on('roomCreate', function(appObj, creatorConnectionObj, roomName, roomOptions, callback) {
+// Configure EasyRTC
+const rtc = easyrtc.listen(app, io, {
+  logLevel: 'debug',
+  enableDebug: true,
+  apiPrefix: 'easyrtc/',
+  socketIo: {
+    'log level': 2
+  },
+  appIceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' },
+    { 
+      urls: 'turn:numb.viagenie.ca',
+      username: 'webrtc@live.com',
+      credential: 'muazkh'
+    }
+  ]
+});
+
+// Handle EasyRTC events
+rtc.events.on('roomCreate', (appObj, creatorConnectionObj, roomName, roomOptions, callback) => {
   console.log('Room created:', roomName);
-  if (callback) {
+  if (typeof callback === 'function') {
     callback(null, roomName);
   }
 });
 
-easyrtc.events.on('roomJoin', function(connectionObj, roomName, roomParameter, callback) {
-  console.log('User joined room:', roomName);
-  if (callback) {
+rtc.events.on('roomJoin', (connectionObj, roomName, roomParameter, callback) => {
+  console.log('User joined room:', roomName, 'Connection ID:', connectionObj.getConnectionId());
+  if (typeof callback === 'function') {
     callback(null);
   }
+});
+
+rtc.events.on('connection', (connectionObj) => {
+  console.log('New connection:', connectionObj.getConnectionId());
+  
+  connectionObj.events.on('disconnect', () => {
+    console.log('Connection closed:', connectionObj.getConnectionId());
+  });
+  
+  connectionObj.events.on('error', (error) => {
+    console.error('Connection error:', error);
+  });
 });
 const myIceServers = [
   { urls: "stun:stun1.l.google.com:19302" },
