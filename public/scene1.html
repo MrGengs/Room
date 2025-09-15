@@ -1,229 +1,130 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>AR-Room</title>
-    <style>
-      #joystick {
-        width: 100px;
-        height: 100px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 50%;
-        position: relative;
-        overflow: hidden;
-      }
-      #joystick-knob {
-        width: 50px;
-        height: 50px;
-        background: rgba(255, 255, 255, 0.5);
-        border-radius: 50%;
-        position: absolute;
-        left: 25px;
-        top: 25px;
-        transition: transform 0.1s ease-out;
-      }
-    </style>
-    <meta name="description" content="AR">
-          <a-entity id="sepeda-arrow" 
-            gltf-model="url(assets/scene1/arrow.glb)"
-            position="0 2.5 0" 
-            rotation="0 0 0"
-            scale="0.5 0.5 0.5"
-            visible="false">
-          </a-entity>
 
-    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+<head>
+  <meta charset="utf-8" />
+  <title>AR-Room</title>
+  <meta name="description" content="AR">
+  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js"></script>
-    <script src="/easyrtc/easyrtc.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/networked-aframe@0.14.0/dist/networked-aframe.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js"></script>
+  <script src="/easyrtc/easyrtc.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/networked-aframe@0.14.0/dist/networked-aframe.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe-environment-component@1.5.0/dist/aframe-environment-component.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@fern-solutions/aframe-mirror@1.1.1/dist/mirror.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-cursor-teleport@1.6.0/dist/aframe-cursor-teleport-component.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe-blink-controls@0.4.3/dist/aframe-blink-controls.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/AdaRoseCannon/aframe-xr-boilerplate@bca4792/simple-navmesh-constraint.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-gltf-model-plus@1.0.0/dist/gltf-model-plus.min.js"></script>
-    <script src="/dist/components.js"></script>
-    <script defer src="/dist/ui.js"></script>
-  </head>
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/aframe-environment-component@1.5.0/dist/aframe-environment-component.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fern-solutions/aframe-mirror@1.1.1/dist/mirror.umd.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/gh/c-frame/aframe-cursor-teleport@1.6.0/dist/aframe-cursor-teleport-component.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aframe-blink-controls@0.4.3/dist/aframe-blink-controls.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/gh/AdaRoseCannon/aframe-xr-boilerplate@bca4792/simple-navmesh-constraint.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-gltf-model-plus@1.0.0/dist/gltf-model-plus.min.js"></script>
+  <script src="/dist/components.js"></script>
+  <script src="/js/joystick.js"></script>
+  <script defer src="/dist/ui.js"></script>
+</head>
 
-  <body>
-    <!-- Virtual Gamepad for Mobile -->
-    <div id="mobile-controls" style="position: fixed; bottom: 30px; left: 20px; z-index: 1000; pointer-events: none; display: block;">
-      <!-- Joystick Control -->
-      <div style="width: 120px; height: 120px; position: relative; pointer-events: auto;">
-        <div id="joystick" style="display: block;">
-          <div id="joystick-knob"></div>
-        </div>
+<body>
+  <!-- Virtual Gamepad for Mobile -->
+  <div id="mobile-controls"
+    style="position: fixed; bottom: 30px; left: 20px; z-index: 1000; display: none; touch-action: none; -webkit-tap-highlight-color: transparent;">
+    <!-- Joystick Control -->
+    <div id="joystick"
+      style="width: 120px; height: 120px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; position: relative; overflow: visible;">
+      <div id="joystick-knob"
+        style="width: 80px; height: 80px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; left: 20px; top: 20px; transition: transform 0.1s ease-out; touch-action: none; pointer-events: none;">
       </div>
     </div>
+  </div>
 
-    <a-scene
-      light="defaultLightsEnabled:false"
-      renderer="stencil:true"
-      networked-scene="
+  <a-scene light="defaultLightsEnabled:false" renderer="stencil:true" networked-scene="
         connectOnLoad: false;
         room: forest;
         debug: true;
         adapter: wseasyrtc;
         audio: false;
         video: false;
-    "
-      shadow="type: pcfsoft"
-      gltf-model="meshoptDecoderPath:https://unpkg.com/meshoptimizer@0.19.0/meshopt_decoder.js"
-      raycaster="far: 100; objects: .clickable,[link];"
-      cursor="rayOrigin: mouse"
-    >
-      <a-assets>
-        <template id="avatar-template">
-          <a-entity player-info>
-            <a-entity class="model" animation-mixer>
-              <a-text class="nametag" align="center" value="?" position="0 2.1 0" scale=".5 .5 .5"></a-text>
-            </a-entity>
-            <a-entity class="camera" position="0 1.6 0"></a-entity>
+    " shadow="type: pcfsoft" gltf-model="meshoptDecoderPath:https://unpkg.com/meshoptimizer@0.19.0/meshopt_decoder.js"
+    raycaster="far: 100; objects: .clickable,[link];" cursor="rayOrigin: mouse">
+    <a-assets>
+      <template id="avatar-template">
+        <a-entity player-info>
+          <a-entity class="model" animation-mixer>
+            <a-text class="nametag" align="center" value="?" position="0 2.1 0" scale=".5 .5 .5"></a-text>
           </a-entity>
-        </template>
-        <img id="thumbJapan" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/japan.png" />
-        <img id="thumbForest" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" />
-      </a-assets>
-
-      <a-entity id="scene">
-        <!-- School building with collision -->
-        <a-entity id="school-group" position="0 -11 0">
-          <a-gltf-model src="assets/scene1/sekolah.glb" scale="2 2 2" rotation="0 0 0" class="collidable"></a-gltf-model>
-          <!-- Smaller collision box closer to actual building -->
-          <a-box
-            class="collidable"
-            position="0 8 0"
-            width="6"
-            height="12"
-            depth="6"
-            visible="false"
-          ></a-box>
+          <a-entity class="camera" position="0 1.6 0"></a-entity>
         </a-entity>
-        <a-plane class="ground" position="0 0 0" rotation="-90 0 0" width="100" height="100" visible="true"></a-plane>
-        <a-entity light="type:ambient;intensity:0.5"></a-entity>
+      </template>
+      <img id="thumbJapan" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/japan.png" />
+      <img id="thumbForest" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" />
+    </a-assets>
 
-        <a-mirror id="mirror" class="collidable" position="0 1.8 -3" scale="5 3 1" layers="0,3">
-          <a-box color="black" position="0 0 -0.02" scale="1.02 1.02 0.01"></a-box>
-        </a-mirror>
+    <a-entity id="scene">
+      <!-- School building with collision -->
+      <a-entity id="school-group" position="0 -11 0">
+        <a-gltf-model src="assets/scene1/sekolah.glb" scale="2 2 2" rotation="0 0 0" class="collidable"></a-gltf-model>
+        <!-- Smaller collision box closer to actual building -->
+        <a-box class="collidable" position="0 8 0" width="6" height="12" depth="6" visible="false"></a-box>
+      </a-entity>
+      <a-plane class="ground" position="0 0 0" rotation="-90 0 0" width="100" height="100" visible="true"></a-plane>
+      <a-entity light="type:ambient;intensity:0.5"></a-entity>
 
-        <!-- Car collision system -->
-        <a-entity id="car-group" position="0 0 2" rotation="0 180 0">
-          <!-- Main collision body for the car -->
-          <a-box
-            id="ferrari-body"
-            class="collidable"
-            pushable
-            physics-object="mass: 1200"
-            position="0 0.6 0"
-            width="1.8"
-            height="1.2"
-            depth="4.0"
-            visible="false"
-          ></a-box>
-          <!-- Visual model for the car -->
-          <a-entity id="ferrari" gltf-model="url(assets/scene1/ferrari.glb)" position="0 0 0" scale="1.3 1.3 1.3"></a-entity>
-          <!-- Arrow indicator for car -->
-          <a-entity id="car-arrow" 
-            gltf-model="url(assets/scene1/arrow.glb)"
-            position="0 2.5 0" 
-            rotation="0 0 0"
-            scale="0.7 0.7 0.7"
-            visible="false">
-          </a-entity>
-          
-          <!-- Force indicator for car -->
-          <a-text 
-            id="car-force-indicator"
-            value="F: 0N"
-            position="0 3.2 0"
-            align="center"
-            color="#FF5722"
-            font="kelsonsans"
-            width="8"
-            visible="false">
-          </a-text>
-          
-          <!-- Acceleration indicator for car -->
-          <a-text 
-            id="car-acceleration-indicator"
-            value="A: 0 m/s²"
-            position="0 2.8 0"
-            align="center"
-            color="#4CAF50"
-            font="kelsonsans"
-            width="8"
-            visible="false">
-          </a-text>
+      <a-mirror id="mirror" class="collidable" position="0 1.8 -3" scale="5 3 1" layers="0,3">
+        <a-box color="black" position="0 0 -0.02" scale="1.02 1.02 0.01"></a-box>
+      </a-mirror>
+
+      <!-- Car collision system -->
+      <a-entity id="car-group" position="0 0 2" rotation="0 180 0">
+        <!-- Main collision body for the car -->
+        <a-box id="ferrari-body" class="collidable" pushable physics-object="mass: 1200" position="0 0.6 0" width="1.8"
+          height="1.2" depth="4.0" visible="false"></a-box>
+        <!-- Visual model for the car -->
+        <a-entity id="ferrari" gltf-model="url(assets/scene1/ferrari.glb)" position="0 0 0"
+          scale="1.3 1.3 1.3"></a-entity>
+        <!-- Arrow indicator for car -->
+        <a-entity id="car-arrow" gltf-model="url(assets/scene1/arrow.glb)" position="0 2.5 0" rotation="0 0 0"
+          scale="0.7 0.7 0.7" visible="false">
+        </a-entity>
+
+        <!-- Force indicator for car -->
+        <a-text id="car-force-indicator" value="F: 0N" position="0 3.2 0" align="center" color="#FF5722"
+          font="kelsonsans" width="8" visible="false">
+        </a-text>
+
+        <!-- Acceleration indicator for car -->
+        <a-text id="car-acceleration-indicator" value="A: 0 m/s²" position="0 2.8 0" align="center" color="#4CAF50"
+          font="kelsonsans" width="8" visible="false">
+        </a-text>
         <!-- NPC Pusher -->
-        <a-entity
-          id="npc-pusher"
-          gltf-model="url(assets/scene1/push.glb)"
-          position="0 0 3.1"
-          rotation="0 180 0"
-          scale="0.01 0.01 0.01"
-          animation-mixer="clip: mixamo.com; loop: repeat"
-          visible="false"
-        ></a-entity>
+        <a-entity id="npc-pusher" gltf-model="url(assets/scene1/push.glb)" position="0 0 3.1" rotation="0 180 0"
+          scale="0.01 0.01 0.01" animation-mixer="clip: mixamo.com; loop: repeat" visible="false"></a-entity>
+      </a-entity>
+
+      <!-- Cart model with collision -->
+      <a-entity id="cart-group" position="3 0 3" rotation="0 180 0">
+        <!-- Main collision body for the cart -->
+        <a-box id="cart-body" class="collidable" pushable physics-object="mass: 50" position="0 0.3 0" width="1.0"
+          height="0.6" depth="2.0" visible="false"></a-box>
+        <!-- Visual model for the cart -->
+        <a-entity id="cart" gltf-model="url(assets/scene1/cart.glb)" scale="0.01 0.01 0.01" rotation="0 180 0"
+          animation-mixer="clip: Static Pose; loop: infinite">
+        </a-entity>
+        <!-- Arrow indicator for cart -->
+        <a-entity id="cart-arrow" gltf-model="url(assets/scene1/arrow.glb)" position="0 1.5 0" rotation="0 180 0"
+          scale="0.3 0.3 0.3" visible="false">
         </a-entity>
 
-        <!-- Cart model with collision -->
-        <a-entity id="cart-group" position="3 0 3" rotation="0 180 0">
-          <!-- Main collision body for the cart -->
-          <a-box
-            id="cart-body"
-            class="collidable"
-            pushable
-            physics-object="mass: 50"
-            position="0 0.3 0"
-            width="1.0"
-            height="0.6"
-            depth="2.0"
-            visible="false"
-          ></a-box>
-          <!-- Visual model for the cart -->
-          <a-entity 
-            id="cart" 
-            gltf-model="url(assets/scene1/cart.glb)" 
-            scale="0.01 0.01 0.01"
-            rotation="0 180 0"
-            animation-mixer="clip: Static Pose; loop: infinite">
-          </a-entity>
-          <!-- Arrow indicator for cart -->
-          <a-entity id="cart-arrow" 
-            gltf-model="url(assets/scene1/arrow.glb)"
-            position="0 1.5 0" 
-            rotation="0 180 0"
-            scale="0.3 0.3 0.3"
-            visible="false">
-          </a-entity>
-          
-          <!-- Force indicator for cart -->
-          <a-text 
-            id="cart-force-indicator"
-            value="F: 0N"
-            position="0 2.2 0"
-            align="center"
-            color="#FF5722"
-            font="kelsonsans"
-            width="8"
-            visible="false">
-          </a-text>
-          
-          <!-- Acceleration indicator for cart -->
-          <a-text 
-            id="cart-acceleration-indicator"
-            value="A: 0 m/s²"
-            position="0 1.8 0"
-            align="center"
-            color="#4CAF50"
-            font="kelsonsans"
-            width="8"
-            visible="false">
-          </a-text>
+        <!-- Force indicator for cart -->
+        <a-text id="cart-force-indicator" value="F: 0N" position="0 2.2 0" align="center" color="#FF5722"
+          font="kelsonsans" width="8" visible="false">
+        </a-text>
+
+        <!-- Acceleration indicator for cart -->
+        <a-text id="cart-acceleration-indicator" value="A: 0 m/s²" position="0 1.8 0" align="center" color="#4CAF50"
+          font="kelsonsans" width="8" visible="false">
+        </a-text>
         <!-- NPC Pusher Cart -->
         <a-entity
           id="npc-pusher-cart"
@@ -236,591 +137,238 @@
         ></a-entity>
         </a-entity>
         
-        <!-- Modern 3D Physics Control Panel -->
-        <a-entity id="physics-panel-3d" position="-2 3.5 6" rotation="0 90 0" class="collidable">
-          <!-- Holographic Background -->
-          <a-plane
-            width="4.0"
-            height="5.5"
-            color="#001122"
-            opacity="0.15"
-            position="0 0 -0.2"
-            material="transparent: true; shader: flat">
-            <a-animation
-              attribute="material.opacity"
-              to="0.25"
-              dur="2000"
-              direction="alternate"
-              repeat="indefinite">
-            </a-animation>
-          </a-plane>
-
-          <!-- Main Panel Frame with Glass Effect -->
-          <a-box
+        <!-- Compact 3D Physics Control Panel -->
+        <a-entity id="physics-panel-3d" position="-2 3.5 6" rotation="0 90 0">
+          <!-- Main Panel Frame with Depth -->
+          <a-box 
             id="panel-frame"
-            width="3.5"
-            height="5.0"
-            depth="0.2"
-            color="#0a1f2e"
-            opacity="0.8"
-            material="transparent: true; roughness: 0.1; metalness: 0.8"
+            width="3.5" 
+            height="5.0" 
+            depth="0.15" 
+            color="#2a2a2a" 
+            opacity="0.95"
             shadow="cast: true; receive: true"
-            class="clickable collidable">
-            <!-- Neon Border Glow -->
-            <a-animation
-              attribute="material.emissive"
-              from="#000000"
-              to="#00e676"
-              dur="3000"
-              direction="alternate"
-              repeat="indefinite">
-            </a-animation>
-          </a-box>
-
-          <!-- Glowing Edge Lines -->
-          <a-box
-            width="3.7"
-            height="0.05"
-            depth="0.25"
-            color="#00e676"
-            opacity="0.9"
-            position="0 2.5 0"
-            material="emissive: #00e676; emissiveIntensity: 0.3">
-          </a-box>
-          <a-box
-            width="3.7"
-            height="0.05"
-            depth="0.25"
-            color="#00e676"
-            opacity="0.9"
-            position="0 -2.5 0"
-            material="emissive: #00e676; emissiveIntensity: 0.3">
-          </a-box>
-          <a-box
-            width="0.05"
-            height="5.2"
-            depth="0.25"
-            color="#00e676"
-            opacity="0.9"
-            position="1.75 0 0"
-            material="emissive: #00e676; emissiveIntensity: 0.3">
-          </a-box>
-          <a-box
-            width="0.05"
-            height="5.2"
-            depth="0.25"
-            color="#00e676"
-            opacity="0.9"
-            position="-1.75 0 0"
-            material="emissive: #00e676; emissiveIntensity: 0.3">
+            class="clickable">
           </a-box>
           
-          <!-- Panel Title with Holographic Effect -->
-          <a-text
-            value="⚡ PHYSICS CONTROL ⚡"
-            position="0 2.2 0.15"
-            align="center"
-            color="#00ffff"
-            font="kelsonsans"
-            width="7"
-            material="emissive: #00ffff; emissiveIntensity: 0.5">
-            <a-animation
-              attribute="material.emissive"
-              from="#00ffff"
-              to="#00e676"
-              dur="1500"
-              direction="alternate"
-              repeat="indefinite">
-            </a-animation>
-          </a-text>
-
-          <!-- Subtitle -->
-          <a-text
-            value="INTERACTIVE PHYSICS ENGINE"
-            position="0 1.95 0.12"
-            align="center"
-            color="#64b5f6"
-            font="kelsonsans"
-            width="4"
-            opacity="0.8">
+          <!-- Panel Border for 3D Effect -->
+          <a-box 
+            width="3.7" 
+            height="5.2" 
+            depth="0.1" 
+            color="#1a1a1a" 
+            opacity="0.8"
+            position="0 0 -0.05">
+          </a-box>
+          
+          <!-- Panel Title -->
+          <a-text 
+            value="PHYSICS CONTROL" 
+            position="0 2.2 0.08" 
+            align="center" 
+            color="#00E676" 
+            font="kelsonsans" 
+            width="6">
           </a-text>
           
-          <!-- Input Controls Section with Glass Effect -->
-          <a-box
-            width="3.2"
-            height="1.4"
-            depth="0.08"
-            color="#1a2332"
-            opacity="0.7"
-            position="0 1.4 0.12"
-            material="transparent: true; roughness: 0.2; metalness: 0.6"
-            class="collidable">
-            <!-- Glow effect -->
-            <a-animation
-              attribute="material.emissive"
-              from="#000000"
-              to="#0d47a1"
-              dur="4000"
-              direction="alternate"
-              repeat="indefinite">
-            </a-animation>
-          </a-box>
-
-          <!-- Control Section Border -->
-          <a-box
-            width="3.3"
-            height="1.5"
-            depth="0.02"
-            color="#00e676"
-            opacity="0.6"
-            position="0 1.4 0.08"
-            material="emissive: #00e676; emissiveIntensity: 0.2">
+          <!-- Input Controls Section -->
+          <a-box 
+            width="3.2" 
+            height="1.3" 
+            depth="0.05" 
+            color="#333333" 
+            opacity="0.9"
+            position="0 1.4 0.08">
           </a-box>
           
           <!-- Force Controls -->
-          <a-text
-            value="⚡ FORCE (N) ⚡"
-            position="0 1.8 0.15"
-            align="center"
-            color="#ffc107"
-            font="kelsonsans"
-            width="5"
-            material="emissive: #ffc107; emissiveIntensity: 0.3">
-            <a-animation
-              attribute="rotation"
-              to="0 0 1"
-              dur="5000"
-              repeat="indefinite">
-            </a-animation>
+          <a-text 
+            value="Force (N)" 
+            position="0 1.8 0.12" 
+            align="center" 
+            color="#FFC107" 
+            font="kelsonsans" 
+            width="5">
           </a-text>
-
-          <!-- Force Control Row -->
-          <a-entity>
-            <!-- Minus Button with High Visibility -->
-            <a-box
-              id="force-minus"
-              width="0.4"
-              height="0.4"
-              depth="0.15"
-              color="#ff0000"
-              position="-1.0 1.5 0.3"
-              class="clickable"
-              cursor-listener
-              material="emissive: #ff0000; emissiveIntensity: 0.8; roughness: 0.0; metalness: 0.9"
-              shadow="cast: true"
-              opacity="1.0">
-              <!-- Bright background -->
-              <a-box
-                width="0.38"
-                height="0.38"
-                depth="0.14"
-                color="#ffffff"
-                position="0 0 0.01"
-                opacity="0.3">
-              </a-box>
-              <!-- Dark background for minus icon -->
-              <a-box
-                width="0.25"
-                height="0.08"
-                depth="0.02"
-                color="#000000"
-                position="0 0 0.08"
-                material="emissive: #000000; emissiveIntensity: 0.5">
-              </a-box>
-              <!-- Large visible minus icon -->
-              <a-text
-                value="−"
-                position="0 0 0.09"
-                align="center"
-                color="#ffffff"
-                font="kelsonsans"
-                width="20"
-                material="emissive: #ffffff; emissiveIntensity: 2.0">
-              </a-text>
-              <!-- Strong pulse effect -->
-              <a-animation
-                attribute="material.emissiveIntensity"
-                from="0.8"
-                to="1.2"
-                dur="800"
-                direction="alternate"
-                repeat="indefinite">
-              </a-animation>
-              <!-- Outer glow -->
-              <a-box
-                width="0.5"
-                height="0.5"
-                depth="0.05"
-                color="#ff0000"
-                position="0 0 -0.1"
-                opacity="0.8"
-                material="emissive: #ff0000; emissiveIntensity: 0.6">
-              </a-box>
-            </a-box>
           
-            <!-- Digital Display -->
-            <a-box
-              width="1.2"
-              height="0.3"
-              depth="0.08"
-              color="#000a1a"
-              position="0 1.5 0.12"
-              material="roughness: 0.8; metalness: 0.2"
-              shadow="receive: true"
-              class="collidable">
-              <a-text
-                id="force-display"
-                value="100"
-                position="0 0 0.05"
-                align="center"
-                color="#00ff41"
-                font="kelsonsans"
-                width="6"
-                material="emissive: #00ff41; emissiveIntensity: 0.6">
-                <a-animation
-                  attribute="material.emissive"
-                  from="#00ff41"
-                  to="#39ff14"
-                  dur="800"
-                  direction="alternate"
-                  repeat="indefinite">
-                </a-animation>
-              </a-text>
-              <!-- Digital screen scanlines -->
-              <a-box
-                width="1.15"
-                height="0.02"
-                depth="0.001"
-                color="#00ff41"
-                position="0 0.05 0.04"
-                opacity="0.3">
-              </a-box>
-            </a-box>
-
-            <!-- Plus Button with High Visibility (Match Minus) -->
-            <a-box
-              id="force-plus"
-              width="0.4"
-              height="0.4"
-              depth="0.15"
-              color="#00e676"
-              position="1.0 1.5 0.3"
-              class="clickable"
-              cursor-listener
-              material="emissive: #00e676; emissiveIntensity: 0.8; roughness: 0.0; metalness: 0.9"
-              shadow="cast: true"
-              opacity="1.0">
-              <!-- Bright background -->
-              <a-box
-                width="0.38"
-                height="0.38"
-                depth="0.14"
-                color="#ffffff"
-                position="0 0 0.01"
-                opacity="0.3">
-              </a-box>
-              <!-- Dark background vertical bar for plus icon -->
-              <a-box
-                width="0.08"
-                height="0.25"
-                depth="0.02"
-                color="#000000"
-                position="0 0 0.08"
-                material="emissive: #000000; emissiveIntensity: 0.5">
-              </a-box>
-              <!-- Dark background horizontal bar for plus icon -->
-              <a-box
-                width="0.25"
-                height="0.08"
-                depth="0.02"
-                color="#000000"
-                position="0 0 0.08"
-                material="emissive: #000000; emissiveIntensity: 0.5">
-              </a-box>
-              <!-- Strong pulse effect -->
-              <a-animation
-                attribute="material.emissiveIntensity"
-                from="0.8"
-                to="1.2"
-                dur="800"
-                direction="alternate"
-                repeat="indefinite">
-              </a-animation>
-              <!-- Outer glow -->
-              <a-box
-                width="0.5"
-                height="0.5"
-                depth="0.05"
-                color="#00e676"
-                position="0 0 -0.1"
-                opacity="0.8"
-                material="emissive: #00e676; emissiveIntensity: 0.6">
-              </a-box>
-            </a-box>
-          </a-entity>
+          <!-- Force Control Row -->
+          <a-box 
+            id="force-minus" 
+            width="0.25" 
+            height="0.25" 
+            depth="0.08" 
+            color="#FF5722" 
+            position="-1.0 1.5 0.12"
+            class="clickable"
+            cursor-listener
+            event-set__mouseenter="color: #FF7043"
+            event-set__mouseleave="color: #FF5722"
+            shadow="cast: true">
+            <a-text 
+              value="-" 
+              position="0 0 0.05" 
+              align="center" 
+              color="white" 
+              font="kelsonsans" 
+              width="10">
+            </a-text>
+          </a-box>
+          
+          <a-box 
+            width="1.0" 
+            height="0.25" 
+            depth="0.05" 
+            color="#1e1e1e" 
+            position="0 1.5 0.1">
+            <a-text 
+              id="force-display" 
+              value="100" 
+              position="0 0 0.03" 
+              align="center" 
+              color="#4CAF50" 
+              font="kelsonsans" 
+              width="6">
+            </a-text>
+          </a-box>
+          
+          <a-box 
+            id="force-plus" 
+            width="0.25" 
+            height="0.25" 
+            depth="0.08" 
+            color="#4CAF50" 
+            position="1.0 1.5 0.12"
+            class="clickable"
+            cursor-listener
+            event-set__mouseenter="color: #66BB6A"
+            event-set__mouseleave="color: #4CAF50"
+            shadow="cast: true">
+            <a-text 
+              value="+" 
+              position="0 0 0.05" 
+              align="center" 
+              color="white" 
+              font="kelsonsans" 
+              width="10">
+            </a-text>
+          </a-box>
           
           <!-- Distance Controls -->
-          <a-text
-            value="📏 DISTANCE (m) 📏"
-            position="0 1.2 0.15"
-            align="center"
-            color="#ff9800"
-            font="kelsonsans"
-            width="5"
-            material="emissive: #ff9800; emissiveIntensity: 0.3">
-            <a-animation
-              attribute="position"
-              from="0 1.2 0.15"
-              to="0 1.25 0.15"
-              dur="2000"
-              direction="alternate"
-              repeat="indefinite">
-            </a-animation>
+          <a-text 
+            value="Distance (m)" 
+            position="0 1.2 0.12" 
+            align="center" 
+            color="#FFC107" 
+            font="kelsonsans" 
+            width="5">
           </a-text>
           
           <!-- Distance Control Row -->
-          <a-entity>
-            <!-- Distance Minus Button with High Visibility -->
-            <a-box
-              id="distance-minus"
-              width="0.4"
-              height="0.4"
-              depth="0.15"
-              color="#ff6600"
-              position="-1.0 0.9 0.3"
-              class="clickable"
-              cursor-listener
-              material="emissive: #ff6600; emissiveIntensity: 0.8; roughness: 0.0; metalness: 0.9"
-              shadow="cast: true"
-              opacity="1.0">
-              <!-- Bright background -->
-              <a-box
-                width="0.38"
-                height="0.38"
-                depth="0.14"
-                color="#ffffff"
-                position="0 0 0.01"
-                opacity="0.3">
-              </a-box>
-              <!-- Dark background for minus icon -->
-              <a-box
-                width="0.25"
-                height="0.08"
-                depth="0.02"
-                color="#000000"
-                position="0 0 0.08"
-                material="emissive: #000000; emissiveIntensity: 0.5">
-              </a-box>
-              <!-- Large visible minus icon -->
-              <a-text
-                value="−"
-                position="0 0 0.09"
-                align="center"
-                color="#ffffff"
-                font="kelsonsans"
-                width="20"
-                material="emissive: #ffffff; emissiveIntensity: 2.0">
-              </a-text>
-              <a-animation
-                attribute="rotation"
-                to="0 0 360"
-                dur="2000"
-                repeat="indefinite">
-              </a-animation>
-              <!-- Strong outer glow -->
-              <a-box
-                width="0.5"
-                height="0.5"
-                depth="0.05"
-                color="#ff6600"
-                position="0 0 -0.1"
-                opacity="0.8"
-                material="emissive: #ff6600; emissiveIntensity: 0.6">
-              </a-box>
-            </a-box>
-
-            <!-- Digital Display -->
-            <a-box
-              width="1.2"
-              height="0.3"
-              depth="0.08"
-              color="#001a0a"
-              position="0 0.9 0.12"
-              material="roughness: 0.8; metalness: 0.2"
-              shadow="receive: true"
-              class="collidable">
-              <a-text
-                id="distance-display"
-                value="5"
-                position="0 0 0.05"
-                align="center"
-                color="#00ff80"
-                font="kelsonsans"
-                width="6"
-                material="emissive: #00ff80; emissiveIntensity: 0.6">
-                <a-animation
-                  attribute="material.emissiveIntensity"
-                  from="0.6"
-                  to="0.9"
-                  dur="1000"
-                  direction="alternate"
-                  repeat="indefinite">
-                </a-animation>
-              </a-text>
-              <!-- Digital screen effect -->
-              <a-box
-                width="1.15"
-                height="0.02"
-                depth="0.001"
-                color="#00ff80"
-                position="0 -0.05 0.04"
-                opacity="0.4">
-              </a-box>
-            </a-box>
-
-            <!-- Distance Plus Button with High Visibility (Match Minus) -->
-            <a-box
-              id="distance-plus"
-              width="0.4"
-              height="0.4"
-              depth="0.15"
-              color="#4caf50"
-              position="1.0 0.9 0.3"
-              class="clickable"
-              cursor-listener
-              material="emissive: #4caf50; emissiveIntensity: 0.8; roughness: 0.0; metalness: 0.9"
-              shadow="cast: true"
-              opacity="1.0">
-              <!-- Bright background -->
-              <a-box
-                width="0.38"
-                height="0.38"
-                depth="0.14"
-                color="#ffffff"
-                position="0 0 0.01"
-                opacity="0.3">
-              </a-box>
-              <!-- Dark background vertical bar for plus icon -->
-              <a-box
-                width="0.08"
-                height="0.25"
-                depth="0.02"
-                color="#000000"
-                position="0 0 0.08"
-                material="emissive: #000000; emissiveIntensity: 0.5">
-              </a-box>
-              <!-- Dark background horizontal bar for plus icon -->
-              <a-box
-                width="0.25"
-                height="0.08"
-                depth="0.02"
-                color="#000000"
-                position="0 0 0.08"
-                material="emissive: #000000; emissiveIntensity: 0.5">
-              </a-box>
-              <a-animation
-                attribute="rotation"
-                to="0 0 -360"
-                dur="2500"
-                repeat="indefinite">
-              </a-animation>
-              <!-- Strong outer glow -->
-              <a-box
-                width="0.5"
-                height="0.5"
-                depth="0.05"
-                color="#4caf50"
-                position="0 0 -0.1"
-                opacity="0.8"
-                material="emissive: #4caf50; emissiveIntensity: 0.6">
-              </a-box>
-            </a-box>
-          </a-entity>
+          <a-box 
+            id="distance-minus" 
+            width="0.25" 
+            height="0.25" 
+            depth="0.08" 
+            color="#FF5722" 
+            position="-1.0 0.9 0.12"
+            class="clickable"
+            cursor-listener
+            event-set__mouseenter="color: #FF7043"
+            event-set__mouseleave="color: #FF5722"
+            shadow="cast: true">
+            <a-text 
+              value="-" 
+              position="0 0 0.05" 
+              align="center" 
+              color="white" 
+              font="kelsonsans" 
+              width="10">
+            </a-text>
+          </a-box>
+          
+          <a-box 
+            width="1.0" 
+            height="0.25" 
+            depth="0.05" 
+            color="#1e1e1e" 
+            position="0 0.9 0.1">
+            <a-text 
+              id="distance-display" 
+              value="5" 
+              position="0 0 0.03" 
+              align="center" 
+              color="#4CAF50" 
+              font="kelsonsans" 
+              width="6">
+            </a-text>
+          </a-box>
+          
+          <a-box 
+            id="distance-plus" 
+            width="0.25" 
+            height="0.25" 
+            depth="0.08" 
+            color="#4CAF50" 
+            position="1.0 0.9 0.12"
+            class="clickable"
+            cursor-listener
+            event-set__mouseenter="color: #66BB6A"
+            event-set__mouseleave="color: #4CAF50"
+            shadow="cast: true">
+            <a-text 
+              value="+" 
+              position="0 0 0.05" 
+              align="center" 
+              color="white" 
+              font="kelsonsans" 
+              width="10">
+            </a-text>
+          </a-box>
           
           <!-- Action Buttons -->
-          <a-entity>
-            <!-- Apply Button with Holographic Design -->
-            <a-box
-              id="apply-force-btn"
-              width="1.4"
-              height="0.4"
-              depth="0.15"
-              color="#1b5e20"
-              position="-0.8 0.4 0.15"
-              class="clickable"
-              cursor-listener
-              material="emissive: #1b5e20; emissiveIntensity: 0.4; roughness: 0.1; metalness: 0.9"
-              shadow="cast: true">
-              <!-- Button border glow -->
-              <a-box
-                width="1.5"
-                height="0.45"
-                depth="0.02"
-                color="#00e676"
-                position="0 0 -0.08"
-                opacity="0.7"
-                material="emissive: #00e676; emissiveIntensity: 0.3">
-                <a-animation
-                  attribute="material.emissiveIntensity"
-                  from="0.3"
-                  to="0.7"
-                  dur="1500"
-                  direction="alternate"
-                  repeat="indefinite">
-                </a-animation>
-              </a-box>
-              <a-text
-                value="🚀 APPLY 🚀"
-                position="0 0 0.08"
-                align="center"
-                color="white"
-                font="kelsonsans"
-                width="5"
-                material="emissive: white; emissiveIntensity: 0.8">
-              </a-text>
-            </a-box>
-
-            <!-- Reset Button with Holographic Design -->
-            <a-box
-              id="reset-btn"
-              width="1.4"
-              height="0.4"
-              depth="0.15"
-              color="#b71c1c"
-              position="0.8 0.4 0.15"
-              class="clickable"
-              cursor-listener
-              material="emissive: #b71c1c; emissiveIntensity: 0.4; roughness: 0.1; metalness: 0.9"
-              shadow="cast: true">
-              <!-- Button border glow -->
-              <a-box
-                width="1.5"
-                height="0.45"
-                depth="0.02"
-                color="#ff1744"
-                position="0 0 -0.08"
-                opacity="0.7"
-                material="emissive: #ff1744; emissiveIntensity: 0.3">
-                <a-animation
-                  attribute="material.emissiveIntensity"
-                  from="0.3"
-                  to="0.7"
-                  dur="1800"
-                  direction="alternate"
-                  repeat="indefinite">
-                </a-animation>
-              </a-box>
-              <a-text
-                value="🔄 RESET 🔄"
-                position="0 0 0.08"
-                align="center"
-                color="white"
-                font="kelsonsans"
-                width="5"
-                material="emissive: white; emissiveIntensity: 0.8">
-              </a-text>
-            </a-box>
-          </a-entity>
+          <a-box 
+            id="apply-force-btn" 
+            width="1.3" 
+            height="0.3" 
+            depth="0.1" 
+            color="#4CAF50" 
+            position="-0.8 0.4 0.12"
+            class="clickable"
+            cursor-listener
+            event-set__mouseenter="color: #66BB6A"
+            event-set__mouseleave="color: #4CAF50"
+            shadow="cast: true">
+            <a-text 
+              value="APPLY" 
+              position="0 0 0.06" 
+              align="center" 
+              color="white" 
+              font="kelsonsans" 
+              width="5">
+            </a-text>
+          </a-box>
+          
+          <a-box 
+            id="reset-btn" 
+            width="1.3" 
+            height="0.3" 
+            depth="0.1" 
+            color="#f44336" 
+            position="0.8 0.4 0.12"
+            class="clickable"
+            cursor-listener
+            event-set__mouseenter="color: #EF5350"
+            event-set__mouseleave="color: #f44336"
+            shadow="cast: true">
+            <a-text 
+              value="RESET" 
+              position="0 0 0.06" 
+              align="center" 
+              color="white" 
+              font="kelsonsans" 
+              width="5">
+            </a-text>
+          </a-box>
           
           <!-- Separator -->
           <a-box 
@@ -832,14 +380,13 @@
           </a-box>
           
           <!-- Data Display Section -->
-          <a-box
-            width="3.2"
-            height="2.0"
-            depth="0.05"
-            color="#1e1e1e"
+          <a-box 
+            width="3.2" 
+            height="2.0" 
+            depth="0.05" 
+            color="#1e1e1e" 
             opacity="0.9"
-            position="0 -0.9 0.08"
-            class="collidable">
+            position="0 -0.9 0.08">
           </a-box>
           
           <!-- Car Data -->
@@ -971,1021 +518,1038 @@
           </a-text>
         </a-entity>
 
-        <!-- Portal back to index.html -->
-                <a-text
-          value="Kembali ke Beranda"
-          position="-8 2.0 2"
-          align="center"
-          color="#FFFFFF"
-          font="kelsonsans"
-          width="5"
-          look-at="#player"
-        ></a-text>
-        <a-link
-          link="on:click"
-          href="index.html"
-          title="Kembali ke Lobby"
-          image="#thumbForest"
-          position="8 1.6 2"
-          rotation="0 90 0"
-          class="clickable"
-          event-set__mouseenter="material.opacity: 0.8"
-          event-set__mouseleave="material.opacity: 0.6"
-        >
-        </a-link>
-      </a-entity>
+      <!-- Portal back to index.html -->
+      <a-text value="Kembali ke Beranda" position="-8 2.0 2" align="center" color="#FFFFFF" font="kelsonsans" width="5"
+        look-at="#player"></a-text>
+      <a-link link="on:click" href="index.html" title="Kembali ke Lobby" image="#thumbForest" position="8 1.6 2"
+        rotation="0 90 0" class="clickable" event-set__mouseenter="material.opacity: 0.8"
+        event-set__mouseleave="material.opacity: 0.6">
+      </a-link>
+    </a-entity>
 
-      <a-entity
-        id="rig"
-        position="6 0 3"
-        rotation="0 90 0"
-        collider="distance: 0.3"
-        movement-controls="fly:false;"
-        networked="template:#avatar-template;attachTemplateToLocal:false"
-        player-info
-      >
-        <a-entity id="player" class="camera" camera position="0 1.6 0" look-controls>
-          <a-box obb-collider visible="false" height="0.4" depth="0.4" width="0.4"></a-box>
-          <!-- Ring cursor for better interaction -->
-          <a-entity
-            position="0 0 -1"
-            geometry="primitive: ring; radiusInner: 0.018; radiusOuter: 0.025"
-            material="shader: flat; opacity: 0.9"
-            cursor="fuse: true; fuseTimeout: 1200"
-            raycaster="objects: .clickable; far: 20;"
-            animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.2 0.2 0.2; dur: 1200; easing: linear"
-            animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120">
-          </a-entity>
+    <a-entity id="rig" position="6 0 3" rotation="0 90 0" collider="distance: 0.3" movement-controls="fly:false;"
+      networked="template:#avatar-template;attachTemplateToLocal:false" player-info>
+      <a-entity id="player" class="camera" camera position="0 1.6 0" look-controls>
+        <a-box obb-collider visible="false" height="0.4" depth="0.4" width="0.4"></a-box>
+        <!-- Ring cursor for better interaction -->
+        <a-entity position="0 0 -1" geometry="primitive: ring; radiusInner: 0.018; radiusOuter: 0.025"
+          material="shader: flat; opacity: 0.9" cursor="fuse: true; fuseTimeout: 1200"
+          raycaster="objects: .clickable; far: 20;"
+          animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.2 0.2 0.2; dur: 1200; easing: linear"
+          animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120"
+          id="main-cursor">
         </a-entity>
-        <a-entity id="left-hand" networked-hand-controls="hand: left" laser-controls="hand: left"></a-entity>
-        <a-entity id="right-hand" networked-hand-controls="hand:right" laser-controls="hand: right"></a-entity>
       </a-entity>
-    </a-scene>
+      <a-entity id="left-hand" networked-hand-controls="hand: left" laser-controls="hand: left"></a-entity>
+      <a-entity id="right-hand" networked-hand-controls="hand:right" laser-controls="hand: right"></a-entity>
+    </a-entity>
+  </a-scene>
 
-    <script>
-      // Cursor Listener Component for 3D UI interactions
-      AFRAME.registerComponent('cursor-listener', {
-        init: function () {
-          this.el.addEventListener('click', this.onClick.bind(this));
-          this.el.addEventListener('mouseenter', this.onMouseEnter.bind(this));
-          this.el.addEventListener('mouseleave', this.onMouseLeave.bind(this));
-        },
-        onClick: function (evt) {
-          console.log('Element clicked:', this.el.id);
-          
-          // Handle button clicks based on element ID
-          if (this.el.id === 'force-minus') {
+  <script>
+    // Cursor Listener Component for 3D UI interactions
+    AFRAME.registerComponent('cursor-listener', {
+      init: function () {
+        this.el.addEventListener('click', this.onClick.bind(this));
+        this.el.addEventListener('fuse', this.onClick.bind(this)); // Add fuse event support
+        this.el.addEventListener('mouseenter', this.onMouseEnter.bind(this));
+        this.el.addEventListener('mouseleave', this.onMouseLeave.bind(this));
+        console.log('Cursor listener initialized for element:', this.el.id);
+      },
+      onClick: function (evt) {
+        console.log('=== BUTTON CLICKED ===');
+        console.log('Element clicked:', this.el.id);
+        console.log('Event details:', evt);
+        console.log('physicsSimulation3D available:', !!physicsSimulation3D);
+        console.log('physicsSimulation3D:', physicsSimulation3D);
+
+        // Handle button clicks based on element ID
+        if (this.el.id === 'force-minus') {
+          console.log('Processing force-minus click...');
+          if (physicsSimulation3D) {
             physicsSimulation3D.adjustForce(-1);
-          } else if (this.el.id === 'force-plus') {
+          } else {
+            console.error('physicsSimulation3D not initialized');
+          }
+        } else if (this.el.id === 'force-plus') {
+          if (physicsSimulation3D) {
             physicsSimulation3D.adjustForce(1);
-          } else if (this.el.id === 'distance-minus') {
+          } else {
+            console.error('physicsSimulation3D not initialized');
+          }
+        } else if (this.el.id === 'distance-minus') {
+          if (physicsSimulation3D) {
             physicsSimulation3D.adjustDistance(-1);
-          } else if (this.el.id === 'distance-plus') {
+          } else {
+            console.error('physicsSimulation3D not initialized');
+          }
+        } else if (this.el.id === 'distance-plus') {
+          if (physicsSimulation3D) {
             physicsSimulation3D.adjustDistance(1);
-          } else if (this.el.id === 'apply-force-btn') {
+          } else {
+            console.error('physicsSimulation3D not initialized');
+          }
+        } else if (this.el.id === 'apply-force-btn') {
+          if (physicsSimulation3D) {
             physicsSimulation3D.applyForce();
-          } else if (this.el.id === 'reset-btn') {
+          } else {
+            console.error('physicsSimulation3D not initialized');
+          }
+        } else if (this.el.id === 'reset-btn') {
+          if (physicsSimulation3D) {
             physicsSimulation3D.reset();
-          }
-        },
-        onMouseEnter: function (evt) {
-          console.log('Mouse enter:', this.el.id);
-        },
-        onMouseLeave: function (evt) {
-          console.log('Mouse leave:', this.el.id);
-        }
-      });
-
-      // Component to make one entity follow another
-      AFRAME.registerComponent('follow', {
-        schema: { target: { type: 'selector' } },
-        tick: function () {
-          if (!this.data.target) return;
-          this.el.object3D.position.copy(this.data.target.object3D.position);
-          this.el.object3D.quaternion.copy(this.data.target.object3D.quaternion);
-        },
-      });
-
-      // 3D Slider Component
-      AFRAME.registerComponent('slider-3d', {
-        schema: {
-          min: { default: 0 },
-          max: { default: 100 },
-          value: { default: 50 },
-          width: { default: 3 },
-          target: { type: 'selector' }
-        },
-        init: function () {
-          this.isDragging = false;
-          this.startPosition = new THREE.Vector3();
-          this.currentPosition = new THREE.Vector3();
-          
-          this.el.addEventListener('mousedown', this.onMouseDown.bind(this));
-          this.el.addEventListener('mouseup', this.onMouseUp.bind(this));
-          this.el.sceneEl.addEventListener('mousemove', this.onMouseMove.bind(this));
-          
-          // Set initial position based on value
-          this.updateSliderPosition();
-        },
-        onMouseDown: function (evt) {
-          this.isDragging = true;
-          this.el.object3D.getWorldPosition(this.startPosition);
-        },
-        onMouseUp: function (evt) {
-          this.isDragging = false;
-        },
-        onMouseMove: function (evt) {
-          if (!this.isDragging) return;
-          
-          const raycaster = this.el.sceneEl.systems.raycaster.raycaster;
-          const camera = this.el.sceneEl.camera;
-          
-          // Calculate intersection with slider plane
-          const slider = this.el;
-          const parent = slider.parentNode;
-          const parentPos = new THREE.Vector3();
-          parent.object3D.getWorldPosition(parentPos);
-          
-          // Calculate local X position relative to slider track
-          const halfWidth = this.data.width / 2;
-          const localX = THREE.MathUtils.clamp(
-            evt.detail.intersection.point.x - parentPos.x,
-            -halfWidth,
-            halfWidth
-          );
-          
-          // Update slider position
-          slider.setAttribute('position', `${localX} ${slider.getAttribute('position').y} ${slider.getAttribute('position').z}`);
-          
-          // Calculate value based on position
-          const normalizedPos = (localX + halfWidth) / this.data.width;
-          this.data.value = this.data.min + normalizedPos * (this.data.max - this.data.min);
-          
-          // Update display
-          this.updateDisplay();
-        },
-        updateSliderPosition: function () {
-          const normalizedValue = (this.data.value - this.data.min) / (this.data.max - this.data.min);
-          const halfWidth = this.data.width / 2;
-          const posX = -halfWidth + normalizedValue * this.data.width;
-          
-          const currentPos = this.el.getAttribute('position');
-          this.el.setAttribute('position', `${posX} ${currentPos.y} ${currentPos.z}`);
-        },
-        updateDisplay: function () {
-          if (this.data.target) {
-            this.data.target.setAttribute('value', Math.round(this.data.value).toString());
+          } else {
+            console.error('physicsSimulation3D not initialized');
           }
         }
-      });
+      },
+      onMouseEnter: function (evt) {
+        console.log('Mouse enter:', this.el.id);
+      },
+      onMouseLeave: function (evt) {
+        console.log('Mouse leave:', this.el.id);
+      }
+    });
 
-      // Simple slider component for 3D interface
-      AFRAME.registerComponent('simple-slider', {
-        schema: {
-          min: { default: 0 },
-          max: { default: 100 },
-          value: { default: 50 },
-          step: { default: 10 }
-        },
-        init: function () {
-          this.el.addEventListener('click', this.onClick.bind(this));
-        },
-        onClick: function (evt) {
-          // Cycle through values on click
-          this.data.value += this.data.step;
-          if (this.data.value > this.data.max) {
-            this.data.value = this.data.min;
-          }
-          this.updatePosition();
-          this.el.emit('valuechange', { value: this.data.value });
-        },
-        updatePosition: function () {
-          const normalizedValue = (this.data.value - this.data.min) / (this.data.max - this.data.min);
-          const halfWidth = 1.5; // 3/2
-          const posX = -halfWidth + normalizedValue * 3;
-          
-          const currentPos = this.el.getAttribute('position');
-          this.el.setAttribute('position', `${posX} ${currentPos.y} ${currentPos.z}`);
+    // Component to make one entity follow another
+    AFRAME.registerComponent('follow', {
+      schema: { target: { type: 'selector' } },
+      tick: function () {
+        if (!this.data.target) return;
+        this.el.object3D.position.copy(this.data.target.object3D.position);
+        this.el.object3D.quaternion.copy(this.data.target.object3D.quaternion);
+      },
+    });
+
+    // 3D Slider Component
+    AFRAME.registerComponent('slider-3d', {
+      schema: {
+        min: { default: 0 },
+        max: { default: 100 },
+        value: { default: 50 },
+        width: { default: 3 },
+        target: { type: 'selector' }
+      },
+      init: function () {
+        this.isDragging = false;
+        this.startPosition = new THREE.Vector3();
+        this.currentPosition = new THREE.Vector3();
+
+        this.el.addEventListener('mousedown', this.onMouseDown.bind(this));
+        this.el.addEventListener('mouseup', this.onMouseUp.bind(this));
+        this.el.sceneEl.addEventListener('mousemove', this.onMouseMove.bind(this));
+
+        // Set initial position based on value
+        this.updateSliderPosition();
+      },
+      onMouseDown: function (evt) {
+        this.isDragging = true;
+        this.el.object3D.getWorldPosition(this.startPosition);
+      },
+      onMouseUp: function (evt) {
+        this.isDragging = false;
+      },
+      onMouseMove: function (evt) {
+        if (!this.isDragging) return;
+
+        const raycaster = this.el.sceneEl.systems.raycaster.raycaster;
+        const camera = this.el.sceneEl.camera;
+
+        // Calculate intersection with slider plane
+        const slider = this.el;
+        const parent = slider.parentNode;
+        const parentPos = new THREE.Vector3();
+        parent.object3D.getWorldPosition(parentPos);
+
+        // Calculate local X position relative to slider track
+        const halfWidth = this.data.width / 2;
+        const localX = THREE.MathUtils.clamp(
+          evt.detail.intersection.point.x - parentPos.x,
+          -halfWidth,
+          halfWidth
+        );
+
+        // Update slider position
+        slider.setAttribute('position', `${localX} ${slider.getAttribute('position').y} ${slider.getAttribute('position').z}`);
+
+        // Calculate value based on position
+        const normalizedPos = (localX + halfWidth) / this.data.width;
+        this.data.value = this.data.min + normalizedPos * (this.data.max - this.data.min);
+
+        // Update display
+        this.updateDisplay();
+      },
+      updateSliderPosition: function () {
+        const normalizedValue = (this.data.value - this.data.min) / (this.data.max - this.data.min);
+        const halfWidth = this.data.width / 2;
+        const posX = -halfWidth + normalizedValue * this.data.width;
+
+        const currentPos = this.el.getAttribute('position');
+        this.el.setAttribute('position', `${posX} ${currentPos.y} ${currentPos.z}`);
+      },
+      updateDisplay: function () {
+        if (this.data.target) {
+          this.data.target.setAttribute('value', Math.round(this.data.value).toString());
         }
-      });
+      }
+    });
 
-      // Player collider: stops the player from penetrating any .collidable object
-      AFRAME.registerComponent('collider', {
-        schema: { 
-          distance: { default: 1.2 },
-          debug: { default: false }
-        },
-        init: function () {
-          this.raycaster = new THREE.Raycaster();
-          this.lastSafePosition = new THREE.Vector3();
-          this.directions = [
-            new THREE.Vector3(0, 0, -1), // forward
-            new THREE.Vector3(0, 0, 1), // backward
-            new THREE.Vector3(-1, 0, 0), // left
-            new THREE.Vector3(1, 0, 0), // right
-            new THREE.Vector3(-0.7, 0, -0.7), // diagonal front-left
-            new THREE.Vector3(0.7, 0, -0.7), // diagonal front-right
-            new THREE.Vector3(-0.7, 0, 0.7), // diagonal back-left
-            new THREE.Vector3(0.7, 0, 0.7), // diagonal back-right
-          ];
-          this.el.addEventListener('loaded', () => {
-            this.el.object3D.getWorldPosition(this.lastSafePosition);
-          });
-        },
-        tick: function (time, delta) {
-          const collidableEls = this.el.sceneEl.querySelectorAll('.collidable');
-          if (collidableEls.length === 0) return;
+    // Simple slider component for 3D interface
+    AFRAME.registerComponent('simple-slider', {
+      schema: {
+        min: { default: 0 },
+        max: { default: 100 },
+        value: { default: 50 },
+        step: { default: 10 }
+      },
+      init: function () {
+        this.el.addEventListener('click', this.onClick.bind(this));
+      },
+      onClick: function (evt) {
+        // Cycle through values on click
+        this.data.value += this.data.step;
+        if (this.data.value > this.data.max) {
+          this.data.value = this.data.min;
+        }
+        this.updatePosition();
+        this.el.emit('valuechange', { value: this.data.value });
+      },
+      updatePosition: function () {
+        const normalizedValue = (this.data.value - this.data.min) / (this.data.max - this.data.min);
+        const halfWidth = 1.5; // 3/2
+        const posX = -halfWidth + normalizedValue * 3;
 
-          const collidables = [];
-          collidableEls.forEach((el) => {
-            if (el.object3D) {
-              collidables.push(el.object3D);
+        const currentPos = this.el.getAttribute('position');
+        this.el.setAttribute('position', `${posX} ${currentPos.y} ${currentPos.z}`);
+      }
+    });
+
+    // Player collider: stops the player from penetrating any .collidable object
+    AFRAME.registerComponent('collider', {
+      schema: {
+        distance: { default: 1.2 },
+        debug: { default: false }
+      },
+      init: function () {
+        this.raycaster = new THREE.Raycaster();
+        this.lastSafePosition = new THREE.Vector3();
+        this.directions = [
+          new THREE.Vector3(0, 0, -1), // forward
+          new THREE.Vector3(0, 0, 1), // backward
+          new THREE.Vector3(-1, 0, 0), // left
+          new THREE.Vector3(1, 0, 0), // right
+          new THREE.Vector3(-0.7, 0, -0.7), // diagonal front-left
+          new THREE.Vector3(0.7, 0, -0.7), // diagonal front-right
+          new THREE.Vector3(-0.7, 0, 0.7), // diagonal back-left
+          new THREE.Vector3(0.7, 0, 0.7), // diagonal back-right
+        ];
+        this.el.addEventListener('loaded', () => {
+          this.el.object3D.getWorldPosition(this.lastSafePosition);
+        });
+      },
+      tick: function (time, delta) {
+        const collidableEls = this.el.sceneEl.querySelectorAll('.collidable');
+        if (collidableEls.length === 0) return;
+
+        const collidables = [];
+        collidableEls.forEach((el) => {
+          if (el.object3D) {
+            collidables.push(el.object3D);
+          }
+        });
+
+        let collision = false;
+        const currentPosition = new THREE.Vector3();
+        this.el.object3D.getWorldPosition(currentPosition);
+
+        for (const dir of this.directions) {
+          const worldDir = dir.clone().applyQuaternion(this.el.object3D.quaternion);
+          this.raycaster.set(currentPosition, worldDir);
+          this.raycaster.far = this.data.distance;
+          const intersects = this.raycaster.intersectObjects(collidables, true);
+
+          if (intersects.length > 0 && intersects[0].distance < this.data.distance) {
+            const hitEl = intersects[0].object.el;
+
+            if (this.data.debug) {
+              console.log('Collision detected with:', hitEl ? hitEl.id : 'unknown', 'distance:', intersects[0].distance);
             }
-          });
 
-          let collision = false;
-          const currentPosition = new THREE.Vector3();
-          this.el.object3D.getWorldPosition(currentPosition);
-
-          for (const dir of this.directions) {
-            const worldDir = dir.clone().applyQuaternion(this.el.object3D.quaternion);
-            this.raycaster.set(currentPosition, worldDir);
-            this.raycaster.far = this.data.distance;
-            const intersects = this.raycaster.intersectObjects(collidables, true);
-
-            if (intersects.length > 0 && intersects[0].distance < this.data.distance) {
-              const hitEl = intersects[0].object.el;
-              
+            // Handle pushable objects
+            if (hitEl && hitEl.components && hitEl.components.pushable) {
+              const pushStrength = 0.02;
+              const pushVector = worldDir.clone().multiplyScalar(pushStrength * delta);
+              hitEl.components.pushable.push(pushVector);
               if (this.data.debug) {
-                console.log('Collision detected with:', hitEl ? hitEl.id : 'unknown', 'distance:', intersects[0].distance);
+                console.log('Pushing object:', hitEl.id, 'with vector:', pushVector);
               }
-              
-              // Handle pushable objects
-              if (hitEl && hitEl.components && hitEl.components.pushable) {
-                const pushStrength = 0.02;
-                const pushVector = worldDir.clone().multiplyScalar(pushStrength * delta);
-                hitEl.components.pushable.push(pushVector);
-                if (this.data.debug) {
-                  console.log('Pushing object:', hitEl.id, 'with vector:', pushVector);
-                }
-              }
-              
-              // Prevent penetration
-              this.el.object3D.position.copy(this.lastSafePosition);
-              collision = true;
-              break;
             }
-          }
-          
-          if (!collision) {
-            this.el.object3D.getWorldPosition(this.lastSafePosition);
-          }
-        },
-      });
 
-      // Pushable component: handles its own gravity and can be pushed
-      AFRAME.registerComponent('pushable', {
-        init: function () {
-          this.raycaster = new THREE.Raycaster();
-          this.downVector = new THREE.Vector3(0, -1, 0);
-          this.velocity = new THREE.Vector3();
-          this.friction = 0.92;
-        },
-        push: function (vector) {
-          // Only allow pushing from front or back, not sides
-          if (Math.abs(vector.x) > Math.abs(vector.z)) {
-            return;
+            // Prevent penetration
+            this.el.object3D.position.copy(this.lastSafePosition);
+            collision = true;
+            break;
           }
-          this.velocity.add(vector);
+        }
 
-          // If this element has a parent group, move the entire group
+        if (!collision) {
+          this.el.object3D.getWorldPosition(this.lastSafePosition);
+        }
+      },
+    });
+
+    // Pushable component: handles its own gravity and can be pushed
+    AFRAME.registerComponent('pushable', {
+      init: function () {
+        this.raycaster = new THREE.Raycaster();
+        this.downVector = new THREE.Vector3(0, -1, 0);
+        this.velocity = new THREE.Vector3();
+        this.friction = 0.92;
+      },
+      push: function (vector) {
+        // Only allow pushing from front or back, not sides
+        if (Math.abs(vector.x) > Math.abs(vector.z)) {
+          return;
+        }
+        this.velocity.add(vector);
+
+        // If this element has a parent group, move the entire group
+        const parentGroup = this.el.parentNode;
+        if (parentGroup && parentGroup.id === 'car-group') {
+          parentGroup.object3D.position.add(vector);
+        } else {
+          this.el.object3D.position.add(vector);
+        }
+
+        // Update all connected objects (like the visual ferrari model)
+        const followingElements = this.el.sceneEl.querySelectorAll('[follow]');
+        followingElements.forEach((follower) => {
+          const followComponent = follower.components.follow;
+          if (followComponent && followComponent.data.target === this.el) {
+            follower.object3D.position.copy(this.el.object3D.position);
+          }
+        });
+      },
+      tick: function () {
+        // Apply friction
+        this.velocity.multiplyScalar(this.friction);
+
+        // Apply small remaining velocity
+        if (this.velocity.length() > 0.001) {
           const parentGroup = this.el.parentNode;
           if (parentGroup && parentGroup.id === 'car-group') {
-            parentGroup.object3D.position.add(vector);
+            parentGroup.object3D.position.add(this.velocity.clone().multiplyScalar(0.1));
           } else {
-            this.el.object3D.position.add(vector);
+            this.el.object3D.position.add(this.velocity.clone().multiplyScalar(0.1));
           }
+        }
 
-          // Update all connected objects (like the visual ferrari model)
-          const followingElements = this.el.sceneEl.querySelectorAll('[follow]');
-          followingElements.forEach((follower) => {
-            const followComponent = follower.components.follow;
-            if (followComponent && followComponent.data.target === this.el) {
-              follower.object3D.position.copy(this.el.object3D.position);
-            }
-          });
-        },
-        tick: function () {
-          // Apply friction
-          this.velocity.multiplyScalar(this.friction);
+        // Apply gravity/ground constraint
+        const groundEls = this.el.sceneEl.querySelectorAll('.ground, .environmentGround');
+        if (groundEls.length === 0) return;
+        const grounds = [];
+        groundEls.forEach((el) => grounds.push(el.object3D));
 
-          // Apply small remaining velocity
-          if (this.velocity.length() > 0.001) {
-            const parentGroup = this.el.parentNode;
-            if (parentGroup && parentGroup.id === 'car-group') {
-              parentGroup.object3D.position.add(this.velocity.clone().multiplyScalar(0.1));
-            } else {
-              this.el.object3D.position.add(this.velocity.clone().multiplyScalar(0.1));
-            }
+        this.raycaster.set(this.el.object3D.position, this.downVector);
+        const intersects = this.raycaster.intersectObjects(grounds, true);
+        if (intersects.length > 0) {
+          const height = this.el.getAttribute('height') || this.el.getAttribute('geometry')?.height || 0.1;
+          this.el.object3D.position.y = intersects[0].point.y + height / 2;
+        }
+      },
+    });
+
+    // Physics Object Component
+    AFRAME.registerComponent('physics-object', {
+      schema: {
+        mass: { default: 1 }
+      },
+      init: function () {
+        this.velocity = new THREE.Vector3();
+        this.acceleration = new THREE.Vector3();
+        this.appliedForce = new THREE.Vector3();
+        this.isMoving = false;
+        this.distanceTraveled = 0;
+        this.startPosition = new THREE.Vector3();
+        this.targetDistance = 0;
+        this.friction = 0.995; // Reduced friction for better movement
+        this.maxValues = {
+          acceleration: 0,
+          velocity: 0,
+          distance: 0
+        }; // Store maximum values achieved
+        this.lastForceAppliedTime = 0;
+        this.shouldKeepDisplayData = false; // Flag to keep data displayed
+        this.inputForce = 0; // Store the input force value for display
+
+        // Wait for the element to be loaded before capturing start position
+        this.el.addEventListener('loaded', () => {
+          setTimeout(() => this.captureStartPosition(), 500);
+        });
+
+        // If already loaded, capture immediately
+        if (this.el.hasLoaded) {
+          setTimeout(() => this.captureStartPosition(), 500);
+        }
+      },
+      captureStartPosition: function () {
+        // Get position from parent group if it exists
+        const parentGroup = this.el.parentNode;
+        if (parentGroup && (parentGroup.id === 'car-group' || parentGroup.id === 'cart-group')) {
+          const pos = parentGroup.getAttribute('position');
+          this.startPosition.set(pos.x, pos.y, pos.z);
+        } else {
+          const pos = this.el.getAttribute('position');
+          this.startPosition.set(pos.x, pos.y, pos.z);
+        }
+        console.log(`Start position captured for ${this.el.id}:`, this.startPosition);
+      },
+      applyForce: function (force, targetDistance) {
+        this.appliedForce.copy(force);
+        this.acceleration.copy(force).divideScalar(this.data.mass);
+        this.isMoving = true;
+        this.distanceTraveled = 0;
+        this.targetDistance = targetDistance;
+        this.captureStartPosition();
+        this.lastForceAppliedTime = Date.now();
+        this.shouldKeepDisplayData = true; // Keep data displayed until manual reset
+
+        // Store the actual input force value for display
+        this.inputForce = force.length() / 50; // Reverse the multiplication done in PhysicsSimulation3D
+
+        // Reset max values when new force is applied
+        this.maxValues.acceleration = 0;
+        this.maxValues.velocity = 0;
+        this.maxValues.distance = 0;
+
+        console.log(`Applying force to ${this.el.id}:`, {
+          inputForce: this.inputForce,
+          actualForce: force,
+          mass: this.data.mass,
+          acceleration: this.acceleration,
+          targetDistance: targetDistance
+        });
+
+        if (this.el.id === 'ferrari-body') {
+          const npc = document.getElementById('npc-pusher');
+          if (npc) {
+            npc.setAttribute('visible', true);
           }
-
-          // Apply gravity/ground constraint
-          const groundEls = this.el.sceneEl.querySelectorAll('.ground, .environmentGround');
-          if (groundEls.length === 0) return;
-          const grounds = [];
-          groundEls.forEach((el) => grounds.push(el.object3D));
-
-          this.raycaster.set(this.el.object3D.position, this.downVector);
-          const intersects = this.raycaster.intersectObjects(grounds, true);
-          if (intersects.length > 0) {
-            const height = this.el.getAttribute('height') || this.el.getAttribute('geometry')?.height || 0.1;
-            this.el.object3D.position.y = intersects[0].point.y + height / 2;
+        } else if (this.el.id === 'cart-body') {
+          const npc = document.getElementById('npc-pusher-cart');
+          if (npc) {
+            npc.setAttribute('visible', true);
           }
-        },
-      });
+        }
 
-      // Physics Object Component
-      AFRAME.registerComponent('physics-object', {
-        schema: {
-          mass: { default: 1 }
-        },
-        init: function () {
-          this.velocity = new THREE.Vector3();
-          this.acceleration = new THREE.Vector3();
-          this.appliedForce = new THREE.Vector3();
+        // Show force and acceleration indicators immediately
+        this.updateIndicators();
+      },
+      tick: function (time, delta) {
+        if (!this.isMoving) return;
+
+        const deltaTime = delta / 1000; // Convert to seconds
+
+        // Apply acceleration to velocity
+        this.velocity.add(this.acceleration.clone().multiplyScalar(deltaTime));
+
+        // Apply friction
+        this.velocity.multiplyScalar(this.friction);
+
+        // Update position - move the parent group if it exists
+        const movement = this.velocity.clone().multiplyScalar(deltaTime);
+        const parentGroup = this.el.parentNode;
+
+        let currentPos;
+        if (parentGroup && (parentGroup.id === 'car-group' || parentGroup.id === 'cart-group')) {
+          currentPos = parentGroup.getAttribute('position');
+          const newPos = {
+            x: currentPos.x + movement.x,
+            y: currentPos.y + movement.y,
+            z: currentPos.z + movement.z
+          };
+          parentGroup.setAttribute('position', newPos);
+          console.log(`Moving ${parentGroup.id} from`, currentPos, 'to', newPos, 'movement:', movement);
+          this.distanceTraveled = Math.sqrt(
+            Math.pow(newPos.x - this.startPosition.x, 2) +
+            Math.pow(newPos.y - this.startPosition.y, 2) +
+            Math.pow(newPos.z - this.startPosition.z, 2)
+          );
+        } else {
+          currentPos = this.el.getAttribute('position');
+          const newPos = {
+            x: currentPos.x + movement.x,
+            y: currentPos.y + movement.y,
+            z: currentPos.z + movement.z
+          };
+          this.el.setAttribute('position', newPos);
+          console.log(`Moving ${this.el.id} from`, currentPos, 'to', newPos, 'movement:', movement);
+          this.distanceTraveled = Math.sqrt(
+            Math.pow(newPos.x - this.startPosition.x, 2) +
+            Math.pow(newPos.y - this.startPosition.y, 2) +
+            Math.pow(newPos.z - this.startPosition.z, 2)
+          );
+        }
+
+        // Stop if target distance reached or velocity is very small
+        if (this.distanceTraveled >= this.targetDistance || this.velocity.length() < 0.01) {
           this.isMoving = false;
-          this.distanceTraveled = 0;
-          this.startPosition = new THREE.Vector3();
-          this.targetDistance = 0;
-          this.friction = 0.995; // Reduced friction for better movement
-          this.maxValues = {
-            acceleration: 0,
-            velocity: 0,
-            distance: 0
-          }; // Store maximum values achieved
-          this.lastForceAppliedTime = 0;
-          this.shouldKeepDisplayData = false; // Flag to keep data displayed
-          this.inputForce = 0; // Store the input force value for display
-          
-          // Wait for the element to be loaded before capturing start position
-          this.el.addEventListener('loaded', () => {
-            setTimeout(() => this.captureStartPosition(), 500);
-          });
-          
-          // If already loaded, capture immediately
-          if (this.el.hasLoaded) {
-            setTimeout(() => this.captureStartPosition(), 500);
+          this.velocity.set(0, 0, 0);
+
+          // --- HIDE NPC WHEN CAR STOPS ---
+          if (this.el.id === 'ferrari-body') {
+            const npc = document.getElementById('npc-puncher');
+            if (npc) {
+              console.log('Car stopped. Hiding NPC.');
+              npc.setAttribute('visible', false);
+              const mixer = npc.components['animation-mixer'];
+              if (mixer && mixer.activeAction) {
+                mixer.stopAction();
+              }
+            }
           }
-        },
-        captureStartPosition: function() {
-          // Get position from parent group if it exists
-          const parentGroup = this.el.parentNode;
-          if (parentGroup && (parentGroup.id === 'car-group' || parentGroup.id === 'cart-group')) {
-            const pos = parentGroup.getAttribute('position');
-            this.startPosition.set(pos.x, pos.y, pos.z);
-          } else {
-            const pos = this.el.getAttribute('position');
-            this.startPosition.set(pos.x, pos.y, pos.z);
+          // --- END HIDE NPC ---
+
+          // --- RESET BICYCLE ANIMATION WHEN IT STOPS ---
+          if (this.el.id === 'cart-body') {
+            const cart = document.getElementById('cart');
+            if (cart) {
+              cart.setAttribute('animation-mixer', 'clip', 'Static Pose');
+            }
           }
-          console.log(`Start position captured for ${this.el.id}:`, this.startPosition);
-        },
-        applyForce: function (force, targetDistance) {
-          this.appliedForce.copy(force);
-          this.acceleration.copy(force).divideScalar(this.data.mass);
-          this.isMoving = true;
-          this.distanceTraveled = 0;
-          this.targetDistance = targetDistance;
-          this.captureStartPosition();
-          this.lastForceAppliedTime = Date.now();
-          this.shouldKeepDisplayData = true; // Keep data displayed until manual reset
-          
-          // Store the actual input force value for display
-          this.inputForce = force.length() / 50; // Reverse the multiplication done in PhysicsSimulation3D
-          
-          // Reset max values when new force is applied
-          this.maxValues.acceleration = 0;
-          this.maxValues.velocity = 0;
-          this.maxValues.distance = 0;
-          
-          console.log(`Applying force to ${this.el.id}:`, {
-            inputForce: this.inputForce,
-            actualForce: force,
-            mass: this.data.mass,
-            acceleration: this.acceleration,
-            targetDistance: targetDistance
-          });
+          // --- END RESET BICYCLE ANIMATION ---
+
+          // Keep acceleration and distance data for display until manual reset
+          console.log(`${this.el.id} stopped. Distance traveled: ${this.distanceTraveled}`);
+          console.log(`Final acceleration was: ${this.acceleration.length()}`);
 
           if (this.el.id === 'ferrari-body') {
             const npc = document.getElementById('npc-pusher');
             if (npc) {
-              npc.setAttribute('visible', true);
+              npc.setAttribute('visible', false);
             }
           } else if (this.el.id === 'cart-body') {
             const npc = document.getElementById('npc-pusher-cart');
             if (npc) {
-              npc.setAttribute('visible', true);
+              npc.setAttribute('visible', false);
             }
           }
-          
-          // Show force and acceleration indicators immediately
-          this.updateIndicators();
-        },
-        tick: function (time, delta) {
-          if (!this.isMoving) return;
+        }
 
-          const deltaTime = delta / 1000; // Convert to seconds
+        // Update maximum values achieved during movement
+        const currentAccel = this.acceleration.length();
+        const currentVel = this.velocity.length();
+        const currentDist = this.distanceTraveled;
 
-          // Apply acceleration to velocity
-          this.velocity.add(this.acceleration.clone().multiplyScalar(deltaTime));
-          
-          // Apply friction
-          this.velocity.multiplyScalar(this.friction);
+        if (currentAccel > this.maxValues.acceleration) {
+          this.maxValues.acceleration = currentAccel;
+        }
+        if (currentVel > this.maxValues.velocity) {
+          this.maxValues.velocity = currentVel;
+        }
+        if (currentDist > this.maxValues.distance) {
+          this.maxValues.distance = currentDist;
+        }
 
-          // Update position - move the parent group if it exists
-          const movement = this.velocity.clone().multiplyScalar(deltaTime);
-          const parentGroup = this.el.parentNode;
-          
-          let currentPos;
-          if (parentGroup && (parentGroup.id === 'car-group' || parentGroup.id === 'cart-group')) {
-            currentPos = parentGroup.getAttribute('position');
-            const newPos = {
-              x: currentPos.x + movement.x,
-              y: currentPos.y + movement.y,
-              z: currentPos.z + movement.z
-            };
-            parentGroup.setAttribute('position', newPos);
-            console.log(`Moving ${parentGroup.id} from`, currentPos, 'to', newPos, 'movement:', movement);
-            this.distanceTraveled = Math.sqrt(
-              Math.pow(newPos.x - this.startPosition.x, 2) +
-              Math.pow(newPos.y - this.startPosition.y, 2) +
-              Math.pow(newPos.z - this.startPosition.z, 2)
-            );
-          } else {
-            currentPos = this.el.getAttribute('position');
-            const newPos = {
-              x: currentPos.x + movement.x,
-              y: currentPos.y + movement.y,
-              z: currentPos.z + movement.z
-            };
-            this.el.setAttribute('position', newPos);
-            console.log(`Moving ${this.el.id} from`, currentPos, 'to', newPos, 'movement:', movement);
-            this.distanceTraveled = Math.sqrt(
-              Math.pow(newPos.x - this.startPosition.x, 2) +
-              Math.pow(newPos.y - this.startPosition.y, 2) +
-              Math.pow(newPos.z - this.startPosition.z, 2)
-            );
+        // Update UI and arrow
+        this.updateUI();
+        this.updateArrow();
+        this.updateIndicators();
+      },
+      updateIndicators: function () {
+        const objectType = this.el.id.includes('ferrari') ? 'car' : 'cart';
+
+        // Get force and acceleration indicators
+        const forceIndicator = document.getElementById(`${objectType}-force-indicator`);
+        const accelIndicator = document.getElementById(`${objectType}-acceleration-indicator`);
+
+        if (this.shouldKeepDisplayData && this.inputForce) {
+          // Show indicators with input values
+          if (forceIndicator) {
+            forceIndicator.setAttribute('value', `F: ${this.inputForce.toFixed(0)}N`);
+            forceIndicator.setAttribute('visible', true);
           }
 
-          // Stop if target distance reached or velocity is very small
-          if (this.distanceTraveled >= this.targetDistance || this.velocity.length() < 0.01) {
-            this.isMoving = false;
-            this.velocity.set(0, 0, 0);
-
-            // --- HIDE NPC WHEN CAR STOPS ---
-            if (this.el.id === 'ferrari-body') {
-              const npc = document.getElementById('npc-puncher');
-              if (npc) {
-                console.log('Car stopped. Hiding NPC.');
-                npc.setAttribute('visible', false);
-                const mixer = npc.components['animation-mixer'];
-                if (mixer && mixer.activeAction) {
-                  mixer.stopAction();
-                }
-              }
-            }
-            // --- END HIDE NPC ---
-
-            // --- RESET BICYCLE ANIMATION WHEN IT STOPS ---
-            if (this.el.id === 'cart-body') {
-              const cart = document.getElementById('cart');
-              if (cart) {
-                cart.setAttribute('animation-mixer', 'clip', 'Static Pose');
-              }
-            }
-            // --- END RESET BICYCLE ANIMATION ---
-
-            // Keep acceleration and distance data for display until manual reset
-            console.log(`${this.el.id} stopped. Distance traveled: ${this.distanceTraveled}`);
-            console.log(`Final acceleration was: ${this.acceleration.length()}`);
-
-            if (this.el.id === 'ferrari-body') {
-              const npc = document.getElementById('npc-pusher');
-              if (npc) {
-                npc.setAttribute('visible', false);
-              }
-            } else if (this.el.id === 'cart-body') {
-              const npc = document.getElementById('npc-pusher-cart');
-              if (npc) {
-                npc.setAttribute('visible', false);
-              }
-            }
+          if (accelIndicator) {
+            // Calculate theoretical acceleration: F = ma, so a = F/m
+            const theoreticalAccel = this.inputForce / this.data.mass;
+            accelIndicator.setAttribute('value', `a: ${theoreticalAccel.toFixed(2)} m/s²`);
+            accelIndicator.setAttribute('visible', true);
           }
+        } else {
+          // Hide indicators when no force applied or after reset
+          if (forceIndicator) forceIndicator.setAttribute('visible', false);
+          if (accelIndicator) accelIndicator.setAttribute('visible', false);
+        }
+      },
+      updateUI: function () {
+        const objectType = this.el.id.includes('ferrari') ? 'car' : 'cart';
 
-          // Update maximum values achieved during movement
-          const currentAccel = this.acceleration.length();
-          const currentVel = this.velocity.length();
-          const currentDist = this.distanceTraveled;
-          
-          if (currentAccel > this.maxValues.acceleration) {
-            this.maxValues.acceleration = currentAccel;
-          }
-          if (currentVel > this.maxValues.velocity) {
-            this.maxValues.velocity = currentVel;
-          }
-          if (currentDist > this.maxValues.distance) {
-            this.maxValues.distance = currentDist;
-          }
+        // Update 3D UI elements instead of HTML elements
+        requestAnimationFrame(() => {
+          const accelEl = document.getElementById(`${objectType}-acceleration-3d`);
+          const velocityEl = document.getElementById(`${objectType}-velocity-3d`);
+          const distanceEl = document.getElementById(`${objectType}-distance-3d`);
 
-          // Update UI and arrow
-          this.updateUI();
-          this.updateArrow();
-          this.updateIndicators();
-        },
-        updateIndicators: function () {
-          const objectType = this.el.id.includes('ferrari') ? 'car' : 'cart';
-          
-          // Get force and acceleration indicators
-          const forceIndicator = document.getElementById(`${objectType}-force-indicator`);
-          const accelIndicator = document.getElementById(`${objectType}-acceleration-indicator`);
-          
-          if (this.shouldKeepDisplayData && this.inputForce) {
-            // Show indicators with input values
-            if (forceIndicator) {
-              forceIndicator.setAttribute('value', `F: ${this.inputForce.toFixed(0)}N`);
-              forceIndicator.setAttribute('visible', true);
-            }
-            
-            if (accelIndicator) {
-              // Calculate theoretical acceleration: F = ma, so a = F/m
+          // If we should keep display data (not manually reset), show values based on input
+          if (this.shouldKeepDisplayData) {
+            if (accelEl && this.inputForce) {
+              // Show theoretical acceleration based on input force: a = F/m
               const theoreticalAccel = this.inputForce / this.data.mass;
-              accelIndicator.setAttribute('value', `a: ${theoreticalAccel.toFixed(2)} m/s²`);
-              accelIndicator.setAttribute('visible', true);
+              accelEl.setAttribute('value', `${theoreticalAccel.toFixed(2)} m/s²`);
             }
+            if (velocityEl) velocityEl.setAttribute('value', `${this.maxValues.velocity.toFixed(2)} m/s`);
+            if (distanceEl) distanceEl.setAttribute('value', `${this.maxValues.distance.toFixed(2)} m`);
           } else {
-            // Hide indicators when no force applied or after reset
-            if (forceIndicator) forceIndicator.setAttribute('visible', false);
-            if (accelIndicator) accelIndicator.setAttribute('visible', false);
+            // Show zero values when reset
+            if (accelEl) accelEl.setAttribute('value', `0.00 m/s²`);
+            if (velocityEl) velocityEl.setAttribute('value', `0.00 m/s`);
+            if (distanceEl) distanceEl.setAttribute('value', `0.00 m`);
           }
-        },
-        updateUI: function () {
-          const objectType = this.el.id.includes('ferrari') ? 'car' : 'cart';
-          
-          // Update 3D UI elements instead of HTML elements
-          requestAnimationFrame(() => {
-            const accelEl = document.getElementById(`${objectType}-acceleration-3d`);
-            const velocityEl = document.getElementById(`${objectType}-velocity-3d`);
-            const distanceEl = document.getElementById(`${objectType}-distance-3d`);
-            
-            // If we should keep display data (not manually reset), show values based on input
-            if (this.shouldKeepDisplayData) {
-              if (accelEl && this.inputForce) {
-                // Show theoretical acceleration based on input force: a = F/m
-                const theoreticalAccel = this.inputForce / this.data.mass;
-                accelEl.setAttribute('value', `${theoreticalAccel.toFixed(2)} m/s²`);
-              }
-              if (velocityEl) velocityEl.setAttribute('value', `${this.maxValues.velocity.toFixed(2)} m/s`);
-              if (distanceEl) distanceEl.setAttribute('value', `${this.maxValues.distance.toFixed(2)} m`);
-            } else {
-              // Show zero values when reset
-              if (accelEl) accelEl.setAttribute('value', `0.00 m/s²`);
-              if (velocityEl) velocityEl.setAttribute('value', `0.00 m/s`);
-              if (distanceEl) distanceEl.setAttribute('value', `0.00 m`);
-            }
-            
-            console.log(`3D UI Updated for ${objectType} (${this.el.id}):`, {
-              mass: this.data.mass,
-              inputForce: this.inputForce || 0,
-              theoreticalAcceleration: this.inputForce ? (this.inputForce / this.data.mass).toFixed(2) : '0.00',
-              maxVelocity: this.shouldKeepDisplayData ? this.maxValues.velocity.toFixed(2) : '0.00',
-              maxDistance: this.shouldKeepDisplayData ? this.maxValues.distance.toFixed(2) : '0.00',
-              keepingData: this.shouldKeepDisplayData
-            });
+
+          console.log(`3D UI Updated for ${objectType} (${this.el.id}):`, {
+            mass: this.data.mass,
+            inputForce: this.inputForce || 0,
+            theoreticalAcceleration: this.inputForce ? (this.inputForce / this.data.mass).toFixed(2) : '0.00',
+            maxVelocity: this.shouldKeepDisplayData ? this.maxValues.velocity.toFixed(2) : '0.00',
+            maxDistance: this.shouldKeepDisplayData ? this.maxValues.distance.toFixed(2) : '0.00',
+            keepingData: this.shouldKeepDisplayData
           });
-        },
-        updateArrow: function () {
-          const objectType = this.el.id.includes('ferrari') ? 'car' : 'cart';
-          const arrow = document.getElementById(`${objectType}-arrow`);
-          
-          console.log(`updateArrow called for ${this.el.id}, objectType: ${objectType}, arrow found: ${!!arrow}`);
-          console.log(`Current acceleration magnitude: ${this.acceleration.length()}`);
-          console.log(`Current velocity magnitude: ${this.velocity.length()}`);
-          console.log(`Is moving: ${this.isMoving}`);
-          
-          if (!arrow) {
-            console.error(`Arrow not found for ${objectType}`);
-            return;
-          }
-          
-          // Show arrow if there's any acceleration data (even when stopped)
-          if (this.shouldKeepDisplayData && this.inputForce > 0) {
-            arrow.setAttribute('visible', true);
-            
-            // Scale arrow based on input force (more meaningful scaling)
-            const forceMagnitude = this.inputForce;
-            const minScale = 0.3;
-            const maxScale = 2.0;
-            const scaleFactor = 0.01; // Scale factor for force
-            
-            // Scale based on input force
-            let scale = minScale + (forceMagnitude * scaleFactor);
-            scale = Math.max(minScale, Math.min(maxScale, scale));
-            
-            console.log(`${objectType} - Input Force: ${forceMagnitude}N, Arrow Scale: ${scale.toFixed(2)}`);
-            
-            arrow.setAttribute('scale', `${scale} ${scale} ${scale}`);
-            
-            // Point arrow in direction of movement (use last known direction if stopped)
-            if (this.isMoving && this.velocity.length() > 0.01) {
-              const direction = this.velocity.clone().normalize();
-              let angle = Math.atan2(direction.x, direction.z) * 180 / Math.PI;
-              angle = angle + 90; // Rotate arrow 90 degrees to the right
-              arrow.setAttribute('rotation', `0 ${angle} 0`);
-            }
-            
-            console.log(`Arrow visible for ${objectType}, scale: ${scale.toFixed(2)}, input force: ${forceMagnitude}N`);
-          } else {
-            arrow.setAttribute('visible', false);
-          }
-        }
-      });
+        });
+      },
+      updateArrow: function () {
+        const objectType = this.el.id.includes('ferrari') ? 'car' : 'cart';
+        const arrow = document.getElementById(`${objectType}-arrow`);
 
-      // 3D Physics Simulation Manager
-      class PhysicsSimulation3D {
-        constructor() {
-          this.forceValue = 100;
-          this.distanceValue = 5;
-          this.updateDisplays();
-        }
+        console.log(`updateArrow called for ${this.el.id}, objectType: ${objectType}, arrow found: ${!!arrow}`);
+        console.log(`Current acceleration magnitude: ${this.acceleration.length()}`);
+        console.log(`Current velocity magnitude: ${this.velocity.length()}`);
+        console.log(`Is moving: ${this.isMoving}`);
 
-        adjustForce(direction) {
-          this.forceValue += direction * 10; // Changed from 25 to 10 for more precise control
-          this.forceValue = Math.max(0, Math.min(1000, this.forceValue)); // Increased max to 1000
-          this.updateDisplays();
-          console.log('Force adjusted to:', this.forceValue);
-        }
-
-        adjustDistance(direction) {
-          this.distanceValue += direction * 1;
-          this.distanceValue = Math.max(1, Math.min(20, this.distanceValue));
-          this.updateDisplays();
-          console.log('Distance adjusted to:', this.distanceValue);
-        }
-
-        updateDisplays() {
-          const forceDisplay = document.getElementById('force-display');
-          const distanceDisplay = document.getElementById('distance-display');
-          
-          if (forceDisplay) {
-            forceDisplay.setAttribute('value', this.forceValue.toString());
-          }
-          if (distanceDisplay) {
-            distanceDisplay.setAttribute('value', this.distanceValue.toString());
-          }
-        }
-
-        applyForce() {
-          console.log(`Applying 3D force: ${this.forceValue}N, Distance: ${this.distanceValue}m`);
-
-          // --- NPC ANIMATION ---
-          const npc = document.getElementById('npc-puncher');
-          if (npc) {
-            console.log('NPC appearing and starting to walk.');
-            npc.setAttribute('visible', true);
-            npc.setAttribute('animation-mixer', {
-              clip: 'Walk',
-              loop: 'infinite' // Loop until car stops
-            });
-          }
-          // --- END NPC ANIMATION ---
-
-          // Apply force to car (backward direction)
-          const carBody = document.getElementById('ferrari-body');
-          if (carBody && carBody.components && carBody.components['physics-object']) {
-            const carForce = new THREE.Vector3(0, 0, this.forceValue * 50);
-            carBody.components['physics-object'].applyForce(carForce, this.distanceValue);
-            console.log('3D Force applied to car');
-          } else {
-            console.error('Car physics object not found');
-          }
-
-          // Apply force to cart (backward direction)
-          const cartBody = document.getElementById('cart-body');
-          if (cartBody && cartBody.components && cartBody.components['physics-object']) {
-            const cartForce = new THREE.Vector3(0, 0, this.forceValue * 50);
-            cartBody.components['physics-object'].applyForce(cartForce, this.distanceValue);
-            console.log('3D Force applied to cart');
-
-            // --- CHANGE CART ANIMATION ---
-            const cart = document.getElementById('cart');
-            if (cart) {
-              cart.setAttribute('animation-mixer', 'clip', 'M_rig_Action_S');
-            }
-            // --- END CHANGE CART ANIMATION ---
-
-          } else {
-            console.error('Cart physics object not found');
-          }
-        }
-
-        reset() {
-          console.log('Resetting 3D simulation...');
-
-          const npcC = document.getElementById('npc-pusher');
-          if (npcC) {
-            npcC.setAttribute('visible', false);
-          }
-          const npcCart = document.getElementById('npc-pusher-cart');
-          if (npcCart) {
-            npcCart.setAttribute('visible', false);
-          }
-          
-          // Reset car position
-          const carGroup = document.getElementById('car-group');
-          if (carGroup) {
-            carGroup.setAttribute('position', '0 0 2');
-          }
-          
-          // Reset cart position
-          const cartGroup = document.getElementById('cart-group');
-          if (cartGroup) {
-            cartGroup.setAttribute('position', '3 0 3');
-          }
-
-          // Reset physics components
-          setTimeout(() => {
-            const carBody = document.getElementById('ferrari-body');
-            if (carBody && carBody.components && carBody.components['physics-object']) {
-              const physics = carBody.components['physics-object'];
-              physics.velocity.set(0, 0, 0);
-              physics.acceleration.set(0, 0, 0);
-              physics.isMoving = false;
-              physics.distanceTraveled = 0;
-              physics.shouldKeepDisplayData = false; // Allow data to be reset
-              physics.maxValues = { acceleration: 0, velocity: 0, distance: 0 }; // Reset max values
-              physics.inputForce = 0; // Reset input force
-              physics.captureStartPosition();
-              physics.updateIndicators(); // Hide indicators
-            }
-
-            const cartBody = document.getElementById('cart-body');
-            if (cartBody && cartBody.components && cartBody.components['physics-object']) {
-              const physics = cartBody.components['physics-object'];
-              physics.velocity.set(0, 0, 0);
-              physics.acceleration.set(0, 0, 0);
-              physics.isMoving = false;
-              physics.distanceTraveled = 0;
-              physics.shouldKeepDisplayData = false; // Allow data to be reset
-              physics.maxValues = { acceleration: 0, velocity: 0, distance: 0 }; // Reset max values
-              physics.inputForce = 0; // Reset input force
-              physics.captureStartPosition();
-              physics.updateIndicators(); // Hide indicators
-            }
-
-            // Hide arrows
-            const carArrow = document.getElementById('car-arrow');
-            const cartArrow = document.getElementById('cart-arrow');
-            if (carArrow) carArrow.setAttribute('visible', false);
-            if (cartArrow) cartArrow.setAttribute('visible', false);
-
-            // Reset 3D UI displays
-            this.resetUI();
-          }, 100);
-        }
-
-        resetUI() {
-          requestAnimationFrame(() => {
-            const elements = [
-              { id: 'car-acceleration-3d', value: '0 m/s²' },
-              { id: 'car-velocity-3d', value: '0 m/s' },
-              { id: 'car-distance-3d', value: '0 m' },
-              { id: 'cart-acceleration-3d', value: '0 m/s²' },
-              { id: 'cart-velocity-3d', value: '0 m/s' },
-              { id: 'cart-distance-3d', value: '0 m' }
-            ];
-            
-            elements.forEach(item => {
-              const element = document.getElementById(item.id);
-              if (element) {
-                element.setAttribute('value', item.value);
-                console.log(`Reset 3D UI ${item.id} to ${item.value}`);
-              }
-            });
-          });
-        }
-      }
-
-      // Global variable for the 3D physics simulation
-      let physicsSimulation3D;
-
-      // Physics Simulation Manager (Legacy - keeping for compatibility)
-      class PhysicsSimulation {
-        constructor() {
-          // This is now just a placeholder - all functionality moved to PhysicsSimulation3D
-        }
-
-        setupEventListeners() {
-          // No longer needed as we use 3D interface
-        }
-
-        applyForce() {
-          // Redirect to 3D version
-          if (physicsSimulation3D) {
-            physicsSimulation3D.applyForce();
-          }
-        }
-
-        reset() {
-          // Redirect to 3D version
-          if (physicsSimulation3D) {
-            physicsSimulation3D.reset();
-          }
-        }
-      }
-
-      // Panggil setupMobileControls saat DOM selesai dimuat
-      document.addEventListener('DOMContentLoaded', function() {
-        setupMobileControls();
-        
-        // Inisialisasi karakter yang dipilih
-        const selectedCharacter = localStorage.getItem('selectedCharacter');
-        if (selectedCharacter) {
-          const rig = document.getElementById('rig');
-          if (rig) {
-            const modelUrl = selectedCharacter === 'male' 
-              ? 'https://cdn.glitch.global/c2231c1a-2935-4332-8715-032588334f99/Asian_M_1_Busi.glb?v=16813662' 
-              : 'https://cdn.jsdelivr.net/gh/c-frame/valid-avatars-glb@c539a28/avatars/Asian/Asian_F_1_Busi.glb';
-            
-            rig.setAttribute('player-info', 'avatarSrc', modelUrl);
-          }
-        }
-      });
-      
-      // Initialize mobile controls
-      function setupMobileControls() {
-        const joystick = document.getElementById('joystick');
-        const joystickKnob = document.getElementById('joystick-knob');
-        const camera = document.querySelector('[camera]');
-        
-        if (!camera) {
-          console.error('Camera element not found');
+        if (!arrow) {
+          console.error(`Arrow not found for ${objectType}`);
           return;
         }
-        
-        let isJoystickActive = false;
-        let joystickStartX = 0;
-        let joystickStartY = 0;
-        let joystickX = 0;
-        let joystickY = 0;
-        const joystickRadius = 25;
-        const movementSpeed = 0.1;
-        
-        // Common function to handle both touch and mouse events
-        function handleJoystickStart(clientX, clientY) {
-          isJoystickActive = true;
-          const rect = joystick.getBoundingClientRect();
-          joystickStartX = rect.left + rect.width / 2;
-          joystickStartY = rect.top + rect.height / 2;
-          updateJoystick({ clientX, clientY });
-        }
-        
-        function handleJoystickMove(clientX, clientY) {
-          if (!isJoystickActive) return;
-          updateJoystick({ clientX, clientY });
-          updateCameraMovement();
-        }
-        
-        function handleJoystickEnd() {
-          isJoystickActive = false;
-          joystickX = 0;
-          joystickY = 0;
-          joystickKnob.style.transform = 'translate(25px, 25px)';
-        }
-        
-        // Update joystick position
-        function updateJoystick(touch) {
-          const x = touch.clientX - joystickStartX;
-          const y = touch.clientY - joystickStartY;
-          const distance = Math.sqrt(x * x + y * y);
-          const angle = Math.atan2(y, x);
-          
-          if (distance < joystickRadius) {
-            joystickX = x / joystickRadius;
-            joystickY = y / joystickRadius;
-            joystickKnob.style.transform = `translate(${x + 25}px, ${y + 25}px)`;
-          } else {
-            joystickX = Math.cos(angle);
-            joystickY = Math.sin(angle);
-            joystickKnob.style.transform = `translate(${Math.cos(angle) * joystickRadius + 25}px, ${Math.sin(angle) * joystickRadius + 25}px)`;
+
+        // Show arrow if there's any acceleration data (even when stopped)
+        if (this.shouldKeepDisplayData && this.inputForce > 0) {
+          arrow.setAttribute('visible', true);
+
+          // Scale arrow based on input force (more meaningful scaling)
+          const forceMagnitude = this.inputForce;
+          const minScale = 0.3;
+          const maxScale = 2.0;
+          const scaleFactor = 0.01; // Scale factor for force
+
+          // Scale based on input force
+          let scale = minScale + (forceMagnitude * scaleFactor);
+          scale = Math.max(minScale, Math.min(maxScale, scale));
+
+          console.log(`${objectType} - Input Force: ${forceMagnitude}N, Arrow Scale: ${scale.toFixed(2)}`);
+
+          arrow.setAttribute('scale', `${scale} ${scale} ${scale}`);
+
+          // Point arrow in direction of movement (use last known direction if stopped)
+          if (this.isMoving && this.velocity.length() > 0.01) {
+            const direction = this.velocity.clone().normalize();
+            let angle = Math.atan2(direction.x, direction.z) * 180 / Math.PI;
+            angle = angle + 90; // Rotate arrow 90 degrees to the right
+            arrow.setAttribute('rotation', `0 ${angle} 0`);
           }
+
+          console.log(`Arrow visible for ${objectType}, scale: ${scale.toFixed(2)}, input force: ${forceMagnitude}N`);
+        } else {
+          arrow.setAttribute('visible', false);
         }
-        
-        // Update camera movement based on joystick input
-        function updateCameraMovement() {
-          if (!camera) return;
-          
-          const cameraEl = camera.object3D;
-          const direction = new THREE.Vector3();
-          cameraEl.getWorldDirection(direction);
-          
-          // Project direction onto XZ plane (ignore Y-axis for movement)
-          const forward = new THREE.Vector3(direction.x, 0, direction.z).normalize();
-          
-          // Calculate movement vector based on joystick input
-          const moveX = joystickX * movementSpeed;
-          const moveZ = -joystickY * movementSpeed; // Invert Y-axis for natural movement
-          
-          // Apply movement
-          if (moveX !== 0 || moveZ !== 0) {
-            // Strafe movement (left/right) - use camera right vector
-            const right = new THREE.Vector3();
-            right.crossVectors(new THREE.Vector3(0, 1, 0), forward).normalize();
-            
-            // Calculate final movement direction
-            const movement = new THREE.Vector3();
-            // Forward/backward movement based on camera forward
-            movement.addScaledVector(forward, moveZ);
-            // Left/right strafing
-            movement.addScaledVector(right, moveX);
-            
-            // Apply movement to camera position
-            const currentPosition = camera.getAttribute('position');
-            camera.setAttribute('position', {
-              x: currentPosition.x + movement.x,
-              y: currentPosition.y,  // Keep Y position the same (no flying)
-              z: currentPosition.z + movement.z
-            });
-          }
-        }
-        
-        // Show joystick based on device selection in localStorage
-        function checkDeviceType() {
-          const deviceType = localStorage.getItem('deviceType');
-          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-          
-          console.log('Device type from localStorage:', deviceType);
-          console.log('Is mobile device:', isMobile);
-          
-          // Tampilkan joystick jika:
-          // 1. Pengguna memilih 'mobile' di localStorage, ATAU
-          // 2. Perangkat terdeteksi sebagai mobile (tanpa memandang pilihan di localStorage)
-          if (deviceType === 'mobile' || isMobile) {
-            console.log('Menampilkan joystick untuk perangkat mobile');
-            joystick.style.display = 'block';
-            joystick.style.visibility = 'visible';
-            document.getElementById('mobile-controls').style.display = 'block';
-          } else {
-            console.log('Menyembunyikan joystick untuk perangkat desktop');
-            joystick.style.display = 'none';
-            document.getElementById('mobile-controls').style.display = 'none';
-          }
-        }
-        
-        // Initialize mobile controls
-        checkDeviceType();
-        
-        // Touch events for mobile
-        joystick.addEventListener('touchstart', (e) => {
-          e.preventDefault();
-          handleJoystickStart(e.touches[0].clientX, e.touches[0].clientY);
-        }, { passive: false });
-        
-        document.addEventListener('touchmove', (e) => {
-          if (!isJoystickActive) return;
-          e.preventDefault();
-          handleJoystickMove(e.touches[0].clientX, e.touches[0].clientY);
-        }, { passive: false });
-        
-        document.addEventListener('touchend', handleJoystickEnd);
-        
-        // Mouse events for laptop/desktop
-        joystick.addEventListener('mousedown', (e) => {
-          e.preventDefault();
-          handleJoystickStart(e.clientX, e.clientY);
-          
-          document.addEventListener('mousemove', handleMouseMove);
-          document.addEventListener('mouseup', handleMouseUp);
-        });
-        
-        function handleMouseMove(e) {
-          handleJoystickMove(e.clientX, e.clientY);
-        }
-        
-        function handleMouseUp() {
-          handleJoystickEnd();
-          document.removeEventListener('mousemove', handleMouseMove);
-          document.removeEventListener('mouseup', handleMouseUp);
-        }
-        
-        // Start animation loop
-        function animate() {
-          if (isJoystickActive) {
-            updateCameraMovement();
-          }
-          requestAnimationFrame(animate);
-        }
-        
-        animate();
       }
-    </script>
-  </body>
+    });
+
+    // 3D Physics Simulation Manager
+    class PhysicsSimulation3D {
+      constructor() {
+        this.forceValue = 100;
+        this.distanceValue = 5;
+        // Delay initial display update to ensure DOM is ready
+        setTimeout(() => {
+          this.updateDisplays();
+        }, 1000);
+      }
+
+      adjustForce(direction) {
+        this.forceValue += direction * 10; // Changed from 25 to 10 for more precise control
+        this.forceValue = Math.max(0, Math.min(1000, this.forceValue)); // Increased max to 1000
+        this.updateDisplays();
+        console.log('Force adjusted to:', this.forceValue);
+      }
+
+      adjustDistance(direction) {
+        this.distanceValue += direction * 1;
+        this.distanceValue = Math.max(1, Math.min(20, this.distanceValue));
+        this.updateDisplays();
+        console.log('Distance adjusted to:', this.distanceValue);
+      }
+
+      updateDisplays() {
+        console.log('updateDisplays called, force:', this.forceValue, 'distance:', this.distanceValue);
+        const forceDisplay = document.getElementById('force-display');
+        const distanceDisplay = document.getElementById('distance-display');
+
+        console.log('forceDisplay element found:', !!forceDisplay);
+        console.log('distanceDisplay element found:', !!distanceDisplay);
+
+        if (forceDisplay) {
+          forceDisplay.setAttribute('value', this.forceValue.toString());
+          console.log('Force display updated to:', this.forceValue);
+        }
+        if (distanceDisplay) {
+          distanceDisplay.setAttribute('value', this.distanceValue.toString());
+          console.log('Distance display updated to:', this.distanceValue);
+        }
+      }
+
+      applyForce() {
+        console.log(`Applying 3D force: ${this.forceValue}N, Distance: ${this.distanceValue}m`);
+
+        // --- NPC ANIMATION ---
+        const npc = document.getElementById('npc-puncher');
+        if (npc) {
+          console.log('NPC appearing and starting to walk.');
+          npc.setAttribute('visible', true);
+          npc.setAttribute('animation-mixer', {
+            clip: 'Walk',
+            loop: 'infinite' // Loop until car stops
+          });
+        }
+        // --- END NPC ANIMATION ---
+
+        // Apply force to car (backward direction)
+        const carBody = document.getElementById('ferrari-body');
+        if (carBody && carBody.components && carBody.components['physics-object']) {
+          const carForce = new THREE.Vector3(0, 0, this.forceValue * 50);
+          carBody.components['physics-object'].applyForce(carForce, this.distanceValue);
+          console.log('3D Force applied to car');
+        } else {
+          console.error('Car physics object not found');
+        }
+
+        // Apply force to cart (backward direction)
+        const cartBody = document.getElementById('cart-body');
+        if (cartBody && cartBody.components && cartBody.components['physics-object']) {
+          const cartForce = new THREE.Vector3(0, 0, this.forceValue * 50);
+          cartBody.components['physics-object'].applyForce(cartForce, this.distanceValue);
+          console.log('3D Force applied to cart');
+
+          // --- CHANGE CART ANIMATION ---
+          const cart = document.getElementById('cart');
+          if (cart) {
+            cart.setAttribute('animation-mixer', 'clip', 'M_rig_Action_S');
+          }
+          // --- END CHANGE CART ANIMATION ---
+
+        } else {
+          console.error('Cart physics object not found');
+        }
+      }
+
+      reset() {
+        console.log('Resetting 3D simulation...');
+
+        const npcC = document.getElementById('npc-pusher');
+        if (npcC) {
+          npcC.setAttribute('visible', false);
+        }
+        const npcCart = document.getElementById('npc-pusher-cart');
+        if (npcCart) {
+          npcCart.setAttribute('visible', false);
+        }
+
+        // Reset car position
+        const carGroup = document.getElementById('car-group');
+        if (carGroup) {
+          carGroup.setAttribute('position', '0 0 2');
+        }
+
+        // Reset cart position
+        const cartGroup = document.getElementById('cart-group');
+        if (cartGroup) {
+          cartGroup.setAttribute('position', '3 0 3');
+        }
+
+        // Reset physics components
+        setTimeout(() => {
+          const carBody = document.getElementById('ferrari-body');
+          if (carBody && carBody.components && carBody.components['physics-object']) {
+            const physics = carBody.components['physics-object'];
+            physics.velocity.set(0, 0, 0);
+            physics.acceleration.set(0, 0, 0);
+            physics.isMoving = false;
+            physics.distanceTraveled = 0;
+            physics.shouldKeepDisplayData = false; // Allow data to be reset
+            physics.maxValues = { acceleration: 0, velocity: 0, distance: 0 }; // Reset max values
+            physics.inputForce = 0; // Reset input force
+            physics.captureStartPosition();
+            physics.updateIndicators(); // Hide indicators
+          }
+
+          const cartBody = document.getElementById('cart-body');
+          if (cartBody && cartBody.components && cartBody.components['physics-object']) {
+            const physics = cartBody.components['physics-object'];
+            physics.velocity.set(0, 0, 0);
+            physics.acceleration.set(0, 0, 0);
+            physics.isMoving = false;
+            physics.distanceTraveled = 0;
+            physics.shouldKeepDisplayData = false; // Allow data to be reset
+            physics.maxValues = { acceleration: 0, velocity: 0, distance: 0 }; // Reset max values
+            physics.inputForce = 0; // Reset input force
+            physics.captureStartPosition();
+            physics.updateIndicators(); // Hide indicators
+          }
+
+          // Hide arrows
+          const carArrow = document.getElementById('car-arrow');
+          const cartArrow = document.getElementById('cart-arrow');
+          if (carArrow) carArrow.setAttribute('visible', false);
+          if (cartArrow) cartArrow.setAttribute('visible', false);
+
+          // Reset 3D UI displays
+          this.resetUI();
+        }, 100);
+      }
+
+      resetUI() {
+        requestAnimationFrame(() => {
+          const elements = [
+            { id: 'car-acceleration-3d', value: '0 m/s²' },
+            { id: 'car-velocity-3d', value: '0 m/s' },
+            { id: 'car-distance-3d', value: '0 m' },
+            { id: 'cart-acceleration-3d', value: '0 m/s²' },
+            { id: 'cart-velocity-3d', value: '0 m/s' },
+            { id: 'cart-distance-3d', value: '0 m' }
+          ];
+
+          elements.forEach(item => {
+            const element = document.getElementById(item.id);
+            if (element) {
+              element.setAttribute('value', item.value);
+              console.log(`Reset 3D UI ${item.id} to ${item.value}`);
+            }
+          });
+        });
+      }
+    }
+
+    // Global variable for the 3D physics simulation
+    let physicsSimulation3D;
+
+    // Physics Simulation Manager (Legacy - keeping for compatibility)
+    class PhysicsSimulation {
+      constructor() {
+        // This is now just a placeholder - all functionality moved to PhysicsSimulation3D
+      }
+
+      setupEventListeners() {
+        // No longer needed as we use 3D interface
+      }
+
+      applyForce() {
+        // Redirect to 3D version
+        if (physicsSimulation3D) {
+          physicsSimulation3D.applyForce();
+        }
+      }
+
+      reset() {
+        // Redirect to 3D version
+        if (physicsSimulation3D) {
+          physicsSimulation3D.reset();
+        }
+      }
+    }
+
+    // Initialize PhysicsSimulation3D immediately when script loads
+    physicsSimulation3D = new PhysicsSimulation3D();
+    console.log('PhysicsSimulation3D initialized immediately');
+
+    // Debug: Log all elements with cursor-listener after scene loads
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(() => {
+        const listenedElements = document.querySelectorAll('[cursor-listener]');
+        console.log('Elements with cursor-listener:', listenedElements.length);
+        listenedElements.forEach(el => {
+          console.log('- Element:', el.id, 'has cursor-listener');
+        });
+
+        const clickableElements = document.querySelectorAll('.clickable');
+        console.log('Clickable elements:', clickableElements.length);
+        clickableElements.forEach(el => {
+          console.log('- Clickable element:', el.id);
+        });
+
+        // Test physicsSimulation3D
+        console.log('Testing physicsSimulation3D:', physicsSimulation3D);
+        if (physicsSimulation3D) {
+          console.log('physicsSimulation3D methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(physicsSimulation3D)));
+        }
+
+        // Add additional click event to test
+        const forceMinusButton = document.getElementById('force-minus');
+        if (forceMinusButton) {
+          console.log('Found force-minus button, adding test click listener');
+          forceMinusButton.addEventListener('click', function(evt) {
+            console.log('DIRECT click on force-minus detected!');
+            evt.stopPropagation();
+          });
+        } else {
+          console.error('force-minus button not found!');
+        }
+
+        // Debug cursor events
+        const cursor = document.getElementById('main-cursor');
+        if (cursor) {
+          console.log('Found cursor, adding debug events');
+          cursor.addEventListener('raycaster-intersection', function(evt) {
+            console.log('Cursor intersecting with:', evt.detail.els.map(el => el.id));
+          });
+          cursor.addEventListener('raycaster-intersection-cleared', function(evt) {
+            console.log('Cursor intersection cleared');
+          });
+          cursor.addEventListener('click', function(evt) {
+            console.log('Cursor click event triggered');
+          });
+        }
+      }, 2000); // Wait 2 seconds for A-Frame to fully initialize
+    });
+
+    // Panggil setupMobileControls saat DOM selesai dimuat
+    document.addEventListener('DOMContentLoaded', function () {
+      setupMobileControls();
+
+      // Inisialisasi karakter yang dipilih
+      const selectedCharacter = localStorage.getItem('selectedCharacter');
+      if (selectedCharacter) {
+        const rig = document.getElementById('rig');
+        if (rig) {
+          const modelUrl = selectedCharacter === 'male'
+            ? 'https://cdn.glitch.global/c2231c1a-2935-4332-8715-032588334f99/Asian_M_1_Busi.glb?v=16813662'
+            : 'https://cdn.jsdelivr.net/gh/c-frame/valid-avatars-glb@c539a28/avatars/Asian/Asian_F_1_Busi.glb';
+
+          rig.setAttribute('player-info', 'avatarSrc', modelUrl);
+        }
+      }
+    });
+
+    // Initialize mobile controls
+    function setupMobileControls() {
+      const camera = document.querySelector('[camera]');
+      const rig = document.getElementById('rig');
+
+      if (!camera) {
+        console.error('Camera element not found');
+        return;
+      }
+
+      const movementSpeed = 0.1;
+      let isMobile = false;
+      let joystick = null;
+
+      // Initialize joystick
+      function initJoystick() {
+        // Remove any existing joystick
+        if (joystick) {
+          const joystickElement = document.getElementById('joystick');
+          if (joystickElement) {
+            joystickElement.innerHTML = '';
+          }
+        }
+
+        joystick = new JoyStick('joystick', {
+          title: 'joystick',
+          width: 150,
+          height: 150,
+          internalFillColor: 'rgba(255, 255, 255, 0.5)',
+          internalLineWidth: 2,
+          internalStrokeColor: '#FFFFFF',
+          externalLineWidth: 2,
+          externalStrokeColor: 'rgba(255, 255, 255, 0.3)',
+          autoReturnToCenter: true
+        }, function (stickData) {
+          if (stickData.x !== 0 || stickData.y !== 0) {
+            // Invert Y-axis for natural movement (up = forward, down = backward)
+            updateCameraMovement(stickData.x, -stickData.y);
+          }
+        });
+      }
+
+      // Update camera movement based on joystick input
+      function updateCameraMovement(x, y) {
+        if (!camera) return;
+
+        const cameraEl = camera.object3D;
+        const direction = new THREE.Vector3();
+        cameraEl.getWorldDirection(direction);
+
+        // Project direction onto XZ plane (ignore Y-axis for movement)
+        const forward = new THREE.Vector3(direction.x, 0, direction.z).normalize();
+
+        // Calculate movement vector based on joystick input
+        const moveX = y * movementSpeed; // Positive X = right, Negative X = left
+        const moveZ = x * movementSpeed; // Invert Y so positive Y = forward, negative Y = backward
+
+        // Strafe movement (left/right) - use camera right vector
+        const right = new THREE.Vector3();
+        right.crossVectors(new THREE.Vector3(0, 1, 0), forward).normalize();
+
+        // Calculate final movement direction
+        const movement = new THREE.Vector3();
+        // Forward/backward movement based on camera forward (positive Z is forward)
+        movement.addScaledVector(forward, moveZ);
+        // Left/right strafing (positive X is right)
+        movement.addScaledVector(right, moveX);
+
+        // Apply movement to camera position
+        const currentPosition = camera.getAttribute('position');
+        camera.setAttribute('position', {
+          x: currentPosition.x + movement.x,
+          y: currentPosition.y,  // Keep Y position the same (no flying)
+          z: currentPosition.z + movement.z
+        });
+      }
+
+      // Show joystick for mobile devices
+      function checkDeviceType() {
+        const deviceType = localStorage.getItem('deviceType');
+        isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        console.log('Device type from localStorage:', deviceType);
+        console.log('Is mobile device:', isMobile);
+
+        // Show joystick if:
+        // 1. User selected 'mobile' in localStorage, OR
+        // 2. Device is detected as mobile (regardless of localStorage)
+        if (deviceType === 'mobile' || isMobile) {
+          console.log('Showing joystick for mobile device');
+          document.getElementById('mobile-controls').style.display = 'block';
+          initJoystick();
+        } else {
+          console.log('Hiding joystick for desktop');
+          document.getElementById('mobile-controls').style.display = 'none';
+        }
+      }
+
+      // Initialize mobile controls
+      checkDeviceType();
+    }
+
+    // Animation loop for smooth movement
+    function animate() {
+      requestAnimationFrame(animate);
+    }
+
+    // Start the application
+    document.addEventListener('DOMContentLoaded', function () {
+      setupMobileControls();
+      animate();
+    });
+  </script>
+</body>
+
 </html>
