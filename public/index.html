@@ -20,7 +20,26 @@
     <script defer src="/dist/ui.js"></script>
   </head>
   <body>
-    <a-scene
+    <!-- Device Selection Screen -->
+    <div id="device-selection" style="position: fixed; width: 100%; height: 100%; background: #1a1a1a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999;">
+      <h1 style="color: white; font-size: 2.5em; margin-bottom: 2em;">Pilih Perangkat Anda</h1>
+      <div style="display: flex; gap: 2em;">
+        <button id="btn-desktop" style="padding: 1em 2em; font-size: 1.2em; background: #3a7bd5; color: white; border: none; border-radius: 5px; cursor: pointer;">Desktop</button>
+        <button id="btn-mobile" style="padding: 1em 2em; font-size: 1.2em; background: #3a7bd5; color: white; border: none; border-radius: 5px; cursor: pointer;">Mobile</button>
+      </div>
+    </div>
+
+    <!-- Virtual Gamepad for Mobile -->
+    <div id="mobile-controls" style="display: none; position: fixed; bottom: 30px; left: 20px; z-index: 1000; pointer-events: none;">
+      <!-- Joystick Control -->
+      <div style="width: 120px; height: 120px; position: relative; pointer-events: auto;">
+        <div id="joystick" style="width: 100%; height: 100%; background: rgba(255, 255, 255, 0.2); border-radius: 50%; position: relative; overflow: hidden;">
+          <div id="joystick-knob" style="width: 70px; height: 70px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; left: 25px; top: 25px; transition: transform 0.1s ease-out;"></div>
+        </div>
+      </div>
+    </div>
+
+    <a-scene style="display: none;"
       light="defaultLightsEnabled:false"
       renderer="stencil:true"
       networked-scene="
@@ -39,8 +58,6 @@
         <img id="thumbScene1" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" />
         <a-asset-item id="avatar-male-model" src="SittingIdle_man.fbx"></a-asset-item>
         <a-asset-item id="avatar-female-model" src="SittingIdle_woman.fbx"></a-asset-item>
-        <a-asset-item id="pohon1-model" src="assets/home/pohon1.glb"></a-asset-item>
-        <a-asset-item id="pohon2-model" src="assets/home/pohon2.glb"></a-asset-item>
         <template id="avatar-template">
           <a-entity player-info>
             <a-entity class="model" animation-mixer>
@@ -53,7 +70,21 @@
 
       <a-gltf-model id="world-nav-mesh" src="assets/home/world.glb" nav-mesh class="collidable"></a-gltf-model>
 
-      <a-text value="Selamat Datang Di AR-Room" align="center" position="0 2 -4" scale="1.5 1.5 1.5"></a-text>
+      <a-text
+        value="PaDyViR"
+        align="center"
+        position="0 2.5 -4"
+        scale="2 2 2"
+        color="#4CC3D9"
+        style="font-weight: bold"
+      ></a-text>
+      <a-text
+        value="Particle Dynamics Virtual Reality"
+        align="center"
+        position="0 2 -4"
+        scale="2 2 2"
+        style="font-weight: bold"
+      ></a-text>
 
       <a-link
         change-room="on:obbcollisionstarted;room:scene1;url:scene1.html"
@@ -61,7 +92,7 @@
         href="scene1.html"
         title="Go To World 1"
         image="#thumbScene1"
-        position="3 1.6 -5"
+        position="3 1.6 -10"
         class="clickable collidable"
         event-set__mouseenter="material.opacity: 0.8"
         event-set__mouseleave="material.opacity: 0.6"
@@ -74,7 +105,7 @@
         href="scene2.html"
         title="Go To World 2"
         image="#thumbScene1"
-        position="-3 1.6 -5"
+        position="-3 1.6 -10"
         class="clickable collidable"
         event-set__mouseenter="material.opacity: 0.8"
         event-set__mouseleave="material.opacity: 0.6"
@@ -110,70 +141,6 @@
         <!-- Ground -->
         <a-plane position="0 0 0" rotation="-90 0 0" width="100" height="100" color="#4A4A4A" visible="true"></a-plane>
         <a-entity light="type:ambient;intensity:0.5"></a-entity>
-        
-        <!-- Trees - Pohon Area 1 (Depan Kiri) -->
-        <a-entity id="pohon-1" gltf-model="#pohon1-model" position="-8 0 -8" scale="1.5 1.5 1.5" rotation="0 45 0" class="collidable"></a-entity>
-        <a-entity id="pohon-2" gltf-model="#pohon2-model" position="-6 0.5 -10" scale="2.4 2.4 2.4" rotation="0 120 0" class="collidable">
-          <a-box position="0 2 0" width="2" height="4" depth="2" visible="false" class="collidable"></a-box>
-        </a-entity>
-        <a-entity id="pohon-3" gltf-model="#pohon1-model" position="-10 0 -6" scale="1.8 1.8 1.8" rotation="0 270 0" class="collidable"></a-entity>
-        
-        <!-- Trees - Pohon Area 2 (Depan Kanan) -->
-        <a-entity id="pohon-4" gltf-model="#pohon2-model" position="8 0.5 -8" scale="2.8 2.8 2.8" rotation="0 180 0" class="collidable">
-          <a-box position="0 2.2 0" width="2.2" height="4.4" depth="2.2" visible="false" class="collidable"></a-box>
-        </a-entity>
-        <a-entity id="pohon-5" gltf-model="#pohon1-model" position="6 0 -10" scale="1.6 1.6 1.6" rotation="0 90 0" class="collidable"></a-entity>
-        <a-entity id="pohon-6" gltf-model="#pohon2-model" position="10 0.5 -6" scale="2.6 2.6 2.6" rotation="0 315 0" class="collidable">
-          <a-box position="0 2.1 0" width="2.1" height="4.2" depth="2.1" visible="false" class="collidable"></a-box>
-        </a-entity>
-        
-        <!-- Trees - Pohon Area 3 (Belakang Kiri) -->
-        <a-entity id="pohon-7" gltf-model="#pohon1-model" position="-8 0 8" scale="1.7 1.7 1.7" rotation="0 60 0" class="collidable"></a-entity>
-        <a-entity id="pohon-8" gltf-model="#pohon2-model" position="-6 0.5 10" scale="2.2 2.2 2.2" rotation="0 200 0" class="collidable">
-          <a-box position="0 1.9 0" width="1.9" height="3.8" depth="1.9" visible="false" class="collidable"></a-box>
-        </a-entity>
-        <a-entity id="pohon-9" gltf-model="#pohon1-model" position="-10 0 6" scale="1.9 1.9 1.9" rotation="0 150 0" class="collidable"></a-entity>
-        
-        <!-- Trees - Pohon Area 4 (Belakang Kanan) -->
-        <a-entity id="pohon-10" gltf-model="#pohon2-model" position="8 0.5 8" scale="3.0 3.0 3.0" rotation="0 30 0" class="collidable">
-          <a-box position="0 2.3 0" width="2.3" height="4.6" depth="2.3" visible="false" class="collidable"></a-box>
-        </a-entity>
-        <a-entity id="pohon-11" gltf-model="#pohon1-model" position="6 0 10" scale="1.3 1.3 1.3" rotation="0 240 0" class="collidable"></a-entity>
-        <a-entity id="pohon-12" gltf-model="#pohon2-model" position="10 0.5 6" scale="3.2 3.2 3.2" rotation="0 75 0" class="collidable">
-          <a-box position="0 2.4 0" width="2.4" height="4.8" depth="2.4" visible="false" class="collidable"></a-box>
-        </a-entity>
-        
-        <!-- Trees - Pohon Area 5 (Samping Kiri) -->
-        <a-entity id="pohon-13" gltf-model="#pohon1-model" position="-12 0 0" scale="1.4 1.4 1.4" rotation="0 135 0" class="collidable"></a-entity>
-        <a-entity id="pohon-14" gltf-model="#pohon2-model" position="-14 0.5 2" scale="3.4 3.4 3.4" rotation="0 300 0" class="collidable">
-          <a-box position="0 2.5 0" width="2.5" height="5" depth="2.5" visible="false" class="collidable"></a-box>
-        </a-entity>
-        <a-entity id="pohon-15" gltf-model="#pohon1-model" position="-14 0 -2" scale="1.2 1.2 1.2" rotation="0 45 0" class="collidable"></a-entity>
-        
-        <!-- Trees - Pohon Area 6 (Samping Kanan) -->
-        <a-entity id="pohon-16" gltf-model="#pohon2-model" position="12 0.5 0" scale="3.6 3.6 3.6" rotation="0 225 0" class="collidable">
-          <a-box position="0 2.6 0" width="2.6" height="5.2" depth="2.6" visible="false" class="collidable"></a-box>
-        </a-entity>
-        <a-entity id="pohon-17" gltf-model="#pohon1-model" position="14 0 2" scale="1.1 1.1 1.1" rotation="0 15 0" class="collidable"></a-entity>
-        <a-entity id="pohon-18" gltf-model="#pohon2-model" position="14 0.5 -2" scale="3.0 3.0 3.0" rotation="0 165 0" class="collidable">
-          <a-box position="0 2.3 0" width="2.3" height="4.6" depth="2.3" visible="false" class="collidable"></a-box>
-        </a-entity>
-        
-        <!-- Trees - Pohon Area 7 (Jauh Depan) -->
-        <a-entity id="pohon-19" gltf-model="#pohon1-model" position="0 0 -12" scale="1.6 1.6 1.6" rotation="0 90 0" class="collidable"></a-entity>
-        <a-entity id="pohon-20" gltf-model="#pohon2-model" position="-2 0.5 -14" scale="2.6 2.6 2.6" rotation="0 210 0" class="collidable">
-          <a-box position="0 2.1 0" width="2.1" height="4.2" depth="2.1" visible="false" class="collidable"></a-box>
-        </a-entity>
-        <a-entity id="pohon-21" gltf-model="#pohon1-model" position="2 0 -14" scale="1.7 1.7 1.7" rotation="0 330 0" class="collidable"></a-entity>
-        
-        <!-- Trees - Pohon Area 8 (Jauh Belakang) -->
-        <a-entity id="pohon-22" gltf-model="#pohon2-model" position="0 0.5 12" scale="2.8 2.8 2.8" rotation="0 270 0" class="collidable">
-          <a-box position="0 2.2 0" width="2.2" height="4.4" depth="2.2" visible="false" class="collidable"></a-box>
-        </a-entity>
-        <a-entity id="pohon-23" gltf-model="#pohon1-model" position="-2 0 14" scale="1.8 1.8 1.8" rotation="0 120 0" class="collidable"></a-entity>
-        <a-entity id="pohon-24" gltf-model="#pohon2-model" position="2 0.5 14" scale="2.4 2.4 2.4" rotation="0 60 0" class="collidable">
-          <a-box position="0 2 0" width="2" height="4" depth="2" visible="false" class="collidable"></a-box>
-        </a-entity>
       </a-entity>
 
       <a-entity
@@ -199,5 +166,197 @@
         <a-entity id="right-hand" networked-hand-controls="hand:right" laser-controls="hand: right"></a-entity>
       </a-entity>
     </a-scene>
+
+    <script>
+      // Check if device is already selected
+      const deviceType = localStorage.getItem('deviceType');
+      const deviceSelection = document.getElementById('device-selection');
+      const scene = document.querySelector('a-scene');
+      const mobileControls = document.getElementById('mobile-controls');
+      
+      // Always show device selection screen
+      deviceSelection.style.display = 'flex';
+      scene.style.display = 'none';
+
+      // Device selection handlers
+      document.getElementById('btn-desktop').addEventListener('click', () => {
+        deviceSelection.style.display = 'none';
+        scene.style.display = 'block';
+      });
+
+      document.getElementById('btn-mobile').addEventListener('click', () => {
+        deviceSelection.style.display = 'none';
+        scene.style.display = 'block';
+        mobileControls.style.display = 'block';
+        setupMobileControls();
+      });
+
+      // Mobile controls setup
+      function setupMobileControls() {
+        const joystick = document.getElementById('joystick');
+        const joystickKnob = document.getElementById('joystick-knob');
+        const rig = document.getElementById('rig');
+        
+        if (!rig) {
+          console.error('Element with id "rig" not found');
+          return;
+        }
+        
+        let isJoystickActive = false;
+        let joystickStartX = 0;
+        let joystickStartY = 0;
+        let joystickX = 0;
+        let joystickY = 0;
+        const joystickRadius = 25;
+        const movementSpeed = 0.1;
+        
+        // Common function to handle both touch and mouse events
+        function handleJoystickStart(clientX, clientY) {
+          isJoystickActive = true;
+          const rect = joystick.getBoundingClientRect();
+          joystickStartX = rect.left + rect.width / 2;
+          joystickStartY = rect.top + rect.height / 2;
+          updateJoystick({ clientX, clientY });
+        }
+        
+        function handleJoystickMove(clientX, clientY) {
+          if (!isJoystickActive) return;
+          updateJoystick({ clientX, clientY });
+          updatePlayerMovement();
+        }
+        
+        function handleJoystickEnd() {
+          isJoystickActive = false;
+          joystickX = 0;
+          joystickY = 0;
+          joystickKnob.style.transform = 'translate(25px, 25px)';
+        }
+        
+        // Touch events for mobile
+        joystick.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          handleJoystickStart(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: false });
+        
+        document.addEventListener('touchmove', (e) => {
+          if (!isJoystickActive) return;
+          e.preventDefault();
+          handleJoystickMove(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: false });
+        
+        document.addEventListener('touchend', handleJoystickEnd);
+        
+        // Mouse events for laptop/desktop
+        joystick.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          handleJoystickStart(e.clientX, e.clientY);
+          
+          // Add move and up listeners to document to track mouse movement outside joystick
+          document.addEventListener('mousemove', handleMouseMove);
+          document.addEventListener('mouseup', handleMouseUp);
+        });
+        
+        function handleMouseMove(e) {
+          handleJoystickMove(e.clientX, e.clientY);
+        }
+        
+        function handleMouseUp() {
+          handleJoystickEnd();
+          // Clean up event listeners
+          document.removeEventListener('mousemove', handleMouseMove);
+          document.removeEventListener('mouseup', handleMouseUp);
+        }
+        
+        // Update joystick position
+        function updateJoystick(touch) {
+          const x = touch.clientX - joystickStartX;
+          const y = touch.clientY - joystickStartY;
+          const distance = Math.sqrt(x * x + y * y);
+          const angle = Math.atan2(y, x);
+          
+          if (distance < joystickRadius) {
+            joystickX = x / joystickRadius;
+            joystickY = y / joystickRadius;
+            joystickKnob.style.transform = `translate(${x + 25}px, ${y + 25}px)`;
+          } else {
+            joystickX = Math.cos(angle);
+            joystickY = Math.sin(angle);
+            joystickKnob.style.transform = `translate(${Math.cos(angle) * joystickRadius + 25}px, ${Math.sin(angle) * joystickRadius + 25}px)`;
+          }
+        }
+        
+        // Update player movement based on joystick input
+        function updatePlayerMovement() {
+          if (!rig) return;
+          
+          // Get camera direction
+          const camera = document.querySelector('[camera]');
+          if (!camera) return;
+          
+          const cameraEl = camera.object3D;
+          const direction = new THREE.Vector3();
+          cameraEl.getWorldDirection(direction);
+          
+          // Project direction onto XZ plane (ignore Y-axis for movement)
+          const forward = new THREE.Vector3(direction.x, 0, direction.z).normalize();
+          
+          // Calculate movement vector based on joystick input
+          // Invert Y-axis to match standard game controls (up = forward, down = backward)
+          const moveX = joystickX * movementSpeed;
+          const moveZ = -joystickY * movementSpeed;
+          
+          // Apply movement
+          if (moveX !== 0 || moveZ !== 0) {
+            // Strafe movement (left/right) - use camera right vector
+            const right = new THREE.Vector3();
+            right.crossVectors(new THREE.Vector3(0, 1, 0), forward).normalize();
+            
+            // Calculate final movement direction
+            const movement = new THREE.Vector3();
+            // Forward/backward movement based on camera forward
+            movement.addScaledVector(forward, moveZ);
+            // Left/right strafing
+            movement.addScaledVector(right, moveX);
+            
+            // Apply movement to rig position
+            const currentPosition = rig.getAttribute('position');
+            rig.setAttribute('position', {
+              x: currentPosition.x + movement.x,
+              y: currentPosition.y,  // Keep Y position the same (no flying)
+              z: currentPosition.z + movement.z
+            });
+            
+            // Only update rotation if moving (not just strafing)
+            if (Math.abs(moveZ) > 0.1) {
+              // Calculate target rotation based on movement direction
+              const targetRotation = Math.atan2(movement.x, movement.z);
+              rig.setAttribute('rotation', {
+                x: 0,
+                y: THREE.Math.radToDeg(targetRotation),
+                z: 0
+              });
+            }
+          }
+        }
+        
+        // Prevent default touch behavior for joystick
+        document.addEventListener('touchstart', (e) => {
+          if (e.target === joystick) {
+            e.preventDefault();
+          }
+        }, { passive: false });
+        
+        // Add animation frame loop for smooth movement
+        function animate() {
+          if (isJoystickActive) {
+            updatePlayerMovement();
+          }
+          requestAnimationFrame(animate);
+        }
+        
+        // Start animation loop
+        animate();
+      }
+    </script>
   </body>
 </html>

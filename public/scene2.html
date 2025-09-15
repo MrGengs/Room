@@ -179,7 +179,7 @@
         border-radius: 10px;
         font-family: sans-serif;
         width: 320px;
-        display: none; /* Awalnya disembunyikan */
+        display: none;
       }
       .input-group {
         margin-bottom: 10px;
@@ -1260,26 +1260,36 @@
       // Fungsi untuk animasi fallback (jika GLB tidak ada)
       // Modifikasi: Buat fungsi ini lebih fleksibel
       function animateBlock(state, acceleration = 0) {
-        // Hapus animasi sebelumnya jika ada
-        if (blockModel) {
-          blockModel.removeAttribute('animation');
+        // Prioritaskan model GLB jika sudah dimuat, jika tidak, gunakan fallback box
+        const modelToAnimate = document.querySelector('#myModel').querySelector('#glbBlockModel') || document.querySelector('#blockModel');
 
-          // Reset posisi
-          blockModel.setAttribute('position', '0 0 0');
+        if (modelToAnimate) {
+          // Hapus animasi sebelumnya jika ada
+          modelToAnimate.removeAttribute('animation');
+
+          // Tentukan posisi awal berdasarkan model mana yang aktif
+          const isGlb = modelToAnimate.id === 'glbBlockModel';
+          const initialPosition = isGlb ? { x: 1.5, y: 0, z: 0 } : { x: 0, y: 0, z: 0 };
+
+          // Reset posisi ke posisi awal
+          modelToAnimate.setAttribute('position', initialPosition);
 
           if (state === 'move') {
             // Durasi animasi berbanding terbalik dengan percepatan
-            // Semakin besar percepatan, semakin cepat animasinya
             const duration = Math.max(1000, 5000 / (1 + acceleration));
-            // Jarak tempuh bisa dibuat proporsional dengan percepatan
+            // Jarak tempuh proporsional dengan percepatan
             const distance = 1 + acceleration * 0.5;
 
-            const animationString = `property: position; to: ${distance} 0 0; dur: ${duration}; easing: easeInOutQuad; startEvents: start-animation`;
+            // Posisi target adalah posisi awal ditambah jarak pergerakan
+            // Karena parentnya dirotasi -90 derajat pada sumbu Y, pergerakan di sumbu X lokal menjadi pergerakan di sumbu Z global.
+            const targetPosition = `${initialPosition.x} ${initialPosition.y} ${initialPosition.z - distance}`;
+
+            const animationString = `property: position; to: ${targetPosition}; dur: ${duration}; easing: easeInOutQuad; startEvents: start-animation`;
     
-            blockModel.setAttribute('animation', animationString);
+            modelToAnimate.setAttribute('animation', animationString);
 
             // Memicu event untuk memulai animasi
-            blockModel.emit('start-animation');
+            modelToAnimate.emit('start-animation');
           }
         }
       }
@@ -1774,6 +1784,7 @@
         
         // Coba load model bab2.glb
         const bab2Model = document.createElement('a-entity');
+        bab2Model.setAttribute('id', 'glbBlockModel'); // ID ditambahkan untuk target animasi
         bab2Model.setAttribute('gltf-model', 'assets/scene2/balok.glb');
         bab2Model.setAttribute('position', '1.5 0 0');
         bab2Model.setAttribute('rotation', '0 90 0');
@@ -1815,6 +1826,161 @@
           
           environment.appendChild(classModel);
         }
+      }
+
+      // Setup Mobile Controls
+      function setupMobileControls() {
+        const joystick = document.getElementById('joystick');
+        const joystickKnob = document.getElementById('joystick-knob');
+        const camera = document.querySelector('[camera]');
+        
+        if (!camera) {
+          console.error('Camera element not found');
+          return;
+        }
+        
+        let isJoystickActive = false;
+        let joystickStartX = 0;
+        let joystickStartY = 0;
+        let joystickX = 0;
+        let joystickY = 0;
+        const joystickRadius = 25;
+        const movementSpeed = 0.1;
+        
+        // Common function to handle both touch and mouse events
+        function handleJoystickStart(clientX, clientY) {
+          isJoystickActive = true;
+          const rect = joystick.getBoundingClientRect();
+          joystickStartX = rect.left + rect.width / 2;
+          joystickStartY = rect.top + rect.height / 2;
+          updateJoystick({ clientX, clientY });
+        }
+        
+        function handleJoystickMove(clientX, clientY) {
+          if (!isJoystickActive) return;
+          updateJoystick({ clientX, clientY });
+          updateCameraMovement();
+        }
+        
+        function handleJoystickEnd() {
+          isJoystickActive = false;
+          joystickX = 0;
+          joystickY = 0;
+          joystickKnob.style.transform = 'translate(25px, 25px)';
+        }
+        
+        // Touch events for mobile
+        joystick.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          handleJoystickStart(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: false });
+        
+        document.addEventListener('touchmove', (e) => {
+          if (!isJoystickActive) return;
+          e.preventDefault();
+          handleJoystickMove(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: false });
+        
+        document.addEventListener('touchend', handleJoystickEnd);
+        
+        // Mouse events for laptop/desktop
+        joystick.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          handleJoystickStart(e.clientX, e.clientY);
+          
+          // Add move and up listeners to document to track mouse movement outside joystick
+          document.addEventListener('mousemove', handleMouseMove);
+          document.addEventListener('mouseup', handleMouseUp);
+        });
+        
+        function handleMouseMove(e) {
+          handleJoystickMove(e.clientX, e.clientY);
+        }
+        
+        function handleMouseUp() {
+          handleJoystickEnd();
+          // Clean up event listeners
+          document.removeEventListener('mousemove', handleMouseMove);
+          document.removeEventListener('mouseup', handleMouseUp);
+        }
+        
+        // Update joystick position
+        function updateJoystick(touch) {
+          const x = touch.clientX - joystickStartX;
+          const y = touch.clientY - joystickStartY;
+          const distance = Math.sqrt(x * x + y * y);
+          const angle = Math.atan2(y, x);
+          
+          if (distance < joystickRadius) {
+            joystickX = x / joystickRadius;
+            joystickY = y / joystickRadius;
+            joystickKnob.style.transform = `translate(${x + 25}px, ${y + 25}px)`;
+          } else {
+            joystickX = Math.cos(angle);
+            joystickY = Math.sin(angle);
+            joystickKnob.style.transform = `translate(${Math.cos(angle) * joystickRadius + 25}px, ${Math.sin(angle) * joystickRadius + 25}px)`;
+          }
+        }
+        
+        // Update camera movement based on joystick input
+        function updateCameraMovement() {
+          if (!camera) return;
+          
+          const cameraEl = camera.object3D;
+          const direction = new THREE.Vector3();
+          cameraEl.getWorldDirection(direction);
+          
+          // Project direction onto XZ plane (ignore Y-axis for movement)
+          const forward = new THREE.Vector3(direction.x, 0, direction.z).normalize();
+          
+          // Calculate movement vector based on joystick input
+          const moveX = joystickX * movementSpeed;
+          const moveZ = -joystickY * movementSpeed; // Invert Y-axis for natural movement
+          
+          // Apply movement
+          if (moveX !== 0 || moveZ !== 0) {
+            // Strafe movement (left/right) - use camera right vector
+            const right = new THREE.Vector3();
+            right.crossVectors(new THREE.Vector3(0, 1, 0), forward).normalize();
+            
+            // Calculate final movement direction
+            const movement = new THREE.Vector3();
+            // Forward/backward movement based on camera forward
+            movement.addScaledVector(forward, moveZ);
+            // Left/right strafing
+            movement.addScaledVector(right, moveX);
+            
+            // Apply movement to camera position
+            const currentPosition = camera.getAttribute('position');
+            camera.setAttribute('position', {
+              x: currentPosition.x + movement.x,
+              y: currentPosition.y,  // Keep Y position the same (no flying)
+              z: currentPosition.z + movement.z
+            });
+          }
+        }
+        
+        // Show joystick for mobile devices
+        function checkDeviceType() {
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          if (isMobile) {
+            joystick.style.display = 'block';
+          }
+        }
+        
+        // Initialize mobile controls
+        checkDeviceType();
+        
+        // Add animation frame loop for smooth movement
+        function animate() {
+          if (isJoystickActive) {
+            updateCameraMovement();
+          }
+          requestAnimationFrame(animate);
+        }
+        
+        // Start animation loop
+        animate();
       }
 
       // Load models setelah DOM ready
@@ -2223,7 +2389,7 @@
       }
 
       function updateBallSizes() {
-        if (!ball1 || !ball2) return;
+        if (!ball1 || !ball2) return; 
         
         // Radius base = 0.15, ditambah proporsional dengan massa
         const radius1 = 0.15 + (m1 * 0.02);  // 0.15 + (massa * 0.02)
