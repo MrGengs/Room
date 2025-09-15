@@ -218,7 +218,7 @@
       <!-- Collision flash light untuk dramatic effect -->
       <a-light id="collisionFlash"
                type="point" 
-               position="0 1 -3" 
+               position="0 0.3 -3" 
                intensity="0"
                color="#FFD700"
                distance="10"
@@ -808,7 +808,7 @@
         <a-sphere
           id="ball1"
           class="collidable"
-          position="-4 1 -3"
+          position="-3 0.3 -3"
           radius="0.25"
           color="#cc2f2f"
           material="depthTest: true"
@@ -820,7 +820,7 @@
         <a-text 
           id="label1" 
           value="m1 = 1kg&#10;v1 = 1m/s" 
-          position="-4 2 -3" 
+          position="-3 1 -3" 
           align="center"
           color="white"
           material="depthTest: false; transparent: true">
@@ -829,7 +829,7 @@
         <a-sphere
           id="ball2"
           class="collidable"
-          position="4 1 -3"
+          position="3 0.3 -3"
           radius="0.25"
           color="#4545ff"
           material="depthTest: true"
@@ -841,7 +841,7 @@
         <a-text 
           id="label2" 
           value="m2 = 1kg&#10;v2 = -1m/s" 
-          position="4 2 -3" 
+          position="3 1 -3" 
           align="center"
           color="white"
           material="depthTest: false; transparent: true">
@@ -849,7 +849,7 @@
 
         <!-- Particle system untuk efek collision -->
         <a-entity id="collisionParticles" 
-                  position="0 1 -3" 
+                  position="0 0.3 -3" 
                   visible="false"
                   particle-system="preset: spark; 
                                   particleCount: 200; 
@@ -869,7 +869,7 @@
         <!-- Trail effects untuk bola -->
         <a-entity id="trail1" 
                   visible="false"
-                  position="-4 1 -3"
+                  position="-4 0.3 -3"
                   particle-system="preset: default; 
                                   particleCount: 50; 
                                   maxAge: 2; 
@@ -883,7 +883,7 @@
 
         <a-entity id="trail2" 
                   visible="false"
-                  position="4 1 -3"
+                  position="4 0.3 -3"
                   particle-system="preset: default; 
                                   particleCount: 50; 
                                   maxAge: 2; 
@@ -2150,18 +2150,24 @@
           showPreCollisionTrail('trail1', ball1.getAttribute('position'));
           showPreCollisionTrail('trail2', ball2.getAttribute('position'));
           
-          // Set animasi menuju collision point dengan smooth easing
-          // Posisi tumbukan: Ball1 berhenti di +0.25, Ball2 berhenti di -0.25 (bersentuhan di x=0)
+          // Set animasi menuju collision point dengan distance yang tepat untuk bersentuhan
+          // Dengan radius 0.25, bola bersentuhan ketika jarak pusat = 0.5
+          // Collision point di x=0, maka Ball1 center di +0.25, Ball2 center di -0.25
+          const ballRadius = 0.25;
+          const collisionX = 0; // Titik tengah collision
+          const ball1CollisionPos = collisionX + ballRadius; // +0.25 (bersentuhan di permukaan)
+          const ball2CollisionPos = collisionX - ballRadius; // -0.25 (bersentuhan di permukaan)
+          
           ball1.setAttribute("animation__go", {
             property: "position",
-            to: "0.25 1 -3", // Ball1 center di +0.25, edge kiri di 0
+            to: `${ball1CollisionPos} 0.3 -3`, // Ball1 center di +0.25, edge kiri menyentuh x=0
             dur: 2000,
             easing: "easeInCubic" // Accelerating towards collision
           });
 
           ball2.setAttribute("animation__go", {
             property: "position",
-            to: "-0.25 1 -3", // Ball2 center di -0.25, edge kanan di 0
+            to: `${ball2CollisionPos} 0.3 -3`, // Ball2 center di -0.25, edge kanan menyentuh x=0
             dur: 2000,
             easing: "easeInCubic" // Accelerating towards collision
           });
@@ -2211,28 +2217,29 @@
               const commonVelocity = v1p; // v1p = v2p dalam tumbukan inelastis
               const commonFinalPos = commonVelocity * distanceScale;
 
-              // Bola-bola menempel dengan jarak minimum (diameter)
+              // Bola-bola bersentuhan tepat tanpa tembus dan tanpa gabung
               const ballRadius = 0.25;
+              const touchingDistance = ballRadius * 2; // Jarak tepat untuk bersentuhan = 0.5
 
               if (Math.abs(commonVelocity) < 0.005) {
-                // Jika kecepatan akhir ≈ 0, kedua bola berhenti di titik tumbukan bersentuhan
-                // Ball1 di posisi kanan, Ball2 di posisi kiri, bersentuhan di tengah (x=0)
-                finalPos1 = ballRadius;    // Ball1 center di +0.25, edge kiri di 0
-                finalPos2 = -ballRadius;   // Ball2 center di -0.25, edge kanan di 0
-                console.log('🛑 PERFECT INELASTIC STOP: Both balls come to rest touching at collision point');
-                console.log(`Stop positions - Ball1: ${finalPos1}, Ball2: ${finalPos2} (touching at x=0)`);
+                // Jika kecepatan akhir ≈ 0, kedua bola berhenti bersentuhan tepat di titik tumbukan
+                // Ball1 di posisi kanan, Ball2 di posisi kiri, bersentuhan tepat di tengah (x=0)
+                finalPos1 = ballRadius;     // Ball1 center di +0.25, edge kiri tepat di 0
+                finalPos2 = -ballRadius;    // Ball2 center di -0.25, edge kanan tepat di 0
+                console.log('🛑 PERFECT INELASTIC STOP: Both balls come to rest touching exactly at collision point');
+                console.log(`Stop positions - Ball1: ${finalPos1}, Ball2: ${finalPos2} (touching perfectly)`);
               } else {
-                // Kedua bola bergerak bersama ke arah yang sama, bersentuhan
+                // Kedua bola bergerak bersama ke arah yang sama, bersentuhan tepat
                 if (commonVelocity > 0) {
-                  // Bergerak ke kanan - Ball1 di depan, Ball2 mengikuti
+                  // Bergerak ke kanan - Ball1 di depan, Ball2 mengikuti bersentuhan
                   finalPos1 = commonFinalPos + ballRadius;
                   finalPos2 = commonFinalPos - ballRadius;
                 } else {
-                  // Bergerak ke kiri - Ball2 di depan, Ball1 mengikuti
+                  // Bergerak ke kiri - Ball2 di depan, Ball1 mengikuti bersentuhan
                   finalPos1 = commonFinalPos + ballRadius;
                   finalPos2 = commonFinalPos - ballRadius;
                 }
-                console.log(`🚀 INELASTIC MOVEMENT: Both balls move together at ${commonVelocity.toFixed(2)} m/s (touching)`);
+                console.log(`🚀 INELASTIC MOVEMENT: Both balls move together at ${commonVelocity.toFixed(2)} m/s (touching perfectly)`);
               }
 
               console.log(`Final positions - Ball1: ${finalPos1.toFixed(2)}, Ball2: ${finalPos2.toFixed(2)}`);
@@ -2293,7 +2300,7 @@
               showTrail('trail1', ball1.getAttribute('position'));
               ball1.setAttribute("animation__after", {
                 property: "position",
-                to: `${finalPos1} 1 -3`,
+                to: `${finalPos1} 0.3 -3`,
                 dur: animationDuration1,
                 easing: easing1
               });
@@ -2302,7 +2309,7 @@
               // Jika v1p sangat kecil, tetap gerakkan ke posisi final
               ball1.setAttribute("animation__after", {
                 property: "position",
-                to: `${finalPos1} 1 -3`,
+                to: `${finalPos1} 0.3 -3`,
                 dur: animationDuration1,
                 easing: easing1
               });
@@ -2332,7 +2339,7 @@
               showTrail('trail2', ball2.getAttribute('position'));
               ball2.setAttribute("animation__after", {
                 property: "position",
-                to: `${finalPos2} 1 -3`,
+                to: `${finalPos2} 0.3 -3`,
                 dur: animationDuration2,
                 easing: easing2
               });
@@ -2341,7 +2348,7 @@
               // Jika v2p sangat kecil, tetap gerakkan ke posisi final
               ball2.setAttribute("animation__after", {
                 property: "position",
-                to: `${finalPos2} 1 -3`,
+                to: `${finalPos2} 0.3 -3`,
                 dur: animationDuration2,
                 easing: easing2
               });
@@ -2722,14 +2729,14 @@
         // Buat trail untuk ball1
         const trail1 = document.createElement('a-entity');
         trail1.setAttribute('id', 'trail1');
-        trail1.setAttribute('position', '-2 1 -3');
+        trail1.setAttribute('position', '-2 0.3 -3');
         trail1.setAttribute('visible', 'false');
         document.querySelector('a-scene').appendChild(trail1);
 
         // Buat trail untuk ball2
         const trail2 = document.createElement('a-entity');
         trail2.setAttribute('id', 'trail2');
-        trail2.setAttribute('position', '2 1 -3');
+        trail2.setAttribute('position', '2 0.3 -3');
         trail2.setAttribute('visible', 'false');
         document.querySelector('a-scene').appendChild(trail2);
 
@@ -2904,10 +2911,10 @@
         // Buat garis penghubung antara kedua bola
         const connector = document.createElement('a-cylinder');
         connector.setAttribute('id', 'inelasticConnector');
-        connector.setAttribute('position', '0 1 -3'); // Di tengah antara bola
+        connector.setAttribute('position', '0 0.3 -3'); // Di tengah antara bola
         connector.setAttribute('rotation', '0 0 90'); // Horizontal
         connector.setAttribute('radius', '0.02');
-        connector.setAttribute('height', '0.6'); // Panjang garis penghubung yang lebih pendek
+        connector.setAttribute('height', '0.5'); // Panjang garis sesuai jarak pusat bola bersentuhan
         connector.setAttribute('material', 'color: #ffff00; opacity: 0.9; transparent: true; emissive: #ffaa00');
         connector.setAttribute('visible', 'true');
 
@@ -3062,7 +3069,7 @@
         for (let i = 0; i < 8; i++) {
           const particle = document.createElement('a-sphere');
           particle.setAttribute('radius', '0.02');
-          particle.setAttribute('position', `${(Math.random() - 0.5) * 0.3} 1 -3`);
+          particle.setAttribute('position', `${(Math.random() - 0.5) * 0.3} 0.3 -3`);
           particle.setAttribute('material', 'color: #ffcc00; emissive: #ff8800; opacity: 0.9; transparent: true');
           
           // Animasi partikel lengket yang bergerak perlahan
@@ -3214,7 +3221,7 @@
         const particles = document.querySelector('#collisionParticles');
         if (particles) {
           particles.setAttribute('visible', true);
-          particles.setAttribute('position', '0 1 -3'); // Collision point
+          particles.setAttribute('position', '0 0.3 -3'); // Collision point
           
           // Start particle emission
           particles.setAttribute('particle-system', {
@@ -3541,9 +3548,9 @@
         animating = false;
         done = false;
         
-        // Reset posisi bola
-        if (ball1) ball1.setAttribute("position", "-4 1 -3");
-        if (ball2) ball2.setAttribute("position", "4 1 -3");
+        // Reset posisi bola ke posisi start yang konsisten
+        if (ball1) ball1.setAttribute("position", "-3 0.3 -3");
+        if (ball2) ball2.setAttribute("position", "3 0.3 -3");
 
         // Reset damage on balls
         if (ball1 && ball1.components && ball1.components['ball-damage']) {
@@ -3790,13 +3797,13 @@
                     const finalPos1 = v1p * distanceScale;
                     ball1.setAttribute("animation__after", {
                       property: "position", 
-                      to: `${finalPos1} 1 -3`, 
+                      to: `${finalPos1} 0.3 -3`, 
                       dur: Math.abs(v1p) * 200 + 1000, // Durasi proporsional dengan kecepatan
                       easing: "easeOutQuad"
                     });
                     console.log(`Ball1 moving to position: ${finalPos1}`);
                   } else {
-                    ball1.setAttribute("position", "0 1 -3");
+                    ball1.setAttribute("position", "0 0.3 -3");
                     console.log('Ball1 staying at collision point (v1p ≈ 0)');
                   }
                   
@@ -3804,13 +3811,13 @@
                     const finalPos2 = v2p * distanceScale;
                     ball2.setAttribute("animation__after", {
                       property: "position", 
-                      to: `${finalPos2} 1 -3`, 
+                      to: `${finalPos2} 0.3 -3`, 
                       dur: Math.abs(v2p) * 200 + 1000, // Durasi proporsional dengan kecepatan
                       easing: "easeOutQuad"
                     });
                     console.log(`Ball2 moving to position: ${finalPos2}`);
                   } else {
-                    ball2.setAttribute("position", "0 1 -3");
+                    ball2.setAttribute("position", "0 0.3 -3");
                     console.log('Ball2 staying at collision point (v2p ≈ 0)');
                   }
 
