@@ -33,7 +33,7 @@
       display: flex;
       gap: 10px;
     }
-    
+
     .ui-button {
       background: rgba(0, 0, 0, 0.7);
       color: white;
@@ -47,20 +47,20 @@
       gap: 8px;
       transition: all 0.3s ease;
     }
-    
+
     .ui-button:hover {
       background: rgba(58, 123, 213, 0.9);
     }
-    
+
     .ui-button i {
       font-size: 16px;
     }
-    
+
     /* VR mode styles */
     .vr-mode .ui-button {
       z-index: 10001;
     }
-    
+
     /* Hide UI elements in VR mode */
     .vr-mode .ui-buttons:not(.vr-visible) {
       display: none;
@@ -74,24 +74,15 @@
     style="position: fixed; bottom: 30px; left: 20px; z-index: 1000; display: none; touch-action: none; -webkit-tap-highlight-color: transparent;">
     <!-- Joystick Control -->
     <div id="joystick"
-      style="width: 120px; height: 120px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; position: relative; overflow: visible;">
+      style="width: 180px; height: 180px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; position: relative; overflow: visible;">
       <div id="joystick-knob"
-        style="width: 80px; height: 80px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; left: 20px; top: 20px; transition: transform 0.1s ease-out; touch-action: none; pointer-events: none;">
+        style="width: 120px; height: 120px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; left: 30px; top: 30px; transition: transform 0.1s ease-out; touch-action: none; pointer-events: none;">
       </div>
     </div>
   </div>
 
-  <!-- UI Buttons Container -->
-  <div class="ui-buttons">
-    <!-- Device Toggle Button -->
-    <button id="device-toggle" class="ui-button">
-      <i>📱</i>
-      <span>Switch to Mobile</span>
-    </button>
-  </div>
-
-  <a-scene light="defaultLightsEnabled:false" renderer="stencil:true; antialias: true;" 
-    vr-mode-ui="enabled: false" webxr="requiredFeatures: local-floor; referenceSpaceType: local-floor;" networked-scene="
+  <a-scene light="defaultLightsEnabled:false" renderer="stencil:true; antialias: true;" vr-mode-ui="enabled: false"
+    webxr="requiredFeatures: local-floor; referenceSpaceType: local-floor;" networked-scene="
         connectOnLoad: false;
         room: forest;
         debug: true;
@@ -178,397 +169,147 @@
           font="kelsonsans" width="8" visible="false">
         </a-text>
         <!-- NPC Pusher Cart -->
-        <a-entity
-          id="npc-pusher-cart"
-          gltf-model="url(assets/scene1/push.glb)"
-          position="0 0 2.2"
-          rotation="0 180 0"
-          scale="0.01 0.01 0.01"
-          animation-mixer="clip: mixamo.com; loop: repeat"
-          visible="false"
-        ></a-entity>
-        </a-entity>
-        
-        <!-- Compact 3D Physics Control Panel -->
-        <a-entity id="physics-panel-3d" position="-2 3.5 6" rotation="0 90 0">
-          <!-- Main Panel Frame with Depth -->
-          <a-box 
-            id="panel-frame"
-            width="3.5" 
-            height="5.0" 
-            depth="0.15" 
-            color="#2a2a2a" 
-            opacity="0.95"
-            shadow="cast: true; receive: true"
-            class="clickable">
-          </a-box>
-          
-          <!-- Panel Border for 3D Effect -->
-          <a-box 
-            width="3.7" 
-            height="5.2" 
-            depth="0.1" 
-            color="#1a1a1a" 
-            opacity="0.8"
-            position="0 0 -0.05">
-          </a-box>
-          
-          <!-- Panel Title -->
-          <a-text 
-            value="PHYSICS CONTROL" 
-            position="0 2.2 0.08" 
-            align="center" 
-            color="#00E676" 
-            font="kelsonsans" 
+        <a-entity id="npc-pusher-cart" gltf-model="url(assets/scene1/push.glb)" position="0 0 2.2" rotation="0 180 0"
+          scale="0.01 0.01 0.01" animation-mixer="clip: mixamo.com; loop: repeat" visible="false"></a-entity>
+      </a-entity>
+
+      <!-- Compact 3D Physics Control Panel -->
+      <a-entity id="physics-panel-3d" position="-2 3.5 6" rotation="0 90 0">
+        <!-- Main Panel Frame with Depth -->
+        <a-box id="panel-frame" width="3.5" height="5.0" depth="0.15" color="#2a2a2a" opacity="0.95"
+          shadow="cast: true; receive: true" class="clickable">
+        </a-box>
+
+        <!-- Panel Border for 3D Effect -->
+        <a-box width="3.7" height="5.2" depth="0.1" color="#1a1a1a" opacity="0.8" position="0 0 -0.05">
+        </a-box>
+
+        <!-- Panel Title -->
+        <a-text value="PHYSICS CONTROL" position="0 2.2 0.08" align="center" color="#00E676" font="kelsonsans"
+          width="6">
+        </a-text>
+
+        <!-- Input Controls Section -->
+        <a-box width="3.2" height="1.3" depth="0.05" color="#333333" opacity="0.9" position="0 1.4 0.08">
+        </a-box>
+
+        <!-- Force Controls -->
+        <a-text value="Force (N)" position="0 1.8 0.12" align="center" color="#FFC107" font="kelsonsans" width="5">
+        </a-text>
+
+        <!-- Force Control Row -->
+        <a-box id="force-minus" width="0.25" height="0.25" depth="0.08" color="#FF5722" position="-1.0 1.5 0.12"
+          class="clickable" cursor-listener event-set__mouseenter="color: #FF7043"
+          event-set__mouseleave="color: #FF5722" shadow="cast: true">
+          <a-text value="-" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="10">
+          </a-text>
+        </a-box>
+
+        <a-box width="1.0" height="0.25" depth="0.05" color="#1e1e1e" position="0 1.5 0.1">
+          <a-text id="force-display" value="100" position="0 0 0.03" align="center" color="#4CAF50" font="kelsonsans"
             width="6">
           </a-text>
-          
-          <!-- Input Controls Section -->
-          <a-box 
-            width="3.2" 
-            height="1.3" 
-            depth="0.05" 
-            color="#333333" 
-            opacity="0.9"
-            position="0 1.4 0.08">
-          </a-box>
-          
-          <!-- Force Controls -->
-          <a-text 
-            value="Force (N)" 
-            position="0 1.8 0.12" 
-            align="center" 
-            color="#FFC107" 
-            font="kelsonsans" 
-            width="5">
+        </a-box>
+
+        <a-box id="force-plus" width="0.25" height="0.25" depth="0.08" color="#4CAF50" position="1.0 1.5 0.12"
+          class="clickable" cursor-listener event-set__mouseenter="color: #66BB6A"
+          event-set__mouseleave="color: #4CAF50" shadow="cast: true">
+          <a-text value="+" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="10">
           </a-text>
-          
-          <!-- Force Control Row -->
-          <a-box 
-            id="force-minus" 
-            width="0.25" 
-            height="0.25" 
-            depth="0.08" 
-            color="#FF5722" 
-            position="-1.0 1.5 0.12"
-            class="clickable"
-            cursor-listener
-            event-set__mouseenter="color: #FF7043"
-            event-set__mouseleave="color: #FF5722"
-            shadow="cast: true">
-            <a-text 
-              value="-" 
-              position="0 0 0.05" 
-              align="center" 
-              color="white" 
-              font="kelsonsans" 
-              width="10">
-            </a-text>
-          </a-box>
-          
-          <a-box 
-            width="1.0" 
-            height="0.25" 
-            depth="0.05" 
-            color="#1e1e1e" 
-            position="0 1.5 0.1">
-            <a-text 
-              id="force-display" 
-              value="100" 
-              position="0 0 0.03" 
-              align="center" 
-              color="#4CAF50" 
-              font="kelsonsans" 
-              width="6">
-            </a-text>
-          </a-box>
-          
-          <a-box 
-            id="force-plus" 
-            width="0.25" 
-            height="0.25" 
-            depth="0.08" 
-            color="#4CAF50" 
-            position="1.0 1.5 0.12"
-            class="clickable"
-            cursor-listener
-            event-set__mouseenter="color: #66BB6A"
-            event-set__mouseleave="color: #4CAF50"
-            shadow="cast: true">
-            <a-text 
-              value="+" 
-              position="0 0 0.05" 
-              align="center" 
-              color="white" 
-              font="kelsonsans" 
-              width="10">
-            </a-text>
-          </a-box>
-          
-          <!-- Distance Controls -->
-          <a-text 
-            value="Distance (m)" 
-            position="0 1.2 0.12" 
-            align="center" 
-            color="#FFC107" 
-            font="kelsonsans" 
-            width="5">
+        </a-box>
+
+        <!-- Distance Controls -->
+        <a-text value="Distance (m)" position="0 1.2 0.12" align="center" color="#FFC107" font="kelsonsans" width="5">
+        </a-text>
+
+        <!-- Distance Control Row -->
+        <a-box id="distance-minus" width="0.25" height="0.25" depth="0.08" color="#FF5722" position="-1.0 0.9 0.12"
+          class="clickable" cursor-listener event-set__mouseenter="color: #FF7043"
+          event-set__mouseleave="color: #FF5722" shadow="cast: true">
+          <a-text value="-" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="10">
           </a-text>
-          
-          <!-- Distance Control Row -->
-          <a-box 
-            id="distance-minus" 
-            width="0.25" 
-            height="0.25" 
-            depth="0.08" 
-            color="#FF5722" 
-            position="-1.0 0.9 0.12"
-            class="clickable"
-            cursor-listener
-            event-set__mouseenter="color: #FF7043"
-            event-set__mouseleave="color: #FF5722"
-            shadow="cast: true">
-            <a-text 
-              value="-" 
-              position="0 0 0.05" 
-              align="center" 
-              color="white" 
-              font="kelsonsans" 
-              width="10">
-            </a-text>
-          </a-box>
-          
-          <a-box 
-            width="1.0" 
-            height="0.25" 
-            depth="0.05" 
-            color="#1e1e1e" 
-            position="0 0.9 0.1">
-            <a-text 
-              id="distance-display" 
-              value="5" 
-              position="0 0 0.03" 
-              align="center" 
-              color="#4CAF50" 
-              font="kelsonsans" 
-              width="6">
-            </a-text>
-          </a-box>
-          
-          <a-box 
-            id="distance-plus" 
-            width="0.25" 
-            height="0.25" 
-            depth="0.08" 
-            color="#4CAF50" 
-            position="1.0 0.9 0.12"
-            class="clickable"
-            cursor-listener
-            event-set__mouseenter="color: #66BB6A"
-            event-set__mouseleave="color: #4CAF50"
-            shadow="cast: true">
-            <a-text 
-              value="+" 
-              position="0 0 0.05" 
-              align="center" 
-              color="white" 
-              font="kelsonsans" 
-              width="10">
-            </a-text>
-          </a-box>
-          
-          <!-- Action Buttons -->
-          <a-box 
-            id="apply-force-btn" 
-            width="1.3" 
-            height="0.3" 
-            depth="0.1" 
-            color="#4CAF50" 
-            position="-0.8 0.4 0.12"
-            class="clickable"
-            cursor-listener
-            event-set__mouseenter="color: #66BB6A"
-            event-set__mouseleave="color: #4CAF50"
-            shadow="cast: true">
-            <a-text 
-              value="APPLY" 
-              position="0 0 0.06" 
-              align="center" 
-              color="white" 
-              font="kelsonsans" 
-              width="5">
-            </a-text>
-          </a-box>
-          
-          <a-box 
-            id="reset-btn" 
-            width="1.3" 
-            height="0.3" 
-            depth="0.1" 
-            color="#f44336" 
-            position="0.8 0.4 0.12"
-            class="clickable"
-            cursor-listener
-            event-set__mouseenter="color: #EF5350"
-            event-set__mouseleave="color: #f44336"
-            shadow="cast: true">
-            <a-text 
-              value="RESET" 
-              position="0 0 0.06" 
-              align="center" 
-              color="white" 
-              font="kelsonsans" 
-              width="5">
-            </a-text>
-          </a-box>
-          
-          <!-- Separator -->
-          <a-box 
-            width="3.0" 
-            height="0.02" 
-            depth="0.05" 
-            color="#00E676" 
-            position="0 0.1 0.08">
-          </a-box>
-          
-          <!-- Data Display Section -->
-          <a-box 
-            width="3.2" 
-            height="2.0" 
-            depth="0.05" 
-            color="#1e1e1e" 
-            opacity="0.9"
-            position="0 -0.9 0.08">
-          </a-box>
-          
-          <!-- Car Data -->
-          <a-text 
-            value="CAR (1200kg)" 
-            position="0 -0.3 0.12" 
-            align="center" 
-            color="#FFC107" 
-            font="kelsonsans" 
-            width="5">
+        </a-box>
+
+        <a-box width="1.0" height="0.25" depth="0.05" color="#1e1e1e" position="0 0.9 0.1">
+          <a-text id="distance-display" value="5" position="0 0 0.03" align="center" color="#4CAF50" font="kelsonsans"
+            width="6">
           </a-text>
-          
-          <a-text 
-            value="A:" 
-            position="-1.4 -0.6 0.12" 
-            align="left" 
-            color="#E0E0E0" 
-            font="kelsonsans" 
-            width="4">
+        </a-box>
+
+        <a-box id="distance-plus" width="0.25" height="0.25" depth="0.08" color="#4CAF50" position="1.0 0.9 0.12"
+          class="clickable" cursor-listener event-set__mouseenter="color: #66BB6A"
+          event-set__mouseleave="color: #4CAF50" shadow="cast: true">
+          <a-text value="+" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="10">
           </a-text>
-          <a-text 
-            id="car-acceleration-3d" 
-            value="0 m/s²" 
-            position="-0.8 -0.6 0.12" 
-            align="left" 
-            color="#4CAF50" 
-            font="kelsonsans" 
-            width="4">
+        </a-box>
+
+        <!-- Action Buttons -->
+        <a-box id="apply-force-btn" width="1.3" height="0.3" depth="0.1" color="#4CAF50" position="-0.8 0.4 0.12"
+          class="clickable" cursor-listener event-set__mouseenter="color: #66BB6A"
+          event-set__mouseleave="color: #4CAF50" shadow="cast: true">
+          <a-text value="APPLY" position="0 0 0.06" align="center" color="white" font="kelsonsans" width="5">
           </a-text>
-          
-          <a-text 
-            value="V:" 
-            position="0.2 -0.6 0.12" 
-            align="left" 
-            color="#E0E0E0" 
-            font="kelsonsans" 
-            width="4">
+        </a-box>
+
+        <a-box id="reset-btn" width="1.3" height="0.3" depth="0.1" color="#f44336" position="0.8 0.4 0.12"
+          class="clickable" cursor-listener event-set__mouseenter="color: #EF5350"
+          event-set__mouseleave="color: #f44336" shadow="cast: true">
+          <a-text value="RESET" position="0 0 0.06" align="center" color="white" font="kelsonsans" width="5">
           </a-text>
-          <a-text 
-            id="car-velocity-3d" 
-            value="0 m/s" 
-            position="0.6 -0.6 0.12" 
-            align="left" 
-            color="#4CAF50" 
-            font="kelsonsans" 
-            width="4">
-          </a-text>
-          
-          <a-text 
-            value="D:" 
-            position="-1.4 -0.8 0.12" 
-            align="left" 
-            color="#E0E0E0" 
-            font="kelsonsans" 
-            width="4">
-          </a-text>
-          <a-text 
-            id="car-distance-3d" 
-            value="0 m" 
-            position="-0.8 -0.8 0.12" 
-            align="left" 
-            color="#4CAF50" 
-            font="kelsonsans" 
-            width="4">
-          </a-text>
-          
-          <!-- Cart Data -->
-          <a-text 
-            value="CART (50kg)" 
-            position="0 -1.2 0.12" 
-            align="center" 
-            color="#FF9800" 
-            font="kelsonsans" 
-            width="5">
-          </a-text>
-          
-          <a-text 
-            value="A:" 
-            position="-1.4 -1.5 0.12" 
-            align="left" 
-            color="#E0E0E0" 
-            font="kelsonsans" 
-            width="4">
-          </a-text>
-          <a-text 
-            id="cart-acceleration-3d" 
-            value="0 m/s²" 
-            position="-0.8 -1.5 0.12" 
-            align="left" 
-            color="#4CAF50" 
-            font="kelsonsans" 
-            width="4">
-          </a-text>
-          
-          <a-text 
-            value="V:" 
-            position="0.2 -1.5 0.12" 
-            align="left" 
-            color="#E0E0E0" 
-            font="kelsonsans" 
-            width="4">
-          </a-text>
-          <a-text 
-            id="cart-velocity-3d" 
-            value="0 m/s" 
-            position="0.6 -1.5 0.12" 
-            align="left" 
-            color="#4CAF50" 
-            font="kelsonsans" 
-            width="4">
-          </a-text>
-          
-          <a-text 
-            value="D:" 
-            position="-1.4 -1.7 0.12" 
-            align="left" 
-            color="#E0E0E0" 
-            font="kelsonsans" 
-            width="4">
-          </a-text>
-          <a-text 
-            id="cart-distance-3d" 
-            value="0 m" 
-            position="-0.8 -1.7 0.12" 
-            align="left" 
-            color="#4CAF50" 
-            font="kelsonsans" 
-            width="4">
-          </a-text>
-        </a-entity>
+        </a-box>
+
+        <!-- Separator -->
+        <a-box width="3.0" height="0.02" depth="0.05" color="#00E676" position="0 0.1 0.08">
+        </a-box>
+
+        <!-- Data Display Section -->
+        <a-box width="3.2" height="2.0" depth="0.05" color="#1e1e1e" opacity="0.9" position="0 -0.9 0.08">
+        </a-box>
+
+        <!-- Car Data -->
+        <a-text value="CAR (1200kg)" position="0 -0.3 0.12" align="center" color="#FFC107" font="kelsonsans" width="5">
+        </a-text>
+
+        <a-text value="A:" position="-1.4 -0.6 0.12" align="left" color="#E0E0E0" font="kelsonsans" width="4">
+        </a-text>
+        <a-text id="car-acceleration-3d" value="0 m/s²" position="-0.8 -0.6 0.12" align="left" color="#4CAF50"
+          font="kelsonsans" width="4">
+        </a-text>
+
+        <a-text value="V:" position="0.2 -0.6 0.12" align="left" color="#E0E0E0" font="kelsonsans" width="4">
+        </a-text>
+        <a-text id="car-velocity-3d" value="0 m/s" position="0.6 -0.6 0.12" align="left" color="#4CAF50"
+          font="kelsonsans" width="4">
+        </a-text>
+
+        <a-text value="D:" position="-1.4 -0.8 0.12" align="left" color="#E0E0E0" font="kelsonsans" width="4">
+        </a-text>
+        <a-text id="car-distance-3d" value="0 m" position="-0.8 -0.8 0.12" align="left" color="#4CAF50"
+          font="kelsonsans" width="4">
+        </a-text>
+
+        <!-- Cart Data -->
+        <a-text value="CART (50kg)" position="0 -1.2 0.12" align="center" color="#FF9800" font="kelsonsans" width="5">
+        </a-text>
+
+        <a-text value="A:" position="-1.4 -1.5 0.12" align="left" color="#E0E0E0" font="kelsonsans" width="4">
+        </a-text>
+        <a-text id="cart-acceleration-3d" value="0 m/s²" position="-0.8 -1.5 0.12" align="left" color="#4CAF50"
+          font="kelsonsans" width="4">
+        </a-text>
+
+        <a-text value="V:" position="0.2 -1.5 0.12" align="left" color="#E0E0E0" font="kelsonsans" width="4">
+        </a-text>
+        <a-text id="cart-velocity-3d" value="0 m/s" position="0.6 -1.5 0.12" align="left" color="#4CAF50"
+          font="kelsonsans" width="4">
+        </a-text>
+
+        <a-text value="D:" position="-1.4 -1.7 0.12" align="left" color="#E0E0E0" font="kelsonsans" width="4">
+        </a-text>
+        <a-text id="cart-distance-3d" value="0 m" position="-0.8 -1.7 0.12" align="left" color="#4CAF50"
+          font="kelsonsans" width="4">
+        </a-text>
+      </a-entity>
 
       <!-- Portal back to index.html -->
       <a-text value="Kembali ke Beranda" position="-8 2.0 2" align="center" color="#FFFFFF" font="kelsonsans" width="5"
@@ -588,8 +329,7 @@
           material="shader: flat; opacity: 0.9" cursor="fuse: true; fuseTimeout: 1200"
           raycaster="objects: .clickable; far: 20;"
           animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.2 0.2 0.2; dur: 1200; easing: linear"
-          animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120"
-          id="main-cursor">
+          animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120" id="main-cursor">
         </a-entity>
       </a-entity>
       <a-entity id="left-hand" networked-hand-controls="hand: left" laser-controls="hand: left"></a-entity>
@@ -1422,7 +1162,7 @@
     console.log('PhysicsSimulation3D initialized immediately');
 
     // Debug: Log all elements with cursor-listener after scene loads
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       setTimeout(() => {
         const listenedElements = document.querySelectorAll('[cursor-listener]');
         console.log('Elements with cursor-listener:', listenedElements.length);
@@ -1446,7 +1186,7 @@
         const forceMinusButton = document.getElementById('force-minus');
         if (forceMinusButton) {
           console.log('Found force-minus button, adding test click listener');
-          forceMinusButton.addEventListener('click', function(evt) {
+          forceMinusButton.addEventListener('click', function (evt) {
             console.log('DIRECT click on force-minus detected!');
             evt.stopPropagation();
           });
@@ -1458,13 +1198,13 @@
         const cursor = document.getElementById('main-cursor');
         if (cursor) {
           console.log('Found cursor, adding debug events');
-          cursor.addEventListener('raycaster-intersection', function(evt) {
+          cursor.addEventListener('raycaster-intersection', function (evt) {
             console.log('Cursor intersecting with:', evt.detail.els.map(el => el.id));
           });
-          cursor.addEventListener('raycaster-intersection-cleared', function(evt) {
+          cursor.addEventListener('raycaster-intersection-cleared', function (evt) {
             console.log('Cursor intersection cleared');
           });
-          cursor.addEventListener('click', function(evt) {
+          cursor.addEventListener('click', function (evt) {
             console.log('Cursor click event triggered');
           });
         }
@@ -1515,8 +1255,8 @@
 
         joystick = new JoyStick('joystick', {
           title: 'joystick',
-          width: 150,
-          height: 150,
+          width: 225,
+          height: 225,
           internalFillColor: 'rgba(255, 255, 255, 0.5)',
           internalLineWidth: 2,
           internalStrokeColor: '#FFFFFF',
@@ -1600,125 +1340,6 @@
     document.addEventListener('DOMContentLoaded', function () {
       setupMobileControls();
       animate();
-    });
-  </script>
-  <script>
-    // Device Toggle Functionality
-    function setupDeviceToggle() {
-      const deviceToggle = document.getElementById('device-toggle');
-      const mobileControls = document.getElementById('mobile-controls');
-      const sceneEl = document.querySelector('a-scene');
-      
-      // Update UI based on current device mode
-      function updateDeviceUI() {
-        const currentMode = localStorage.getItem('deviceType') || 'desktop';
-        if (deviceToggle) {
-          let icon, text;
-          switch(currentMode) {
-            case 'mobile':
-              icon = '🖥️';
-              text = 'Switch to Desktop';
-              break;
-            case 'vr':
-              icon = '🖥️';
-              text = 'Switch to Desktop';
-              break;
-            default: // desktop
-              icon = '🎮';
-              text = 'Switch to VR';
-          }
-          deviceToggle.innerHTML = `<i>${icon}</i><span>${text}</span>`;
-          
-          // Update mobile controls visibility
-          if (mobileControls) {
-            mobileControls.style.display = currentMode === 'mobile' ? 'block' : 'none';
-          }
-        }
-      }
-      
-      // Enter VR mode
-      function enterVR() {
-        if (sceneEl) {
-          document.body.classList.add('vr-mode');
-          if (sceneEl.hasAttribute('vr-mode-ui')) {
-            sceneEl.setAttribute('vr-mode-ui', 'enabled: true');
-          }
-          if (mobileControls) mobileControls.style.display = 'none';
-        }
-      }
-      
-      // Exit VR mode
-      function exitVR() {
-        if (sceneEl && sceneEl.is('vr-mode')) {
-          sceneEl.exitVR();
-        }
-        document.body.classList.remove('vr-mode');
-      }
-      
-      // Toggle between device modes
-      function toggleDeviceMode() {
-        const currentMode = localStorage.getItem('deviceType') || 'desktop';
-        let newMode;
-        
-        // Cycle through modes: desktop -> mobile -> vr -> desktop
-        switch(currentMode) {
-          case 'desktop':
-            newMode = 'mobile';
-            break;
-          case 'mobile':
-            newMode = 'vr';
-            break;
-          case 'vr':
-          default:
-            newMode = 'desktop';
-        }
-        
-        localStorage.setItem('deviceType', newMode);
-        
-        // Handle mode-specific logic
-        if (newMode === 'vr') {
-          enterVR();
-        } else {
-          exitVR();
-          if (newMode === 'mobile' && mobileControls) {
-            mobileControls.style.display = 'block';
-          } else if (mobileControls) {
-            mobileControls.style.display = 'none';
-          }
-        }
-        
-        updateDeviceUI();
-      }
-      
-      // Initialize
-      if (deviceToggle) {
-        deviceToggle.addEventListener('click', toggleDeviceMode);
-        
-        // Check for VR mode on load
-        const currentMode = localStorage.getItem('deviceType');
-        if (currentMode === 'vr') {
-          sceneEl.addEventListener('loaded', function() {
-            enterVR();
-          });
-        }
-        
-        updateDeviceUI();
-      }
-    }
-    
-    // Initialize when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-      setupDeviceToggle();
-    });
-    
-    // Handle VR display changes
-    window.addEventListener('vrdisplaypresentchange', function() {
-      const sceneEl = document.querySelector('a-scene');
-      if (sceneEl && sceneEl.is('vr-mode')) {
-        document.body.classList.add('vr-mode-active');
-      } else {
-        document.body.classList.remove('vr-mode-active');
-      }
     });
   </script>
 </body>

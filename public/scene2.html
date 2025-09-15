@@ -231,9 +231,9 @@
     style="position: fixed; bottom: 30px; left: 20px; z-index: 1000; display: none; touch-action: none; -webkit-tap-highlight-color: transparent;">
     <!-- Joystick Control -->
     <div id="joystick"
-      style="width: 120px; height: 120px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; position: relative; overflow: visible;">
+      style="width: 180px; height: 180px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; position: relative; overflow: visible;">
       <div id="joystick-knob"
-        style="width: 80px; height: 80px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; left: 20px; top: 20px; transition: transform 0.1s ease-out; touch-action: none; pointer-events: none;">
+        style="width: 120px; height: 120px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; left: 30px; top: 30px; transition: transform 0.1s ease-out; touch-action: none; pointer-events: none;">
       </div>
     </div>
   </div>
@@ -608,7 +608,7 @@
           <a-entity position="0 0 0">
             <a-box depth="0.03" height="0.2" width="0.6" color="#2a2a2a" material="depthTest: true">
             </a-box>
-            <a-text id="inputM1Text" value="1.0 kg" color="#fff" align="center" width="3" position="0 0 0.02"
+            <a-text id="inputM1Text" value="1.0 kg" color="#fff" align="center" width="2.5" position="0 0 0.02"
               material="depthTest: false; transparent: true">
             </a-text>
           </a-entity>
@@ -1566,8 +1566,8 @@
       function initJoystick() {
         joystick = new JoyStick('joystick', {
           title: 'joystick',
-          width: 150,
-          height: 150,
+          width: 225,
+          height: 225,
           internalFillColor: 'rgba(255, 255, 255, 0.5)',
           internalLineWidth: 2,
           internalStrokeColor: '#FFFFFF',

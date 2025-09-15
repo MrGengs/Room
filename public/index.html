@@ -13,6 +13,26 @@
     src="https://cdn.jsdelivr.net/npm/aframe-environment-component@1.5.0/dist/aframe-environment-component.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-gltf-model-plus@1.0.0/dist/gltf-model-plus.min.js"></script>
   <style>
+    /* Add smooth transitions */
+    * {
+      transition: all 0.3s ease, transform 0.2s ease;
+    }
+    
+    /* Add focus styles for accessibility */
+    .selection-card:focus {
+      outline: 3px solid #3a7bd5;
+      outline-offset: 3px;
+    }
+    
+    /* Add subtle hover effect on buttons */
+    button {
+      transition: all 0.2s ease;
+    }
+    
+    button:active {
+      transform: scale(0.95);
+    }
+    
     .ui-buttons {
       position: fixed;
       top: 20px;
@@ -151,27 +171,309 @@
 
 <body>
   <!-- Device Selection Screen -->
-  <div id="device-selection"
-    style="position: fixed; width: 100%; height: 100%; background: #1a1a1a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999;">
-    <h1 style="color: white; font-size: 2.5em; margin-bottom: 2em;">Pilih Perangkat Anda</h1>
-    <div style="display: flex; gap: 2em;">
-      <button id="btn-desktop"
-        style="padding: 1em 2em; font-size: 1.2em; background: #3a7bd5; color: white; border: none; border-radius: 5px; cursor: pointer;">Desktop</button>
-      <button id="btn-mobile"
-        style="padding: 1em 2em; font-size: 1.2em; background: #3a7bd5; color: white; border: none; border-radius: 5px; cursor: pointer;">Mobile</button>
-      <button id="btn-vr"
-        style="padding: 1em 2em; font-size: 1.2em; background: #9c27b0; color: white; border: none; border-radius: 5px; cursor: pointer;">VR Mode</button>
+  <div id="device-selection" class="selection-screen">
+    <div class="selection-container">
+      <h1 class="selection-title">Pilih Perangkat Anda</h1>
+      <div class="selection-grid">
+        <div class="selection-card" id="btn-desktop">
+          <div class="card-icon">💻</div>
+          <h3>Desktop</h3>
+          <p>Gunakan keyboard dan mouse</p>
+        </div>
+        <div class="selection-card" id="btn-mobile">
+          <div class="card-icon">📱</div>
+          <h3>Mobile</h3>
+          <p>Kontrol dengan layar sentuh</p>
+        </div>
+        <div class="selection-card highlight" id="btn-vr">
+          <div class="card-icon">🥽</div>
+          <h3>VR Mode</h3>
+          <p>Pengalaman imersif</p>
+          <span class="badge">Rekomendasi</span>
+        </div>
+      </div>
     </div>
   </div>
+
+  <style>
+    .selection-screen {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .selection-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 2.5rem 3rem;
+      max-width: 900px;
+      width: 90%;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+
+    .selection-title {
+      color: #fff;
+      font-size: 2.5em;
+      margin-bottom: 2rem;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      background: linear-gradient(90deg, #fff, #b8c6db);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .selection-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .selection-card {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      border: 2px solid transparent;
+    }
+
+    .selection-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      border-color: #3a7bd5;
+    }
+
+    .selection-card.highlight {
+      border: 2px solid #9c27b0;
+      position: relative;
+    }
+
+    .selection-card.highlight::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #9c27b0, #e91e63);
+    }
+
+    .card-icon {
+      font-size: 3.5rem;
+      margin-bottom: 1rem;
+      transition: transform 0.3s ease;
+    }
+
+    .selection-card:hover .card-icon {
+      transform: scale(1.2);
+    }
+
+    .selection-card h3 {
+      color: #333;
+      margin: 0.5rem 0;
+      font-size: 1.4rem;
+    }
+
+    .selection-card p {
+      color: #666;
+      font-size: 0.9rem;
+      margin: 0.5rem 0 0;
+    }
+
+    .badge {
+      position: absolute;
+      top: 10px;
+      right: -25px;
+      background: #9c27b0;
+      color: white;
+      padding: 2px 25px;
+      font-size: 0.7rem;
+      transform: rotate(45deg);
+      width: 100px;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .selection-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .selection-container {
+        padding: 1.5rem;
+        margin: 1rem;
+        width: auto;
+      }
+      
+      .selection-title {
+        font-size: 2rem;
+      }
+    }
+  </style>
+
+  <!-- Avatar Selection Modal -->
+  <div id="avatar-selection" class="modal">
+    <div class="modal-content">
+      <h2>Pilih Avatar Anda</h2>
+      <div class="avatar-grid">
+        <div class="avatar-option" data-avatar="male">
+          <div class="avatar-preview">
+            <img src="https://cdn.jsdelivr.net/gh/c-frame/valid-avatars-glb@c539a28/avatars/Asian/Asian_M_1_Busi.glb/thumbnail.png" alt="Male Avatar">
+          </div>
+          <span>Pria</span>
+        </div>
+        <div class="avatar-option" data-avatar="female">
+          <div class="avatar-preview">
+            <img src="https://cdn.jsdelivr.net/gh/c-frame/valid-avatars-glb@c539a28/avatars/Asian/Asian_F_1_Busi.glb/thumbnail.png" alt="Female Avatar">
+          </div>
+          <span>Wanita</span>
+        </div>
+      </div>
+      <button id="confirm-avatar" class="confirm-btn">Konfirmasi Pilihan</button>
+    </div>
+  </div>
+
+  <style>
+    /* Avatar Selection Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal.show {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-content {
+      background: #1a1a2e;
+      padding: 2rem;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal.show .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal h2 {
+      color: #fff;
+      margin-bottom: 2rem;
+      font-size: 1.8rem;
+    }
+
+    .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .avatar-option {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .avatar-option:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .avatar-option.selected {
+      border-color: #4cc9f0;
+      box-shadow: 0 0 20px rgba(76, 201, 240, 0.5);
+    }
+
+    .avatar-preview {
+      width: 100%;
+      height: 150px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .avatar-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-option span {
+      color: #fff;
+      font-size: 1.1rem;
+      display: block;
+      margin-top: 0.5rem;
+    }
+
+    .confirm-btn {
+      background: #4cc9f0;
+      color: #1a1a2e;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 30px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+      width: 100%;
+      max-width: 200px;
+    }
+
+    .confirm-btn:hover {
+      background: #3db8dd;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .confirm-btn:active {
+      transform: translateY(0);
+    }
+  </style>
 
   <!-- Virtual Gamepad for Mobile -->
   <div id="mobile-controls"
     style="position: fixed; bottom: 30px; left: 20px; z-index: 1000; display: none; touch-action: none; -webkit-tap-highlight-color: transparent;">
     <!-- Joystick Control -->
     <div id="joystick"
-      style="width: 120px; height: 120px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; position: relative; overflow: visible;">
+      style="width: 180px; height: 180px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; position: relative; overflow: visible;">
       <div id="joystick-knob"
-        style="width: 80px; height: 80px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; left: 20px; top: 20px; transition: transform 0.1s ease-out; touch-action: none; pointer-events: none;">
+        style="width: 120px; height: 120px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; left: 30px; top: 30px; transition: transform 0.1s ease-out; touch-action: none; pointer-events: none;">
       </div>
     </div>
   </div>
@@ -263,6 +565,59 @@
   </a-scene>
 
   <script>
+    // Add animation class to cards on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const cards = document.querySelectorAll('.selection-card');
+      cards.forEach((card, index) => {
+        // Staggered animation
+        card.style.animation = `fadeInUp 0.5s ease-out ${index * 0.1}s forwards`;
+        card.style.opacity = '0';
+        
+        // Add click effect
+        card.addEventListener('mousedown', () => {
+          card.style.transform = 'translateY(-5px) scale(0.98)';
+        });
+        
+        card.addEventListener('mouseup', () => {
+          card.style.transform = 'translateY(-10px)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+          if (!card.classList.contains('highlight')) {
+            card.style.transform = 'translateY(0)';
+          } else {
+            card.style.transform = 'translateY(-10px)';
+          }
+        });
+      });
+    });
+    
+    // Add keyframe animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(156, 39, 176, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(156, 39, 176, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(156, 39, 176, 0); }
+      }
+      
+      .selection-card.highlight {
+        animation: pulse 2s infinite;
+      }
+    `;
+    document.head.appendChild(style);
+    
     // Check if device is already selected
     const deviceType = localStorage.getItem('deviceType');
     const deviceSelection = document.getElementById('device-selection');
@@ -322,10 +677,156 @@
       document.body.classList.remove('vr-mode');
     }
     
-    // Device button handlers
-    document.getElementById('btn-desktop').addEventListener('click', () => setupDevice('desktop'));
-    document.getElementById('btn-mobile').addEventListener('click', () => setupDevice('mobile'));
-    document.getElementById('btn-vr').addEventListener('click', () => setupDevice('vr'));
+    // Enhanced device button handlers with animations
+    function setupDeviceButton(buttonId, deviceType) {
+      const button = document.getElementById(buttonId);
+      if (!button) return;
+      
+      button.addEventListener('click', () => {
+        // Add click animation
+        button.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+          button.style.transform = '';
+        }, 200);
+        
+        // Highlight selected device
+        document.querySelectorAll('.selection-card').forEach(card => {
+          card.classList.remove('selected');
+        });
+        button.classList.add('selected');
+        
+        // Add loading state
+        const originalContent = button.innerHTML;
+        button.innerHTML = `
+          <div class="loading-spinner">
+            <div class="spinner"></div>
+            <span>Menyiapkan...</span>
+          </div>
+        `;
+        
+        // Add spinner styles if not exists
+        if (!document.getElementById('spinner-styles')) {
+          const spinnerStyle = document.createElement('style');
+          spinnerStyle.id = 'spinner-styles';
+          spinnerStyle.textContent = `
+            .loading-spinner {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 10px;
+            }
+            .spinner {
+              width: 20px;
+              height: 20px;
+              border: 3px solid rgba(255, 255, 255, 0.3);
+              border-radius: 50%;
+              border-top-color: #fff;
+              animation: spin 1s ease-in-out infinite;
+            }
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          `;
+          document.head.appendChild(spinnerStyle);
+        }
+        
+        // Proceed with device setup after a short delay
+        setTimeout(() => {
+          setupDevice(deviceType);
+        }, 800);
+      });
+      
+      // Add hover effect
+      button.addEventListener('mouseenter', () => {
+        if (!button.classList.contains('selected')) {
+          button.style.transform = 'translateY(-5px)';
+        }
+      });
+      
+      button.addEventListener('mouseleave', () => {
+        if (!button.classList.contains('selected')) {
+          button.style.transform = 'translateY(0)';
+        } else {
+          button.style.transform = 'translateY(-10px)';
+        }
+      });
+    }
+    
+    // Initialize device buttons
+    setupDeviceButton('btn-desktop', 'desktop');
+    setupDeviceButton('btn-mobile', 'mobile');
+    setupDeviceButton('btn-vr', 'vr');
+
+    // Avatar Selection Logic
+    document.addEventListener('DOMContentLoaded', () => {
+      const avatarModal = document.getElementById('avatar-selection');
+      const avatarOptions = document.querySelectorAll('.avatar-option');
+      const confirmBtn = document.getElementById('confirm-avatar');
+      let selectedAvatar = null;
+
+      // Show avatar selection after device is selected
+      function showAvatarSelection() {
+        avatarModal.classList.add('show');
+      }
+
+      // Handle avatar selection
+      avatarOptions.forEach(option => {
+        option.addEventListener('click', () => {
+          // Remove selected class from all options
+          avatarOptions.forEach(opt => opt.classList.remove('selected'));
+          // Add selected class to clicked option
+          option.classList.add('selected');
+          selectedAvatar = option.getAttribute('data-avatar');
+        });
+      });
+
+      // Handle confirm button click
+      confirmBtn.addEventListener('click', () => {
+        if (!selectedAvatar) {
+          alert('Silakan pilih avatar terlebih dahulu');
+          return;
+        }
+
+        // Save selected avatar to local storage
+        localStorage.setItem('selectedAvatar', selectedAvatar);
+        
+        // Hide modal
+        avatarModal.classList.remove('show');
+        
+        // Start the experience with selected avatar
+        startExperience(selectedAvatar);
+      });
+
+      // Show avatar selection when device is selected
+      document.querySelectorAll('.selection-card').forEach(card => {
+        card.addEventListener('click', () => {
+          // Show avatar selection after a short delay
+          setTimeout(showAvatarSelection, 500);
+        });
+      });
+    });
+
+    // Function to start the experience with selected avatar
+    function startExperience(avatarType) {
+      const scene = document.querySelector('a-scene');
+      const deviceSelection = document.getElementById('device-selection');
+      
+      // Hide device selection
+      deviceSelection.style.display = 'none';
+      
+      // Show the scene
+      scene.style.display = 'block';
+      
+      // Set the avatar based on selection
+      const rig = document.getElementById('rig');
+      if (rig) {
+        const modelUrl = avatarType === 'male'
+          ? 'https://cdn.glitch.global/c2231c1a-2935-4332-8715-032588334f99/Asian_M_1_Busi.glb?v=16813662'
+          : 'https://cdn.jsdelivr.net/gh/c-frame/valid-avatars-glb@c539a28/avatars/Asian/Asian_F_1_Busi.glb';
+        
+        rig.setAttribute('player-info', 'avatarSrc', modelUrl);
+      }
+    }
     
     // Handle VR display activate events
     window.addEventListener('vrdisplaypresentchange', function() {
@@ -381,8 +882,8 @@
 
         joystick = new JoyStick('joystick', {
           title: 'joystick',
-          width: 150,
-          height: 150,
+          width: 225,
+          height: 225,
           internalFillColor: 'rgba(255, 255, 255, 0.5)',
           internalLineWidth: 2,
           internalStrokeColor: '#FFFFFF',
