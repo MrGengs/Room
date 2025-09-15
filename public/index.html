@@ -1,362 +1,284 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8" />
-    <title>AR-Room</title>
-    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js"></script>
-    <script src="/easyrtc/easyrtc.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/networked-aframe@0.14.0/dist/networked-aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.0/dist/aframe-extras.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe-environment-component@1.5.0/dist/aframe-environment-component.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-gltf-model-plus@1.0.0/dist/gltf-model-plus.min.js"></script>
-    <script>
-      window.uiSettings = {
-        showRandomAvatarButton: true,
-        showDieButton: true,
-      };
-    </script>
-    <script src="/dist/components.js"></script>
-    <script defer src="/dist/ui.js"></script>
-  </head>
-  <body>
-    <!-- Device Selection Screen -->
-    <div id="device-selection" style="position: fixed; width: 100%; height: 100%; background: #1a1a1a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999;">
-      <h1 style="color: white; font-size: 2.5em; margin-bottom: 2em;">Pilih Perangkat Anda</h1>
-      <div style="display: flex; gap: 2em;">
-        <button id="btn-desktop" style="padding: 1em 2em; font-size: 1.2em; background: #3a7bd5; color: white; border: none; border-radius: 5px; cursor: pointer;">Desktop</button>
-        <button id="btn-mobile" style="padding: 1em 2em; font-size: 1.2em; background: #3a7bd5; color: white; border: none; border-radius: 5px; cursor: pointer;">Mobile</button>
+
+<head>
+  <meta charset="utf-8" />
+  <title>AR-Room</title>
+  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js"></script>
+  <script src="/easyrtc/easyrtc.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/networked-aframe@0.14.0/dist/networked-aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.0/dist/aframe-extras.min.js"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/aframe-environment-component@1.5.0/dist/aframe-environment-component.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-gltf-model-plus@1.0.0/dist/gltf-model-plus.min.js"></script>
+  <script>
+    window.uiSettings = {
+      showRandomAvatarButton: true,
+      showDieButton: true,
+    };
+  </script>
+  <script src="/dist/components.js"></script>
+  <script src="/js/joystick.js"></script>
+  <script defer src="/dist/ui.js"></script>
+</head>
+
+<body>
+  <!-- Device Selection Screen -->
+  <div id="device-selection"
+    style="position: fixed; width: 100%; height: 100%; background: #1a1a1a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999;">
+    <h1 style="color: white; font-size: 2.5em; margin-bottom: 2em;">Pilih Perangkat Anda</h1>
+    <div style="display: flex; gap: 2em;">
+      <button id="btn-desktop"
+        style="padding: 1em 2em; font-size: 1.2em; background: #3a7bd5; color: white; border: none; border-radius: 5px; cursor: pointer;">Desktop</button>
+      <button id="btn-mobile"
+        style="padding: 1em 2em; font-size: 1.2em; background: #3a7bd5; color: white; border: none; border-radius: 5px; cursor: pointer;">Mobile</button>
+    </div>
+  </div>
+
+  <!-- Virtual Gamepad for Mobile -->
+  <div id="mobile-controls"
+    style="position: fixed; bottom: 30px; left: 20px; z-index: 1000; display: none; touch-action: none; -webkit-tap-highlight-color: transparent;">
+    <!-- Joystick Control -->
+    <div id="joystick"
+      style="width: 120px; height: 120px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; position: relative; overflow: visible;">
+      <div id="joystick-knob"
+        style="width: 80px; height: 80px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; left: 20px; top: 20px; transition: transform 0.1s ease-out; touch-action: none; pointer-events: none;">
       </div>
     </div>
+  </div>
 
-    <!-- Virtual Gamepad for Mobile -->
-    <div id="mobile-controls" style="display: none; position: fixed; bottom: 30px; left: 20px; z-index: 1000; pointer-events: none;">
-      <!-- Joystick Control -->
-      <div style="width: 120px; height: 120px; position: relative; pointer-events: auto;">
-        <div id="joystick" style="width: 100%; height: 100%; background: rgba(255, 255, 255, 0.2); border-radius: 50%; position: relative; overflow: hidden;">
-          <div id="joystick-knob" style="width: 70px; height: 70px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; left: 25px; top: 25px; transition: transform 0.1s ease-out;"></div>
-        </div>
-      </div>
-    </div>
-
-    <a-scene style="display: none;"
-      light="defaultLightsEnabled:false"
-      renderer="stencil:true"
-      networked-scene="
+  <a-scene style="display: none;" light="defaultLightsEnabled:false" renderer="stencil:true" networked-scene="
         connectOnLoad: false;
         room: lobby;
         debug: true;
         adapter: wseasyrtc;
         audio: false;
-        video: false;"
-      shadow="type: pcfsoft"
-      gltf-model="meshoptDecoderPath:https://unpkg.com/meshoptimizer@0.19.0/meshopt_decoder.js"
-      raycaster="far: 100; objects: .clickable,[link];"
-      cursor="rayOrigin: mouse"
-    >
-      <a-assets>
-        <img id="thumbScene1" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" />
-        <a-asset-item id="avatar-male-model" src="SittingIdle_man.fbx"></a-asset-item>
-        <a-asset-item id="avatar-female-model" src="SittingIdle_woman.fbx"></a-asset-item>
-        <template id="avatar-template">
-          <a-entity player-info>
-            <a-entity class="model" animation-mixer>
-              <a-text class="nametag" align="center" value="?" position="0 2.1 0" scale=".5 .5 .5"></a-text>
-            </a-entity>
-            <a-entity class="camera" position="0 1.6 0"></a-entity>
+        video: false;" shadow="type: pcfsoft"
+    gltf-model="meshoptDecoderPath:https://unpkg.com/meshoptimizer@0.19.0/meshopt_decoder.js"
+    raycaster="far: 100; objects: .clickable,[link];" cursor="rayOrigin: mouse">
+    <a-assets>
+      <img id="thumbScene1" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" />
+      <a-asset-item id="avatar-male-model" src="SittingIdle_man.fbx"></a-asset-item>
+      <a-asset-item id="avatar-female-model" src="SittingIdle_woman.fbx"></a-asset-item>
+      <template id="avatar-template">
+        <a-entity player-info>
+          <a-entity class="model" animation-mixer>
+            <a-text class="nametag" align="center" value="?" position="0 2.1 0" scale=".5 .5 .5"></a-text>
           </a-entity>
-        </template>
-      </a-assets>
-
-      <a-gltf-model id="world-nav-mesh" src="assets/home/world.glb" nav-mesh class="collidable"></a-gltf-model>
-
-      <a-text
-        value="PaDyViR"
-        align="center"
-        position="0 2.5 -4"
-        scale="2 2 2"
-        color="#4CC3D9"
-        style="font-weight: bold"
-      ></a-text>
-      <a-text
-        value="Particle Dynamics Virtual Reality"
-        align="center"
-        position="0 2 -4"
-        scale="2 2 2"
-        style="font-weight: bold"
-      ></a-text>
-
-      <a-link
-        change-room="on:obbcollisionstarted;room:scene1;url:scene1.html"
-        link="on:click"
-        href="scene1.html"
-        title="Go To World 1"
-        image="#thumbScene1"
-        position="3 1.6 -10"
-        class="clickable collidable"
-        event-set__mouseenter="material.opacity: 0.8"
-        event-set__mouseleave="material.opacity: 0.6"
-      >
-      </a-link>
-
-      <a-link
-        change-room="on:obbcollisionstarted;room:scene2;url:scene2.html"
-        link="on:click"
-        href="scene2.html"
-        title="Go To World 2"
-        image="#thumbScene1"
-        position="-3 1.6 -10"
-        class="clickable collidable"
-        event-set__mouseenter="material.opacity: 0.8"
-        event-set__mouseleave="material.opacity: 0.6"
-      >
-      </a-link>
-
-      <a-entity id="scene">
-        <!-- World GLB model -->
-        <a-gltf-model src="assets/home/world.glb" position="0 0.2 0" scale="1 1 1" rotation="0 0 0"></a-gltf-model>
-
-        <!-- Interior walls to prevent escape from inside world.glb -->
-        <!-- These walls form the interior boundaries of the world -->
-
-        <!-- Ultra small interior nav-mesh -->
-        <a-box nav-mesh position="0 0 0" width="3" height="0.1" depth="3" visible="false"></a-box>
-
-        <!-- Ultra tight boundary walls -->
-        <!-- East interior wall -->
-        <a-box nav-mesh position="1.5 2 0" width="0.1" height="4" depth="3" visible="false"></a-box>
-        <!-- West interior wall -->
-        <a-box nav-mesh position="-1.5 2 0" width="0.1" height="4" depth="3" visible="false"></a-box>
-        <!-- North interior wall -->
-        <a-box nav-mesh position="0 2 1.5" width="3" height="4" depth="0.1" visible="false"></a-box>
-        <!-- South interior wall -->
-        <a-box nav-mesh position="0 2 -1.5" width="3" height="4" depth="0.1" visible="false"></a-box>
-
-        <!-- Corner blocks (extremely close) -->
-        <a-box nav-mesh position="1.4 2 1.4" width="0.3" height="4" depth="0.3" visible="false"></a-box>
-        <a-box nav-mesh position="-1.4 2 1.4" width="0.3" height="4" depth="0.3" visible="false"></a-box>
-        <a-box nav-mesh position="1.4 2 -1.4" width="0.3" height="4" depth="0.3" visible="false"></a-box>
-        <a-box nav-mesh position="-1.4 2 -1.4" width="0.3" height="4" depth="0.3" visible="false"></a-box>
-
-        <!-- Ground -->
-        <a-plane position="0 0 0" rotation="-90 0 0" width="100" height="100" color="#4A4A4A" visible="true"></a-plane>
-        <a-entity light="type:ambient;intensity:0.5"></a-entity>
-      </a-entity>
-
-      <a-entity
-        id="rig"
-        movement-controls="constrainToNavMesh: true; speed: 0.3"
-        spawn-in-circle="radius:1"
-        networked="template:#avatar-template;attachTemplateToLocal:false"
-        player-info
-      >
-        <a-entity id="player" class="camera" camera position="0 1.6 0" look-controls>
-          <a-entity
-            position="0 0 -1"
-            geometry="primitive: ring; radiusInner: 0.018; radiusOuter: 0.025"
-            material="shader: flat; opacity: 0.9"
-            cursor="fuse: true; fuseTimeout: 1200"
-            raycaster="objects: .clickable; far: 20;"
-            animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.2 0.2 0.2; dur: 1200; easing: linear"
-            animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120"
-          >
-          </a-entity>
+          <a-entity class="camera" position="0 1.6 0"></a-entity>
         </a-entity>
-        <a-entity id="left-hand" networked-hand-controls="hand: left" laser-controls="hand: left"></a-entity>
-        <a-entity id="right-hand" networked-hand-controls="hand:right" laser-controls="hand: right"></a-entity>
+      </template>
+    </a-assets>
+
+    <a-gltf-model id="world-nav-mesh" src="assets/home/world.glb" nav-mesh class="collidable"></a-gltf-model>
+
+    <a-text value="PaDyViR" align="center" position="0 2.5 -4" scale="2 2 2" color="#4CC3D9"
+      style="font-weight: bold"></a-text>
+    <a-text value="Particle Dynamics Virtual Reality" align="center" position="0 2 -4" scale="2 2 2"
+      style="font-weight: bold"></a-text>
+
+    <a-link change-room="on:obbcollisionstarted;room:scene1;url:scene1.html" link="on:click" href="scene1.html"
+      title="Go To World 1" image="#thumbScene1" position="3 1.6 -10" class="clickable collidable"
+      event-set__mouseenter="material.opacity: 0.8" event-set__mouseleave="material.opacity: 0.6">
+    </a-link>
+
+    <a-link change-room="on:obbcollisionstarted;room:scene2;url:scene2.html" link="on:click" href="scene2.html"
+      title="Go To World 2" image="#thumbScene1" position="-3 1.6 -10" class="clickable collidable"
+      event-set__mouseenter="material.opacity: 0.8" event-set__mouseleave="material.opacity: 0.6">
+    </a-link>
+
+    <a-entity id="scene">
+      <!-- World GLB model -->
+      <a-gltf-model src="assets/home/world.glb" position="0 0.2 0" scale="1 1 1" rotation="0 0 0"></a-gltf-model>
+
+      <!-- Interior walls to prevent escape from inside world.glb -->
+      <!-- These walls form the interior boundaries of the world -->
+
+      <!-- Ultra small interior nav-mesh -->
+      <a-box nav-mesh position="0 0 0" width="3" height="0.1" depth="3" visible="false"></a-box>
+
+      <!-- Ultra tight boundary walls -->
+      <!-- East interior wall -->
+      <a-box nav-mesh position="1.5 2 0" width="0.1" height="4" depth="3" visible="false"></a-box>
+      <!-- West interior wall -->
+      <a-box nav-mesh position="-1.5 2 0" width="0.1" height="4" depth="3" visible="false"></a-box>
+      <!-- North interior wall -->
+      <a-box nav-mesh position="0 2 1.5" width="3" height="4" depth="0.1" visible="false"></a-box>
+      <!-- South interior wall -->
+      <a-box nav-mesh position="0 2 -1.5" width="3" height="4" depth="0.1" visible="false"></a-box>
+
+      <!-- Corner blocks (extremely close) -->
+      <a-box nav-mesh position="1.4 2 1.4" width="0.3" height="4" depth="0.3" visible="false"></a-box>
+      <a-box nav-mesh position="-1.4 2 1.4" width="0.3" height="4" depth="0.3" visible="false"></a-box>
+      <a-box nav-mesh position="1.4 2 -1.4" width="0.3" height="4" depth="0.3" visible="false"></a-box>
+      <a-box nav-mesh position="-1.4 2 -1.4" width="0.3" height="4" depth="0.3" visible="false"></a-box>
+
+      <!-- Ground -->
+      <a-plane position="0 0 0" rotation="-90 0 0" width="100" height="100" color="#4A4A4A" visible="true"></a-plane>
+      <a-entity light="type:ambient;intensity:0.5"></a-entity>
+    </a-entity>
+
+    <a-entity id="rig" movement-controls="constrainToNavMesh: true; speed: 0.3" spawn-in-circle="radius:1"
+      networked="template:#avatar-template;attachTemplateToLocal:false" player-info>
+      <a-entity id="player" class="camera" camera position="0 1.6 0" look-controls>
+        <a-entity position="0 0 -1" geometry="primitive: ring; radiusInner: 0.018; radiusOuter: 0.025"
+          material="shader: flat; opacity: 0.9" cursor="fuse: true; fuseTimeout: 1200"
+          raycaster="objects: .clickable; far: 20;"
+          animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.2 0.2 0.2; dur: 1200; easing: linear"
+          animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 120">
+        </a-entity>
       </a-entity>
-    </a-scene>
+      <a-entity id="left-hand" networked-hand-controls="hand: left" laser-controls="hand: left"></a-entity>
+      <a-entity id="right-hand" networked-hand-controls="hand:right" laser-controls="hand: right"></a-entity>
+    </a-entity>
+  </a-scene>
 
-    <script>
-      // Check if device is already selected
-      const deviceType = localStorage.getItem('deviceType');
-      const deviceSelection = document.getElementById('device-selection');
-      const scene = document.querySelector('a-scene');
-      const mobileControls = document.getElementById('mobile-controls');
-      
-      // Always show device selection screen
-      deviceSelection.style.display = 'flex';
-      scene.style.display = 'none';
+  <script>
+    // Check if device is already selected
+    const deviceType = localStorage.getItem('deviceType');
+    const deviceSelection = document.getElementById('device-selection');
+    const scene = document.querySelector('a-scene');
+    const mobileControls = document.getElementById('mobile-controls');
+    let joystick = null;
 
-      // Device selection handlers
-      document.getElementById('btn-desktop').addEventListener('click', () => {
-        deviceSelection.style.display = 'none';
-        scene.style.display = 'block';
-      });
+    // Always show device selection screen
+    deviceSelection.style.display = 'flex';
+    scene.style.display = 'none';
 
-      document.getElementById('btn-mobile').addEventListener('click', () => {
-        deviceSelection.style.display = 'none';
-        scene.style.display = 'block';
+    // Device selection handlers
+    document.getElementById('btn-desktop').addEventListener('click', () => {
+      deviceSelection.style.display = 'none';
+      scene.style.display = 'block';
+      localStorage.setItem('deviceType', 'desktop');
+      // Sembunyikan mobile controls untuk desktop
+      if (mobileControls) mobileControls.style.display = 'none';
+    });
+
+    document.getElementById('btn-mobile').addEventListener('click', () => {
+      deviceSelection.style.display = 'none';
+      scene.style.display = 'block';
+      localStorage.setItem('deviceType', 'mobile');
+      // Tampilkan mobile controls untuk mobile
+      if (mobileControls) {
         mobileControls.style.display = 'block';
         setupMobileControls();
-      });
-
-      // Mobile controls setup
-      function setupMobileControls() {
-        const joystick = document.getElementById('joystick');
-        const joystickKnob = document.getElementById('joystick-knob');
-        const rig = document.getElementById('rig');
-        
-        if (!rig) {
-          console.error('Element with id "rig" not found');
-          return;
-        }
-        
-        let isJoystickActive = false;
-        let joystickStartX = 0;
-        let joystickStartY = 0;
-        let joystickX = 0;
-        let joystickY = 0;
-        const joystickRadius = 25;
-        const movementSpeed = 0.1;
-        
-        // Common function to handle both touch and mouse events
-        function handleJoystickStart(clientX, clientY) {
-          isJoystickActive = true;
-          const rect = joystick.getBoundingClientRect();
-          joystickStartX = rect.left + rect.width / 2;
-          joystickStartY = rect.top + rect.height / 2;
-          updateJoystick({ clientX, clientY });
-        }
-        
-        function handleJoystickMove(clientX, clientY) {
-          if (!isJoystickActive) return;
-          updateJoystick({ clientX, clientY });
-          updatePlayerMovement();
-        }
-        
-        function handleJoystickEnd() {
-          isJoystickActive = false;
-          joystickX = 0;
-          joystickY = 0;
-          joystickKnob.style.transform = 'translate(25px, 25px)';
-        }
-        
-        // Touch events for mobile
-        joystick.addEventListener('touchstart', (e) => {
-          e.preventDefault();
-          handleJoystickStart(e.touches[0].clientX, e.touches[0].clientY);
-        }, { passive: false });
-        
-        document.addEventListener('touchmove', (e) => {
-          if (!isJoystickActive) return;
-          e.preventDefault();
-          handleJoystickMove(e.touches[0].clientX, e.touches[0].clientY);
-        }, { passive: false });
-        
-        document.addEventListener('touchend', handleJoystickEnd);
-        
-        // Mouse events for laptop/desktop
-        joystick.addEventListener('mousedown', (e) => {
-          e.preventDefault();
-          handleJoystickStart(e.clientX, e.clientY);
-          
-          // Add move and up listeners to document to track mouse movement outside joystick
-          document.addEventListener('mousemove', handleMouseMove);
-          document.addEventListener('mouseup', handleMouseUp);
-        });
-        
-        function handleMouseMove(e) {
-          handleJoystickMove(e.clientX, e.clientY);
-        }
-        
-        function handleMouseUp() {
-          handleJoystickEnd();
-          // Clean up event listeners
-          document.removeEventListener('mousemove', handleMouseMove);
-          document.removeEventListener('mouseup', handleMouseUp);
-        }
-        
-        // Update joystick position
-        function updateJoystick(touch) {
-          const x = touch.clientX - joystickStartX;
-          const y = touch.clientY - joystickStartY;
-          const distance = Math.sqrt(x * x + y * y);
-          const angle = Math.atan2(y, x);
-          
-          if (distance < joystickRadius) {
-            joystickX = x / joystickRadius;
-            joystickY = y / joystickRadius;
-            joystickKnob.style.transform = `translate(${x + 25}px, ${y + 25}px)`;
-          } else {
-            joystickX = Math.cos(angle);
-            joystickY = Math.sin(angle);
-            joystickKnob.style.transform = `translate(${Math.cos(angle) * joystickRadius + 25}px, ${Math.sin(angle) * joystickRadius + 25}px)`;
-          }
-        }
-        
-        // Update player movement based on joystick input
-        function updatePlayerMovement() {
-          if (!rig) return;
-          
-          // Get camera direction
-          const camera = document.querySelector('[camera]');
-          if (!camera) return;
-          
-          const cameraEl = camera.object3D;
-          const direction = new THREE.Vector3();
-          cameraEl.getWorldDirection(direction);
-          
-          // Project direction onto XZ plane (ignore Y-axis for movement)
-          const forward = new THREE.Vector3(direction.x, 0, direction.z).normalize();
-          
-          // Calculate movement vector based on joystick input
-          // Invert Y-axis to match standard game controls (up = forward, down = backward)
-          const moveX = joystickX * movementSpeed;
-          const moveZ = -joystickY * movementSpeed;
-          
-          // Apply movement
-          if (moveX !== 0 || moveZ !== 0) {
-            // Strafe movement (left/right) - use camera right vector
-            const right = new THREE.Vector3();
-            right.crossVectors(new THREE.Vector3(0, 1, 0), forward).normalize();
-            
-            // Calculate final movement direction
-            const movement = new THREE.Vector3();
-            // Forward/backward movement based on camera forward
-            movement.addScaledVector(forward, moveZ);
-            // Left/right strafing
-            movement.addScaledVector(right, moveX);
-            
-            // Apply movement to rig position
-            const currentPosition = rig.getAttribute('position');
-            rig.setAttribute('position', {
-              x: currentPosition.x + movement.x,
-              y: currentPosition.y,  // Keep Y position the same (no flying)
-              z: currentPosition.z + movement.z
-            });
-            
-            // Only update rotation if moving (not just strafing)
-            if (Math.abs(moveZ) > 0.1) {
-              // Calculate target rotation based on movement direction
-              const targetRotation = Math.atan2(movement.x, movement.z);
-              rig.setAttribute('rotation', {
-                x: 0,
-                y: THREE.Math.radToDeg(targetRotation),
-                z: 0
-              });
-            }
-          }
-        }
-        
-        // Prevent default touch behavior for joystick
-        document.addEventListener('touchstart', (e) => {
-          if (e.target === joystick) {
-            e.preventDefault();
-          }
-        }, { passive: false });
-        
-        // Add animation frame loop for smooth movement
-        function animate() {
-          if (isJoystickActive) {
-            updatePlayerMovement();
-          }
-          requestAnimationFrame(animate);
-        }
-        
-        // Start animation loop
-        animate();
       }
-    </script>
-  </body>
+    });
+
+    // Initialize mobile controls jika sudah memilih mobile sebelumnya
+    if (deviceType === 'mobile') {
+      deviceSelection.style.display = 'none';
+      scene.style.display = 'block';
+      if (mobileControls) {
+        mobileControls.style.display = 'block';
+        // Tunggu sampai scene selesai dimuat
+        scene.addEventListener('loaded', function () {
+          setTimeout(setupMobileControls, 1000);
+        });
+      }
+    }
+
+    // Initialize mobile controls
+    function setupMobileControls() {
+      const camera = document.querySelector('[camera]');
+      const rig = document.getElementById('rig');
+
+      if (!camera) {
+        console.error('Camera element not found');
+        return;
+      }
+
+      const movementSpeed = 0.1;
+      let isMobile = false;
+
+      // Initialize joystick
+      function initJoystick() {
+        // Remove any existing joystick
+        if (joystick) {
+          const joystickElement = document.getElementById('joystick');
+          if (joystickElement) {
+            joystickElement.innerHTML = '';
+          }
+        }
+
+        joystick = new JoyStick('joystick', {
+          title: 'joystick',
+          width: 150,
+          height: 150,
+          internalFillColor: 'rgba(255, 255, 255, 0.5)',
+          internalLineWidth: 2,
+          internalStrokeColor: '#FFFFFF',
+          externalLineWidth: 2,
+          externalStrokeColor: 'rgba(255, 255, 255, 0.3)',
+          autoReturnToCenter: true
+        }, function (stickData) {
+          if (stickData.x !== 0 || stickData.y !== 0) {
+            updateCameraMovement(stickData.x, stickData.y);
+          }
+        });
+      }
+
+      // Update camera movement based on joystick input
+      function updateCameraMovement(x, y) {
+        if (!camera) return;
+
+        const cameraEl = camera.object3D;
+        const direction = new THREE.Vector3();
+        cameraEl.getWorldDirection(direction);
+
+        // Project direction onto XZ plane (ignore Y-axis for movement)
+        const forward = new THREE.Vector3(direction.x, 0, direction.z).normalize();
+
+        // Calculate movement vector based on joystick input
+        const moveX = x * movementSpeed;
+        const moveZ = y * movementSpeed; // Positive Y moves forward, negative Y moves backward
+
+        // Strafe movement (left/right) - use camera right vector
+        const right = new THREE.Vector3();
+        right.crossVectors(new THREE.Vector3(0, 1, 0), forward).normalize();
+
+        // Calculate final movement direction
+        const movement = new THREE.Vector3();
+        // Forward/backward movement based on camera forward
+        movement.addScaledVector(forward, moveZ);
+        // Left/right strafing
+        movement.addScaledVector(right, moveX);
+
+        // Apply movement to camera position
+        const currentPosition = camera.getAttribute('position');
+        camera.setAttribute('position', {
+          x: currentPosition.x + movement.x,
+          y: currentPosition.y,  // Keep Y position the same (no flying)
+          z: currentPosition.z + movement.z
+        });
+      }
+
+      // Show joystick for mobile devices
+      function checkDeviceType() {
+        const deviceType = localStorage.getItem('deviceType');
+        isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        console.log('Device type from localStorage:', deviceType);
+        console.log('Is mobile device:', isMobile);
+
+        // Show joystick if:
+        // 1. User selected 'mobile' in localStorage, OR
+        // 2. Device is detected as mobile (regardless of localStorage)
+        if (deviceType === 'mobile' || isMobile) {
+          console.log('Showing joystick for mobile device');
+          document.getElementById('mobile-controls').style.display = 'block';
+          initJoystick();
+        } else {
+          console.log('Hiding joystick for desktop');
+          document.getElementById('mobile-controls').style.display = 'none';
+        }
+      }
+
+      // Initialize mobile controls
+      checkDeviceType();
+    }
+  </script>
+</body>
+
 </html>
