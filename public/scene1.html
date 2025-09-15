@@ -469,7 +469,7 @@
           </a-text>
           <a-text 
             id="car-velocity-3d" 
-            value="0 m/s" 
+            value="0 m/s²" 
             position="-1.0 -0.5 0.02" 
             align="left" 
             color="#4CAF50" 
@@ -542,7 +542,7 @@
           </a-text>
           <a-text 
             id="cart-velocity-3d" 
-            value="0 m/s" 
+            value="0 m/s²" 
             position="-1.0 -2.0 0.02" 
             align="left" 
             color="#4CAF50" 
@@ -1115,7 +1115,7 @@
             if (accelIndicator) {
               // Calculate theoretical acceleration: F = ma, so a = F/m
               const theoreticalAccel = this.inputForce / this.data.mass;
-              accelIndicator.setAttribute('value', `A: ${theoreticalAccel.toFixed(2)} m/s²`);
+              accelIndicator.setAttribute('value', `a: ${theoreticalAccel.toFixed(2)} m/s²`);
               accelIndicator.setAttribute('visible', true);
             }
           } else {
@@ -1140,12 +1140,12 @@
                 const theoreticalAccel = this.inputForce / this.data.mass;
                 accelEl.setAttribute('value', `${theoreticalAccel.toFixed(2)} m/s²`);
               }
-              if (velocityEl) velocityEl.setAttribute('value', `${this.maxValues.velocity.toFixed(2)} m/s`);
+              if (velocityEl) velocityEl.setAttribute('value', `${this.maxValues.velocity.toFixed(2)} m/s²`);
               if (distanceEl) distanceEl.setAttribute('value', `${this.maxValues.distance.toFixed(2)} m`);
             } else {
               // Show zero values when reset
               if (accelEl) accelEl.setAttribute('value', `0.00 m/s²`);
-              if (velocityEl) velocityEl.setAttribute('value', `0.00 m/s`);
+              if (velocityEl) velocityEl.setAttribute('value', `0.00 m/s²`);
               if (distanceEl) distanceEl.setAttribute('value', `0.00 m`);
             }
             
@@ -1353,10 +1353,10 @@
           requestAnimationFrame(() => {
             const elements = [
               { id: 'car-acceleration-3d', value: '0 m/s²' },
-              { id: 'car-velocity-3d', value: '0 m/s' },
+              { id: 'car-velocity-3d', value: '0 m/s²' },
               { id: 'car-distance-3d', value: '0 m' },
               { id: 'cart-acceleration-3d', value: '0 m/s²' },
-              { id: 'cart-velocity-3d', value: '0 m/s' },
+              { id: 'cart-velocity-3d', value: '0 m/s²' },
               { id: 'cart-distance-3d', value: '0 m' }
             ];
             
