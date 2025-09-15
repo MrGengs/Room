@@ -22,6 +22,7 @@ export const defaultOutfits = ['Casual', 'Busi', 'Medi', 'Milit', 'Util'];
 
 export const AvatarSelect: Component<Props> = (props) => {
   const outfits = props.outfits ?? defaultOutfits;
+  
   if (outfits.length === 1) {
     setOutfit(outfits[0]);
   }
@@ -34,7 +35,13 @@ export const AvatarSelect: Component<Props> = (props) => {
 
       queueMicrotask(() => {
         const el = document.getElementById(id);
-        el?.scrollIntoView();
+        if (el) {
+          el.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center',
+            inline: 'center'
+          });
+        }
       });
     }
   });
@@ -140,34 +147,45 @@ export const AvatarSelect: Component<Props> = (props) => {
         </div>
       </Show>
 
-      <div class="flex h-52 w-full flex-row flex-nowrap gap-2 overflow-y-hidden overflow-x-scroll">
-        <For each={props.avatars}>
-          {(avatar, idx) => (
-            <Show when={avatar.gender === gender() && avatar.outfit === outfit()}>
-              <button
-                id={`avatar-${idx()}`}
-                class="relative h-52 w-52 shrink-0 cursor-pointer"
-                disabled={avatarLoading()}
-                onClick={() => {
-                  setAvatarSrc(avatarsBaseUrl + avatar.model);
-                }}
-              >
-                <img
-                  class="absolute inset-0"
-                  alt={`avatar ${avatar.text}`}
-                  loading="lazy"
-                  src={avatarsBaseUrl + avatar.image}
-                  width="208"
-                  height="208"
-                />
-                <div
-                  class="absolute inset-0 bg-white/30 backdrop-brightness-125"
-                  classList={{ hidden: avatarSrc().endsWith(avatar.model) }}
-                ></div>
-              </button>
-            </Show>
-          )}
-        </For>
+      <div class="w-full border border-gray-200 rounded-lg bg-gray-50 p-6">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 min-h-[200px]">
+          <For each={props.avatars}>
+            {(avatar, idx) => (
+              <Show when={avatar.gender === gender() && avatar.outfit === outfit()}>
+                <button
+                  id={`avatar-${idx()}`}
+                  class="relative aspect-square w-full cursor-pointer rounded-lg border-2 border-transparent hover:border-gray-300 focus:border-blue-500 focus:outline-none transition-all duration-200 group"
+                  disabled={avatarLoading()}
+                  onClick={() => {
+                    setAvatarSrc(avatarsBaseUrl + avatar.model);
+                  }}
+                >
+                  <img
+                    class="absolute inset-0 w-full h-full rounded-lg object-cover"
+                    alt={`avatar ${avatar.text}`}
+                    loading="lazy"
+                    src={avatarsBaseUrl + avatar.image}
+                  />
+                  <div
+                    class="absolute inset-0 bg-white/30 backdrop-brightness-125 rounded-lg transition-opacity duration-200"
+                    classList={{ 
+                      hidden: avatarSrc().endsWith(avatar.model),
+                      'group-hover:opacity-75': !avatarSrc().endsWith(avatar.model)
+                    }}
+                  ></div>
+                  <div
+                    class="absolute inset-0 ring-4 ring-blue-500 rounded-lg"
+                    classList={{ hidden: !avatarSrc().endsWith(avatar.model) }}
+                  ></div>
+                  {/* Avatar name label */}
+                  <div class="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1 rounded-b-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    {avatar.text}
+                  </div>
+                </button>
+              </Show>
+            )}
+          </For>
+        </div>
       </div>
     </div>
   );
