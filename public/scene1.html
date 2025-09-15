@@ -6,10 +6,32 @@
   <title>AR-Room</title>
   <meta name="description" content="AR">
   <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js"></script>
-  <script src="/easyrtc/easyrtc.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/networked-aframe@0.14.0/dist/networked-aframe.min.js"></script>
+  <script src="https://unpkg.com/networked-aframe@0.14.0/dist/networked-aframe.min.js"></script>
+  <script src="https://unpkg.com/networked-aframe@0.14.0/dist/easyrtc-adapter.js"></script>
+  <script>
+    // Global configuration
+    window.NAF_OPTIONS = {
+      updateRate: 15, // Update rate in Hz
+      useLerp: true,
+      useHttps: window.location.protocol === 'https:',
+      debug: true
+    };
+    
+    // ICE servers configuration
+    const iceServers = [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' }
+    ];
+    
+    // Initialize EasyRTC with proper configuration
+    easyrtc.enableDebug(false);
+    easyrtc.setStunServers(iceServers);
+    easyrtc.enableVideo(false);
+    easyrtc.enableAudio(false);
+    easyrtc.enableDataChannels(true);
+  </script>
 
   <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script>
   <script
@@ -95,7 +117,8 @@
         connectOnLoad: false;
         room: forest;
         debug: true;
-        adapter: wseasyrtc;
+        adapter: easyrtc;
+        onConnect: onConnect;
         audio: false;
         video: false;
     " shadow="type: pcfsoft" gltf-model="meshoptDecoderPath:https://unpkg.com/meshoptimizer@0.19.0/meshopt_decoder.js"

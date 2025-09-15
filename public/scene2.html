@@ -4,10 +4,16 @@
 <head>
   <meta charset="utf-8">
   <title>VR Fisika</title>
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aframe-extras@7.5.4/dist/aframe-extras.min.js"></script>
   <script src="https://unpkg.com/aframe-event-set-component/dist/aframe-event-set-component.min.js"></script>
   <script src="https://unpkg.com/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js"></script>
+  
+  <!-- Networked-Aframe and dependencies -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js"></script>
+  <script src="https://unpkg.com/networked-aframe@0.14.0/dist/networked-aframe.min.js"></script>
+  <script src="https://unpkg.com/networked-aframe@0.14.0/dist/easyrtc-adapter.js"></script>
+  
   <script src="/js/joystick.js"></script>
   <style>
     .ui-buttons {
@@ -52,6 +58,28 @@
     }
   </style>
   <script>
+    // Global Networked-Aframe configuration
+    window.NAF_OPTIONS = {
+      updateRate: 15, // Update rate in Hz
+      useLerp: true,
+      useHttps: window.location.protocol === 'https:',
+      debug: true
+    };
+    
+    // ICE servers configuration
+    const iceServers = [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' }
+    ];
+    
+    // Initialize EasyRTC with proper configuration
+    easyrtc.enableDebug(false);
+    easyrtc.setStunServers(iceServers);
+    easyrtc.enableVideo(false);
+    easyrtc.enableAudio(false);
+    easyrtc.enableDataChannels(true);
+    
     // Device Toggle Functionality
     function setupDeviceToggle() {
       const deviceToggle = document.getElementById('device-toggle');
@@ -872,6 +900,25 @@
       </a-text>
     </a-entity>
 
+    </a-entity>
+    <a-assets>
+      <template id="avatar-template">
+        <a-entity player-info>
+          <a-entity class="model" animation-mixer>
+            <a-text class="nametag" align="center" value="?" position="0 2.1 0" scale=".5 .5 .5"></a-text>
+          </a-entity>
+          <a-entity class="camera" position="0 1.6 0"></a-entity>
+        </a-entity>
+      </template>
+    </a-assets>
+    
+    <!-- Player Rig with Networked Component -->
+    <a-entity id="player-rig" position="0 1.6 5" networked="template:#avatar-template;attachTemplateToLocal:false">
+      <a-entity id="player" class="camera" camera position="0 1.6 0" look-controls>
+        <a-cursor></a-cursor>
+      </a-entity>
+      <a-entity id="left-hand" hand-controls="left" laser-controls="hand: left"></a-entity>
+      <a-entity id="right-hand" hand-controls="right" laser-controls="hand: right"></a-entity>
     </a-entity>
   </a-scene>
 
@@ -2594,14 +2641,57 @@ VERIFIKASI:
         if (!collision) {
           this.el.object3D.getWorldPosition(this.lastSafePosition);
         }
-      },
+      }
     });
 
-    // Info untuk pengguna
-    console.log('VR Fisika loaded successfully!');
-    console.log('If GLB models fail to load due to CORS, fallback models will be used.');
-    console.log('To use GLB models properly, serve this file from a local server (e.g., Live Server extension)');
-  </script>
-</body>
+        // Initialize Networked-Aframe after everything is loaded
+        function initializeNetworkedAFrame() {
+          console.log('Initializing Networked-Aframe for physics lab...');
+          
+          // Configure the adapter
+          NAF.connection.adapter = new NAF.adapters.EasyRtcAdapter();
+          NAF.connection.adapter.setAppName('default');
+          NAF.connection.adapter.setRoom('physics-lab');
+          NAF.connection.adapter.setConnectOnLoad(true);
+          NAF.connection.adapter.setServerUrl(window.location.origin);
+          
+          // Connect to the server
+          const scene = document.querySelector('a-scene');
+          if (scene.hasLoaded) {
+            connectToServer();
+          } else {
+            scene.addEventListener('loaded', connectToServer);
+          }
+        }
+        
+        function connectToServer() {
+          console.log('Connecting to server...');
+          const scene = document.querySelector('a-scene');
+          const networkedScene = scene.systems['networked-scene'];
+          
+          if (networkedScene) {
+            networkedScene.connect();
+            console.log('Networked-Aframe connected successfully to physics-lab room');
+          } else {
+            console.error('Networked-scene system not found');
+          }
+        }
+        
+        // Initialize Networked-Aframe when everything is ready
+        document.addEventListener('DOMContentLoaded', function() {
+          // Initialize Networked-Aframe after a short delay to ensure all scripts are loaded
+          if (window.NAF && window.easyrtc) {
+            setTimeout(initializeNetworkedAFrame, 1000);
+          } else {
+            console.error('Required libraries not loaded');
+          }
+        });
+        
+        // Info untuk pengguna
+        console.log('VR Fisika loaded successfully!');
+        console.log('If GLB models fail to load due to CORS, fallback models will be used.');
+        console.log('To use GLB models properly, serve this file from a local server (e.g., Live Server extension)');
+      </script>
+    </body>
 
-</html>
+    </html>
