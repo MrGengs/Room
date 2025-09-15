@@ -527,9 +527,78 @@
       </a-link>
     </a-entity>
 
+    <!-- Jump Controls Component -->
+    <script>
+      AFRAME.registerComponent('jump-controls', {
+        schema: {
+          jumpHeight: { type: 'number', default: 1.0 },
+          jumpDuration: { type: 'number', default: 800 },
+          isJumping: { type: 'boolean', default: false },
+          initialY: { type: 'number', default: 1.6 }
+        },
+        init: function() {
+          // Add event listeners for keyboard and touch
+          document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !this.data.isJumping) {
+              this.jump();
+            }
+          });
+          
+          // Touch support for mobile
+          document.addEventListener('touchend', (e) => {
+            if (!this.data.isJumping && e.target.id === 'jump-button') {
+              this.jump();
+            }
+          });
+          
+          // Store initial Y position
+          this.data.initialY = this.el.getAttribute('position').y || 1.6;
+        },
+        jump: function() {
+          if (this.data.isJumping) return;
+          
+          this.data.isJumping = true;
+          const startTime = Date.now();
+          const startY = this.el.getAttribute('position').y;
+          const jumpHeight = this.data.jumpHeight;
+          const jumpDuration = this.data.jumpDuration;
+          
+          const animateJump = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / jumpDuration, 1);
+            const jumpProgress = Math.sin(progress * Math.PI);
+            const currentY = startY + (jumpProgress * jumpHeight);
+            
+            // Update position
+            const currentPos = this.el.getAttribute('position');
+            this.el.setAttribute('position', {
+              x: currentPos.x,
+              y: currentY,
+              z: currentPos.z
+            });
+            
+            // Continue animation or complete
+            if (progress < 1) {
+              requestAnimationFrame(animateJump);
+            } else {
+              // Reset to initial position
+              this.el.setAttribute('position', {
+                x: currentPos.x,
+                y: this.data.initialY,
+                z: currentPos.z
+              });
+              this.data.isJumping = false;
+            }
+          };
+          
+          requestAnimationFrame(animateJump);
+        }
+      });
+    </script>
+
     <a-entity id="rig" position="6 0 3" rotation="0 90 0" collider="distance: 0.3" movement-controls="fly:false;"
-      networked="template:#avatar-template;attachTemplateToLocal:false" player-info>
-      <a-entity id="player" class="camera" camera position="0 1.6 0" look-controls>
+      networked="template:#avatar-template;attachTemplateToLocal:false" player-info jump-controls>
+      <a-entity id="player" class="camera" camera position="0 1.6 0" look-controls pointer-lock>
         <a-box obb-collider visible="false" height="0.4" depth="0.4" width="0.4"></a-box>
         <!-- Ring cursor for better interaction -->
         <a-entity position="0 0 -1" geometry="primitive: ring; radiusInner: 0.018; radiusOuter: 0.025"
