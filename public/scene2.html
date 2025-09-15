@@ -26,6 +26,8 @@
           <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+r1yW8iCz5/yPTMgSUFK3nO9d2ONgcXZLjr6qaUGBBIo+3zxm0hCTp+wvLNfSMDL4TP9diALgUlcs7y2W4jBy+N0PLUbCEGMYnZ8c1wJAAzdNrz0G8gBSyCzfPLdSIEO5DV79JlGgU/jNXux2EaBC+N0vHKdCMCMnPN8tV3JQQM0Pb4rFA" type="audio/wav">
         </audio>
         
+        <audio id="slideSound" src="data:audio/wav;base64,UklGRigBAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAZGF0YVgAAAAA" type="audio/wav"></audio>
+        
         <!-- Fallback untuk jika GLB tidak tersedia -->
         <a-mixin id="fallback-box"
                  geometry="primitive: box; width: 2; height: 1; depth: 1"
@@ -232,7 +234,7 @@
           material="depthTest: true"
           shadow="cast: true">
         </a-box>
-        
+        <a-entity id="dust-particles" particle-system="preset: dust; particleCount: 1000; maxAge: 1; size: 0.1, 0.5; color: #696969, #FFFFFF; velocityValue: 0 0 1; velocitySpread: 0.5 0.1 0.5; accelerationValue: 0 -1 0; accelerationSpread: 0 0 0; enabled: false"></a-entity>
       </a-entity>
 
       <a-text
@@ -1255,6 +1257,8 @@
       function animateBlock(state, acceleration = 0) {
         // Prioritaskan model GLB jika sudah dimuat, jika tidak, gunakan fallback box
         const modelToAnimate = document.querySelector('#myModel').querySelector('#glbBlockModel') || document.querySelector('#blockModel');
+        const dustParticles = document.querySelector('#dust-particles');
+        const slideSound = document.querySelector('#slideSound');
 
         if (modelToAnimate) {
           // Hapus animasi sebelumnya jika ada
@@ -1283,6 +1287,35 @@
 
             // Memicu event untuk memulai animasi
             modelToAnimate.emit('start-animation');
+
+            // Play sound and show particles
+            if (slideSound) {
+              slideSound.play();
+            }
+            if (dustParticles) {
+              dustParticles.setAttribute('particle-system', 'enabled', true);
+            }
+            
+            // Stop sound and particles when animation finishes
+            setTimeout(() => {
+              if (slideSound) {
+                slideSound.pause();
+                slideSound.currentTime = 0;
+              }
+              if (dustParticles) {
+                dustParticles.setAttribute('particle-system', 'enabled', false);
+              }
+            }, duration);
+
+          } else {
+            // Stop sound and particles if not moving
+            if (slideSound) {
+              slideSound.pause();
+              slideSound.currentTime = 0;
+            }
+            if (dustParticles) {
+              dustParticles.setAttribute('particle-system', 'enabled', false);
+            }
           }
         }
       }
