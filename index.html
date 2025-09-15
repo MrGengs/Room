@@ -61,19 +61,21 @@
         material="color: #3a7bd5; metalness: 0.1; roughness: 0.5"></a-mixin>
     </a-assets>
 
-    <!-- Kamera dengan gaze cursor dan controller -->
-    <a-entity camera look-controls wasd-controls position="0 1.6 3">
-      <!-- Enhanced reticle with glow effect -->
-      <a-entity id="reticle" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.015; radiusOuter: 0.025"
-        material="shader: flat; color: #00ff88; opacity: 0.8" cursor="fuse: true; fuseTimeout: 1500"
-        raycaster="objects: .clickable; far: 20"
-        animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.1 0.1 0.1; dur: 1500; easing: easeInQuad"
-        animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 200; easing: easeOutQuad"
-        animation__pulse="property: rotation; to: 0 0 360; dur: 2000; loop: true; easing: linear">
-        <!-- Glow effect -->
-        <a-ring position="0 0 -0.001" geometry="radiusInner: 0.02; radiusOuter: 0.04"
-          material="color: #00ff88; opacity: 0.3; transparent: true"
-          animation="property: scale; to: 1.5 1.5 1.5; dur: 1000; loop: true; dir: alternate; easing: easeInOutSine"></a-ring>
+    <!-- Camera with mouse look and jump controls -->
+    <a-entity id="rig" position="0 1.6 3" jump-controls>
+      <a-entity camera look-controls="pointerLockEnabled: true; mouseSensitivity: 0.1" wasd-controls>
+        <!-- Enhanced reticle with glow effect -->
+        <a-entity id="reticle" position="0 0 -1" geometry="primitive: ring; radiusInner: 0.015; radiusOuter: 0.025"
+          material="shader: flat; color: #00ff88; opacity: 0.8" cursor="fuse: true; fuseTimeout: 1500"
+          raycaster="objects: .clickable; far: 20"
+          animation__fuse="property: scale; startEvents: fusing; from: 1 1 1; to: 0.1 0.1 0.1; dur: 1500; easing: easeInQuad"
+          animation__reset="property: scale; startEvents: mouseleave; to: 1 1 1; dur: 200; easing: easeOutQuad"
+          animation__pulse="property: rotation; to: 0 0 360; dur: 2000; loop: true; easing: linear">
+          <!-- Glow effect -->
+          <a-ring position="0 0 -0.001" geometry="radiusInner: 0.02; radiusOuter: 0.04"
+            material="color: #00ff88; opacity: 0.3; transparent: true"
+            animation="property: scale; to: 1.5 1.5 1.5; dur: 1000; loop: true; dir: alternate; easing: easeInOutSine"></a-ring>
+        </a-entity>
       </a-entity>
     </a-entity>
 
@@ -462,17 +464,78 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
           <a-box width="4" height="1.5" depth="0.1" color="#1a1a1a" opacity="0.9" material="transparent: true"></a-box>
           <a-text id="momentumBefore" value="" position="0 0.4 0.06" align="center" color="#ffff00" width="3"></a-text>
           <a-text id="momentumAfter" value="" position="0 0 0.06" align="center" color="#00ff00" width="3"></a-text>
-          <a-text id="energyInfo" value="" position="0 -0.4 0.06" align="center" color="#ff6666" width="3"></a-text>
         </a-entity>
       </a-entity>
-  </a-scene>
+    </a-scene>
 
-  <script>
-    // Check if device is already selected
-    const deviceType = localStorage.getItem('deviceType');
-    const deviceSelection = document.getElementById('device-selection');
-    const scene = document.querySelector('a-scene');
-    const mobileControls = document.getElementById('mobile-controls');
+    <!-- Jump Controls Component -->
+    <script>
+      // Register jump-controls component
+      AFRAME.registerComponent('jump-controls', {
+        schema: {
+          jumpHeight: { type: 'number', default: 0.8 },
+          jumpDuration: { type: 'number', default: 600 },
+          isJumping: { type: 'boolean', default: false },
+          initialY: { type: 'number', default: 1.6 }
+        },
+        init: function() {
+          // Add event listeners for keyboard and touch
+          document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !this.data.isJumping) {
+              this.jump();
+            }
+          });
+          
+          // Touch support for mobile
+          document.addEventListener('touchend', (e) => {
+            if (!this.data.isJumping) {
+              this.jump();
+            }
+          });
+          
+          // Store initial Y position
+          this.data.initialY = this.el.getAttribute('position').y || 1.6;
+        },
+        jump: function() {
+          if (this.data.isJumping) return;
+          
+          this.data.isJumping = true;
+          const startTime = Date.now();
+          const startY = this.el.getAttribute('position').y;
+          const jumpHeight = this.data.jumpHeight;
+          const jumpDuration = this.data.jumpDuration;
+          
+          const animateJump = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / jumpDuration, 1);
+            const jumpProgress = Math.sin(progress * Math.PI);
+            const currentY = startY + (jumpProgress * jumpHeight);
+            
+            // Update position
+            const currentPos = this.el.getAttribute('position');
+            this.el.setAttribute('position', {
+              x: currentPos.x,
+              y: currentY,
+              z: currentPos.z
+            });
+            
+            // Continue animation or complete
+            if (progress < 1) {
+              requestAnimationFrame(animateJump);
+            } else {
+              // Reset to initial position
+              this.el.setAttribute('position', {
+                x: currentPos.x,
+                y: this.data.initialY,
+                z: currentPos.z
+              });
+              this.data.isJumping = false;
+            }
+          };
+          
+          requestAnimationFrame(animateJump);
+        }
+      });
 
     // If device is already selected, skip selection
     if (deviceType) {

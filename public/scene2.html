@@ -1,108 +1,132 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>VR Fisika</title>
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
-    <script src="https://unpkg.com/aframe-event-set-component/dist/aframe-event-set-component.min.js"></script>
-    <script src="https://unpkg.com/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js"></script>
-    <script src="/js/joystick.js"></script>
 
-    <!-- CSS for Bab 2 UI -->
-    <style>
-      #ui-container {
-        position: absolute;
-        top: 20px;
-        left: 20px;
-        z-index: 10;
-        background-color: rgba(0, 0, 0, 0.7);
-        color: white;
-        padding: 15px;
-        border-radius: 10px;
-        font-family: sans-serif;
-        width: 320px;
-        display: none;
-      }
+<head>
+  <meta charset="utf-8">
+  <title>VR Fisika</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+  <script src="https://unpkg.com/aframe-event-set-component/dist/aframe-event-set-component.min.js"></script>
+  <script src="https://unpkg.com/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js"></script>
+  <script src="/js/joystick.js"></script>
+  <style>
+    .ui-buttons {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 10000;
+      display: flex;
+      gap: 10px;
+    }
 
-      .input-group {
-        margin-bottom: 10px;
-      }
+    .ui-button {
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border: 1px solid #3a7bd5;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
 
-      .input-group label {
-        display: inline-block;
-        width: 150px;
-      }
+    .ui-button:hover {
+      background: rgba(58, 123, 213, 0.9);
+    }
 
-      .input-group input {
-        width: 100px;
-        padding: 5px;
-        border-radius: 5px;
-        border: none;
-      }
+    .ui-button i {
+      font-size: 16px;
+    }
 
-      #result-container {
-        margin-top: 15px;
-        padding-top: 10px;
-        border-top: 1px solid #555;
-        font-family: 'Courier New', Courier, monospace;
-      }
+    /* VR mode styles */
+    .vr-mode .ui-button {
+      z-index: 10001;
+    }
 
-      #result-container h3 {
-        margin-top: 0;
-      }
+    /* Hide UI elements in VR mode */
+    .vr-mode .ui-buttons:not(.vr-visible) {
+      display: none;
+    }
 
-      button {
-        padding: 8px 15px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: bold;
-        margin-top: 10px;
-      }
+    
+    button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 10px;
+    }
 
-      #btnCalculate {
+    #btnCalculate {
         background-color: #2e88ff;
         color: white;
-      }
+    }
 
-      #btnCalculate:hover {
+    #btnCalculate:hover {
         background-color: #7bdcff;
+    }
+  </style>
+  <script>
+    // Device Toggle Functionality
+    function setupDeviceToggle() {
+      const deviceToggle = document.getElementById('device-toggle');
+      const mobileControls = document.getElementById('mobile-controls');
+      const sceneEl = document.querySelector('a-scene');
+      let joystick = null;
+
+      // Update UI based on current device mode
+      function updateDeviceUI() {
+        const currentMode = localStorage.getItem('deviceType') || 'desktop';
+        if (deviceToggle) {
+          let icon, text;
+          switch (currentMode) {
+            case 'mobile':
+              icon = '🖥️';
+              text = 'Switch to Desktop';
+              break;
+            case 'vr':
+              icon = '🖥️';
+              text = 'Switch to Desktop';
+              break;
+            default: // desktop
+              icon = '🎮';
+              text = 'Switch to VR';
+          }
+          deviceToggle.innerHTML = `<i>${icon}</i><span>${text}</span>`;
+
+          // Update mobile controls visibility
+          if (mobileControls) {
+            mobileControls.style.display = currentMode === 'mobile' ? 'block' : 'none';
+          }
+        }
       }
-    </style>
-  </head>
-  <body>
-    <!-- UI Container for Bab 2 - Gaya Gesek -->
-    <div id="ui-container">
-      <h3>Input Simulasi Gaya Gesek</h3>
-      <div class="input-group">
-        <label for="massa">Massa Balok (kg):</label>
-        <input type="number" id="massa" value="10">
-      </div>
-      <div class="input-group">
-        <label for="gaya-tarik">Gaya Tarik (N):</label>
-        <input type="number" id="gaya-tarik" value="20">
-      </div>
-      <div class="input-group">
-        <label for="koef-statis">Koefisien Statis (μs):</label>
-        <input type="number" id="koef-statis" value="0.5" step="0.1">
-      </div>
-      <div class="input-group">
-        <label for="koef-kinetis">Koefisien Kinetis (μk):</label>
-        <input type="number" id="koef-kinetis" value="0.3" step="0.1">
-      </div>
 
-      <button id="btnCalculate">Kalkulasi & Animasikan</button>
+      // Enter VR mode
+      function enterVR() {
+        if (sceneEl) {
+          document.body.classList.add('vr-mode');
+          if (sceneEl.hasAttribute('vr-mode-ui')) {
+            sceneEl.setAttribute('vr-mode-ui', 'enabled: true');
+          }
+          if (mobileControls) mobileControls.style.display = 'none';
+        }
+      }
 
-      <div id="result-container" style="display: none;">
-        <h3>Hasil Kalkulasi:</h3>
-        <p id="result-normal"></p>
-        <p id="result-fsmax"></p>
-        <p id="result-fk"></p>
-        <p id="result-kesimpulan"></p>
-        <p id="result-percepatan"></p>
-      </div>
-    </div>
+      // Exit VR mode
+      function exitVR() {
+        if (sceneEl && sceneEl.is('vr-mode')) {
+          sceneEl.exitVR();
+        }
+        document.body.classList.remove('vr-mode');
+      }
+    }
+  </script>
+</head>
+<body>
 
     <!-- Virtual Gamepad for Mobile -->
     <div id="mobile-controls" style="position: fixed; bottom: 30px; left: 20px; z-index: 1000; display: none; touch-action: none; -webkit-tap-highlight-color: transparent;">
@@ -201,14 +225,439 @@
                decay="2">
       </a-light>
 
+      <!-- Compact 3D Friction Force Control Panel -->
+      <a-entity id="friction-panel-3d" position="-4 3.5 -4.5" rotation="0 30 0" visible="false">
+        <!-- Main Panel Frame with Depth -->
+        <a-box
+          id="panel-frame"
+          width="4.5"
+          height="6.5"
+          depth="0.15"
+          color="#2a2a2a"
+          opacity="0.95"
+          shadow="cast: true; receive: true"
+          class="clickable">
+        </a-box>
+
+        <!-- Panel Border for 3D Effect -->
+        <a-box
+          width="4.7"
+          height="6.7"
+          depth="0.1"
+          color="#1a1a1a"
+          opacity="0.8"
+          position="0 0 -0.05">
+        </a-box>
+
+        <!-- Panel Title -->
+        <a-text
+          value="SIMULASI GAYA GESEK"
+          position="0 2.9 0.3"
+          align="center"
+          color="#00E676"
+          font="kelsonsans"
+          width="6">
+        </a-text>
+
+        <!-- Input Controls Section -->
+        <a-box
+          width="4.2"
+          height="4.8"
+          depth="0.05"
+          color="#333333"
+          opacity="0.9"
+          position="0 0.8 0.08">
+        </a-box>
+
+        <!-- Massa Controls -->
+        <a-text
+          value="Massa Balok (kg)"
+          position="0 2.4 0.12"
+          align="center"
+          color="#FFC107"
+          font="kelsonsans"
+          width="5">
+        </a-text>
+
+        <a-box
+          id="massa-minus"
+          width="0.25"
+          height="0.25"
+          depth="0.08"
+          color="#FF5722"
+          position="-1.2 2.0 0.12"
+          class="clickable"
+          cursor-listener
+          event-set__mouseenter="color: #FF7043"
+          event-set__mouseleave="color: #FF5722"
+          shadow="cast: true">
+          <a-text
+            value="-"
+            position="0 0 0.05"
+            align="center"
+            color="white"
+            font="kelsonsans"
+            width="10">
+          </a-text>
+        </a-box>
+
+        <a-box
+          width="1.2"
+          height="0.25"
+          depth="0.05"
+          color="#1e1e1e"
+          position="0 2.0 0.1">
+          <a-text
+            id="massa-display"
+            value="10"
+            position="0 0 0.03"
+            align="center"
+            color="#4CAF50"
+            font="kelsonsans"
+            width="6">
+          </a-text>
+        </a-box>
+
+        <a-box
+          id="massa-plus"
+          width="0.25"
+          height="0.25"
+          depth="0.08"
+          color="#4CAF50"
+          position="1.2 2.0 0.12"
+          class="clickable"
+          cursor-listener
+          event-set__mouseenter="color: #66BB6A"
+          event-set__mouseleave="color: #4CAF50"
+          shadow="cast: true">
+          <a-text
+            value="+"
+            position="0 0 0.05"
+            align="center"
+            color="white"
+            font="kelsonsans"
+            width="10">
+          </a-text>
+        </a-box>
+
+        <!-- Gaya Tarik Controls -->
+        <a-text
+          value="Gaya Tarik (N)"
+          position="0 1.6 0.12"
+          align="center"
+          color="#FFC107"
+          font="kelsonsans"
+          width="5">
+        </a-text>
+
+        <a-box
+          id="gaya-tarik-minus"
+          width="0.25"
+          height="0.25"
+          depth="0.08"
+          color="#FF5722"
+          position="-1.2 1.2 0.12"
+          class="clickable"
+          cursor-listener
+          event-set__mouseenter="color: #FF7043"
+          event-set__mouseleave="color: #FF5722"
+          shadow="cast: true">
+          <a-text
+            value="-"
+            position="0 0 0.05"
+            align="center"
+            color="white"
+            font="kelsonsans"
+            width="10">
+          </a-text>
+        </a-box>
+
+        <a-box
+          width="1.2"
+          height="0.25"
+          depth="0.05"
+          color="#1e1e1e"
+          position="0 1.2 0.1">
+          <a-text
+            id="gaya-tarik-display"
+            value="20"
+            position="0 0 0.03"
+            align="center"
+            color="#4CAF50"
+            font="kelsonsans"
+            width="6">
+          </a-text>
+        </a-box>
+
+        <a-box
+          id="gaya-tarik-plus"
+          width="0.25"
+          height="0.25"
+          depth="0.08"
+          color="#4CAF50"
+          position="1.2 1.2 0.12"
+          class="clickable"
+          cursor-listener
+          event-set__mouseenter="color: #66BB6A"
+          event-set__mouseleave="color: #4CAF50"
+          shadow="cast: true">
+          <a-text
+            value="+"
+            position="0 0 0.05"
+            align="center"
+            color="white"
+            font="kelsonsans"
+            width="10">
+          </a-text>
+        </a-box>
+
+        <!-- Koefisien Statis Controls -->
+        <a-text
+          value="Koefisien Statis (μs)"
+          position="0 0.8 0.12"
+          align="center"
+          color="#FFC107"
+          font="kelsonsans"
+          width="5">
+        </a-text>
+
+        <a-box
+          id="koef-statis-minus"
+          width="0.25"
+          height="0.25"
+          depth="0.08"
+          color="#FF5722"
+          position="-1.2 0.4 0.12"
+          class="clickable"
+          cursor-listener
+          event-set__mouseenter="color: #FF7043"
+          event-set__mouseleave="color: #FF5722"
+          shadow="cast: true">
+          <a-text
+            value="-"
+            position="0 0 0.05"
+            align="center"
+            color="white"
+            font="kelsonsans"
+            width="10">
+          </a-text>
+        </a-box>
+
+        <a-box
+          width="1.2"
+          height="0.25"
+          depth="0.05"
+          color="#1e1e1e"
+          position="0 0.4 0.1">
+          <a-text
+            id="koef-statis-display"
+            value="0.5"
+            position="0 0 0.03"
+            align="center"
+            color="#4CAF50"
+            font="kelsonsans"
+            width="6">
+          </a-text>
+        </a-box>
+
+        <a-box
+          id="koef-statis-plus"
+          width="0.25"
+          height="0.25"
+          depth="0.08"
+          color="#4CAF50"
+          position="1.2 0.4 0.12"
+          class="clickable"
+          cursor-listener
+          event-set__mouseenter="color: #66BB6A"
+          event-set__mouseleave="color: #4CAF50"
+          shadow="cast: true">
+          <a-text
+            value="+"
+            position="0 0 0.05"
+            align="center"
+            color="white"
+            font="kelsonsans"
+            width="10">
+          </a-text>
+        </a-box>
+
+        <!-- Koefisien Kinetis Controls -->
+        <a-text
+          value="Koefisien Kinetis (μk)"
+          position="0 0.0 0.12"
+          align="center"
+          color="#FFC107"
+          font="kelsonsans"
+          width="5">
+        </a-text>
+
+        <a-box
+          id="koef-kinetis-minus"
+          width="0.25"
+          height="0.25"
+          depth="0.08"
+          color="#FF5722"
+          position="-1.2 -0.4 0.12"
+          class="clickable"
+          cursor-listener
+          event-set__mouseenter="color: #FF7043"
+          event-set__mouseleave="color: #FF5722"
+          shadow="cast: true">
+          <a-text
+            value="-"
+            position="0 0 0.05"
+            align="center"
+            color="white"
+            font="kelsonsans"
+            width="10">
+          </a-text>
+        </a-box>
+
+        <a-box
+          width="1.2"
+          height="0.25"
+          depth="0.05"
+          color="#1e1e1e"
+          position="0 -0.4 0.1">
+          <a-text
+            id="koef-kinetis-display"
+            value="0.3"
+            position="0 0 0.03"
+            align="center"
+            color="#4CAF50"
+            font="kelsonsans"
+            width="6">
+          </a-text>
+        </a-box>
+
+        <a-box
+          id="koef-kinetis-plus"
+          width="0.25"
+          height="0.25"
+          depth="0.08"
+          color="#4CAF50"
+          position="1.2 -0.4 0.12"
+          class="clickable"
+          cursor-listener
+          event-set__mouseenter="color: #66BB6A"
+          event-set__mouseleave="color: #4CAF50"
+          shadow="cast: true">
+          <a-text
+            value="+"
+            position="0 0 0.05"
+            align="center"
+            color="white"
+            font="kelsonsans"
+            width="10">
+          </a-text>
+        </a-box>
+
+        <!-- Calculate Button -->
+        <a-box
+          id="calculate-btn-3d"
+          width="2.5"
+          height="0.4"
+          depth="0.1"
+          color="#2196F3"
+          position="0 -1.0 0.12"
+          class="clickable"
+          cursor-listener
+          event-set__mouseenter="color: #42A5F5"
+          event-set__mouseleave="color: #2196F3"
+          shadow="cast: true">
+          <a-text
+            value="KALKULASI & ANIMASIKAN"
+            position="0 0 0.05"
+            align="center"
+            color="white"
+            font="kelsonsans"
+            width="6">
+          </a-text>
+        </a-box>
+
+        <!-- Result Display Panel -->
+        <a-box
+          id="result-panel-3d"
+          width="4.0"
+          height="2.5"
+          depth="0.1"
+          color="#1a1a1a"
+          position="0 -2.5 0.12"
+          opacity="0.9"
+          visible="false">
+
+          <a-text
+            value="HASIL KALKULASI"
+            position="0 1.0 0.05"
+            align="center"
+            color="#00E676"
+            font="kelsonsans"
+            width="5">
+          </a-text>
+
+          <a-text
+            id="result-normal-3d"
+            value=""
+            position="0 0.6 0.05"
+            align="center"
+            color="#FFC107"
+            font="kelsonsans"
+            width="4">
+          </a-text>
+
+          <a-text
+            id="result-fsmax-3d"
+            value=""
+            position="0 0.3 0.05"
+            align="center"
+            color="#FFC107"
+            font="kelsonsans"
+            width="4">
+          </a-text>
+
+          <a-text
+            id="result-fk-3d"
+            value=""
+            position="0 0.0 0.05"
+            align="center"
+            color="#FFC107"
+            font="kelsonsans"
+            width="4">
+          </a-text>
+
+          <a-text
+            id="result-kesimpulan-3d"
+            value=""
+            position="0 -0.3 0.05"
+            align="center"
+            color="#4CAF50"
+            font="kelsonsans"
+            width="4">
+          </a-text>
+
+          <a-text
+            id="result-percepatan-3d"
+            value=""
+            position="0 -0.6 0.05"
+            align="center"
+            color="#4CAF50"
+            font="kelsonsans"
+            width="4">
+          </a-text>
+
+        </a-box>
+
+      </a-entity>
+
       <!-- Kamera dengan gaze cursor -->
-      <a-entity 
+      <a-entity
         id="rig"
         collider="distance: 0.3"
-        camera 
-        look-controls 
-        wasd-controls 
-        position="0 1.2 3" 
+        camera
+        look-controls
+        wasd-controls
+        position="0 1.2 3"
         kinematic-body="radius: 0.3; height: 1.6;"
         sphere-collider="radius: 0.3">
           <a-entity
@@ -308,7 +757,7 @@
         material="depthTest: false; transparent: true">
       </a-text>
 
-      <a-entity position="-0.5 0.8 -1" rotation="-30 0 0">
+      <a-entity position="-0.5 0.2 -1" rotation="-30 0 0">
         <a-box
           id="btnKembali2"
           class="clickable"
@@ -330,7 +779,7 @@
         </a-text>
       </a-entity>
 
-      <a-entity position="0.5 0.8 -1" rotation="-30 0 0">
+      <a-entity position="0.5 0.2 -1" rotation="-30 0 0">
         <a-box
           id="btnReset2"
           class="clickable"
@@ -1296,8 +1745,8 @@
           
         </a-entity>
 
-      </a-entity>
-    </a-scene>
+    </a-entity>
+  </a-scene>
 
     <script>
       // Flag untuk cek apakah model berhasil dimuat
@@ -1458,10 +1907,218 @@
         }
       }
 
+      // Variables for 3D panel values (global scope)
+      let massa_value_3d = 10;
+      let gaya_tarik_value_3d = 20;
+      let koef_statis_value_3d = 0.5;
+      let koef_kinetis_value_3d = 0.3;
+
+      // Function to setup 3D panel controls
+      function setup3DPanelControls() {
+        console.log('🔧 Setting up 3D panel controls...');
+
+        // Massa controls
+        const massaMinus = document.querySelector('#massa-minus');
+        const massaPlus = document.querySelector('#massa-plus');
+        const massaDisplay = document.querySelector('#massa-display');
+
+        if (massaMinus) {
+          // Remove any existing listeners first
+          massaMinus.replaceWith(massaMinus.cloneNode(true));
+          const newMassaMinus = document.querySelector('#massa-minus');
+          newMassaMinus.addEventListener('click', () => {
+            massa_value_3d = Math.max(1, massa_value_3d - 1);
+            const display = document.querySelector('#massa-display');
+            if (display) display.setAttribute('value', massa_value_3d.toString());
+            console.log('Massa decreased to:', massa_value_3d);
+          });
+          console.log('✅ Massa minus button listener added');
+        }
+
+        if (massaPlus) {
+          massaPlus.replaceWith(massaPlus.cloneNode(true));
+          const newMassaPlus = document.querySelector('#massa-plus');
+          newMassaPlus.addEventListener('click', () => {
+            massa_value_3d = Math.min(100, massa_value_3d + 1);
+            const display = document.querySelector('#massa-display');
+            if (display) display.setAttribute('value', massa_value_3d.toString());
+            console.log('Massa increased to:', massa_value_3d);
+          });
+          console.log('✅ Massa plus button listener added');
+        }
+
+        // Gaya Tarik controls
+        const gayaTarikMinus = document.querySelector('#gaya-tarik-minus');
+        const gayaTarikPlus = document.querySelector('#gaya-tarik-plus');
+
+        if (gayaTarikMinus) {
+          gayaTarikMinus.replaceWith(gayaTarikMinus.cloneNode(true));
+          const newGayaTarikMinus = document.querySelector('#gaya-tarik-minus');
+          newGayaTarikMinus.addEventListener('click', () => {
+            gaya_tarik_value_3d = Math.max(0, gaya_tarik_value_3d - 5);
+            const display = document.querySelector('#gaya-tarik-display');
+            if (display) display.setAttribute('value', gaya_tarik_value_3d.toString());
+            console.log('Gaya tarik decreased to:', gaya_tarik_value_3d);
+          });
+          console.log('✅ Gaya tarik minus button listener added');
+        }
+
+        if (gayaTarikPlus) {
+          gayaTarikPlus.replaceWith(gayaTarikPlus.cloneNode(true));
+          const newGayaTarikPlus = document.querySelector('#gaya-tarik-plus');
+          newGayaTarikPlus.addEventListener('click', () => {
+            gaya_tarik_value_3d = Math.min(200, gaya_tarik_value_3d + 5);
+            const display = document.querySelector('#gaya-tarik-display');
+            if (display) display.setAttribute('value', gaya_tarik_value_3d.toString());
+            console.log('Gaya tarik increased to:', gaya_tarik_value_3d);
+          });
+          console.log('✅ Gaya tarik plus button listener added');
+        }
+
+        // Koefisien Statis controls
+        const koefStatisMinus = document.querySelector('#koef-statis-minus');
+        const koefStatisPlus = document.querySelector('#koef-statis-plus');
+
+        if (koefStatisMinus) {
+          koefStatisMinus.replaceWith(koefStatisMinus.cloneNode(true));
+          const newKoefStatisMinus = document.querySelector('#koef-statis-minus');
+          newKoefStatisMinus.addEventListener('click', () => {
+            koef_statis_value_3d = Math.max(0.1, Math.round((koef_statis_value_3d - 0.1) * 10) / 10);
+            const display = document.querySelector('#koef-statis-display');
+            if (display) display.setAttribute('value', koef_statis_value_3d.toFixed(1));
+            console.log('Koef statis decreased to:', koef_statis_value_3d);
+          });
+          console.log('✅ Koef statis minus button listener added');
+        }
+
+        if (koefStatisPlus) {
+          koefStatisPlus.replaceWith(koefStatisPlus.cloneNode(true));
+          const newKoefStatisPlus = document.querySelector('#koef-statis-plus');
+          newKoefStatisPlus.addEventListener('click', () => {
+            koef_statis_value_3d = Math.min(2.0, Math.round((koef_statis_value_3d + 0.1) * 10) / 10);
+            const display = document.querySelector('#koef-statis-display');
+            if (display) display.setAttribute('value', koef_statis_value_3d.toFixed(1));
+            console.log('Koef statis increased to:', koef_statis_value_3d);
+          });
+          console.log('✅ Koef statis plus button listener added');
+        }
+
+        // Koefisien Kinetis controls
+        const koefKinetisMinus = document.querySelector('#koef-kinetis-minus');
+        const koefKinetisPlus = document.querySelector('#koef-kinetis-plus');
+
+        if (koefKinetisMinus) {
+          koefKinetisMinus.replaceWith(koefKinetisMinus.cloneNode(true));
+          const newKoefKinetisMinus = document.querySelector('#koef-kinetis-minus');
+          newKoefKinetisMinus.addEventListener('click', () => {
+            koef_kinetis_value_3d = Math.max(0.1, Math.round((koef_kinetis_value_3d - 0.1) * 10) / 10);
+            const display = document.querySelector('#koef-kinetis-display');
+            if (display) display.setAttribute('value', koef_kinetis_value_3d.toFixed(1));
+            console.log('Koef kinetis decreased to:', koef_kinetis_value_3d);
+          });
+          console.log('✅ Koef kinetis minus button listener added');
+        }
+
+        if (koefKinetisPlus) {
+          koefKinetisPlus.replaceWith(koefKinetisPlus.cloneNode(true));
+          const newKoefKinetisPlus = document.querySelector('#koef-kinetis-plus');
+          newKoefKinetisPlus.addEventListener('click', () => {
+            koef_kinetis_value_3d = Math.min(1.0, Math.round((koef_kinetis_value_3d + 0.1) * 10) / 10);
+            const display = document.querySelector('#koef-kinetis-display');
+            if (display) display.setAttribute('value', koef_kinetis_value_3d.toFixed(1));
+            console.log('Koef kinetis increased to:', koef_kinetis_value_3d);
+          });
+          console.log('✅ Koef kinetis plus button listener added');
+        }
+
+        // 3D Calculate Button
+        const calculateBtn3D = document.querySelector('#calculate-btn-3d');
+        if (calculateBtn3D) {
+          calculateBtn3D.replaceWith(calculateBtn3D.cloneNode(true));
+          const newCalculateBtn3D = document.querySelector('#calculate-btn-3d');
+          newCalculateBtn3D.addEventListener('click', () => {
+            console.log('🧮 3D Calculate button clicked');
+
+            // 1. Use values from 3D controls
+            const massa = massa_value_3d;
+            const F_tarik = gaya_tarik_value_3d;
+            const mu_s = koef_statis_value_3d;
+            const mu_k = koef_kinetis_value_3d;
+            const g = 9.8; // Konstanta gravitasi (m/s^2)
+
+            console.log('Values:', { massa, F_tarik, mu_s, mu_k });
+
+            // Validation
+            if (mu_k > mu_s) {
+              alert("Koefisien Kinetis (μk) tidak boleh lebih besar dari Koefisien Statis (μs).");
+              return;
+            }
+
+            // 2. Perform physics calculations
+            const N = massa * g; // Gaya Normal (N)
+            const Fs_max = mu_s * N; // Gaya Gesek Statis Maksimum (N)
+            const Fk = mu_k * N; // Gaya Gesek Kinetis (N)
+
+            let kesimpulan = "";
+            let percepatan = 0;
+            let statusInfo = "";
+
+            // 3. Determine block condition (static or moving)
+            if (F_tarik <= Fs_max) {
+              // Block remains static
+              percepatan = 0;
+              kesimpulan = `Gaya tarik (${F_tarik.toFixed(2)} N) <= Fs,max (${Fs_max.toFixed(2)} N).`;
+              statusInfo = "BALOK TETAP DIAM! Gaya tarik tidak cukup untuk mengatasi gaya gesek statis.";
+
+              // Animate 3D model
+              animateBlock('idle');
+
+            } else {
+              // Block moves
+              percepatan = (F_tarik - Fk) / massa; // a = (F_tarik - Fk) / m
+              kesimpulan = `Gaya tarik (${F_tarik.toFixed(2)} N) > Fs,max (${Fs_max.toFixed(2)} N).`;
+              statusInfo = `BALOK BERGERAK! Dengan percepatan ${percepatan.toFixed(2)} m/s².`;
+
+              // Animate 3D model
+              animateBlock('move', percepatan);
+            }
+
+            // 4. Display results in 3D panel
+            const statusText = document.querySelector('#statusText');
+            if (statusText) statusText.setAttribute('value', statusInfo);
+
+            // Show 3D result panel
+            const resultPanel3D = document.querySelector('#result-panel-3d');
+            if (resultPanel3D) resultPanel3D.setAttribute('visible', 'true');
+
+            // Update 3D result displays
+            const resultElements3D = [
+              { selector: '#result-normal-3d', text: `N = m × g = ${N.toFixed(2)} N` },
+              { selector: '#result-fsmax-3d', text: `Fs,max = μs × N = ${Fs_max.toFixed(2)} N` },
+              { selector: '#result-fk-3d', text: `Fk = μk × N = ${Fk.toFixed(2)} N` },
+              { selector: '#result-kesimpulan-3d', text: `${kesimpulan}` },
+              { selector: '#result-percepatan-3d', text: `a = ${percepatan.toFixed(2)} m/s²` }
+            ];
+
+            resultElements3D.forEach(({ selector, text }) => {
+              const element = document.querySelector(selector);
+              if (element) element.setAttribute('value', text);
+            });
+
+            console.log('✅ 3D calculation completed and results displayed');
+          });
+          console.log('✅ Calculate 3D button listener added');
+        }
+
+        console.log('🎉 All 3D panel controls setup completed!');
+      }
+
       function setupEventListeners() {
         /* Event listeners untuk Bab3 dan kontrol lain akan ada di sini */
 
-        // Event listener untuk tombol Kalkulasi (Bab 2)
+        // Note: 3D Panel controls are now handled by setup3DPanelControls() function
+
+        // Legacy 2D Event listener for backward compatibility (if old elements exist)
         const btnCalculate = document.querySelector('#btnCalculate');
         if (btnCalculate) {
           btnCalculate.addEventListener('click', () => {
@@ -1542,6 +2199,27 @@
             // Reset teks status
             const statusText = document.querySelector('#statusText');
             if (statusText) statusText.setAttribute('value', 'Masukkan nilai pada panel di kiri untuk memulai simulasi.');
+
+            // Hide 3D result panel and reset values
+            const resultPanel3D = document.querySelector('#result-panel-3d');
+            if (resultPanel3D) resultPanel3D.setAttribute('visible', 'false');
+
+            // Reset 3D panel values to defaults
+            massa_value_3d = 10;
+            gaya_tarik_value_3d = 20;
+            koef_statis_value_3d = 0.5;
+            koef_kinetis_value_3d = 0.3;
+
+            // Update displays
+            const massaDisplay = document.querySelector('#massa-display');
+            const gayaTarikDisplay = document.querySelector('#gaya-tarik-display');
+            const koefStatisDisplay = document.querySelector('#koef-statis-display');
+            const koefKinetisDisplay = document.querySelector('#koef-kinetis-display');
+
+            if (massaDisplay) massaDisplay.setAttribute('value', massa_value_3d.toString());
+            if (gayaTarikDisplay) gayaTarikDisplay.setAttribute('value', gaya_tarik_value_3d.toString());
+            if (koefStatisDisplay) koefStatisDisplay.setAttribute('value', koef_statis_value_3d.toFixed(1));
+            if (koefKinetisDisplay) koefKinetisDisplay.setAttribute('value', koef_kinetis_value_3d.toFixed(1));
 
             // Sembunyikan dan kosongkan hasil kalkulasi
             const resultContainer = document.querySelector('#result-container');
@@ -1877,11 +2555,32 @@
           }, 2100);
         });
 
+
         // Navigation - Main Menu untuk Bab 2
         document.querySelector('#btnBab2').addEventListener('click', () => {
+          console.log('🎯 Bab 2 (Gaya Gesek) button clicked - showing friction simulation');
+
           document.querySelector("#bab2").setAttribute("visible", true);
           if (uiContainer) uiContainer.style.display = 'block'; // Tampilkan panel UI
           document.querySelector("#mainmenu").setAttribute("visible", false);
+
+          // Show 3D friction panel with entrance animation
+          const frictionPanel = document.querySelector('#friction-panel-3d');
+          if (frictionPanel) {
+            frictionPanel.setAttribute('visible', 'true');
+            frictionPanel.setAttribute('animation__show', {
+              property: 'scale',
+              from: '0.1 0.1 0.1',
+              to: '1 1 1',
+              dur: 600,
+              easing: 'easeOutBack'
+            });
+
+            // Setup 3D panel controls after panel becomes visible
+            setTimeout(() => {
+              setup3DPanelControls();
+            }, 100); // Small delay to ensure panel is fully rendered
+          }
 
           // Atur ulang kelas 'clickable'
           document.querySelector("#btnReset2").classList.add("clickable");
@@ -1898,6 +2597,12 @@
           document.querySelector("#bab2").setAttribute("visible", false);
           if (uiContainer) uiContainer.style.display = 'none'; // Sembunyikan panel UI
           document.querySelector("#mainmenu").setAttribute("visible", true);
+
+          // Hide 3D friction panel when exiting Bab 2
+          const frictionPanel = document.querySelector('#friction-panel-3d');
+          const resultPanel3D = document.querySelector('#result-panel-3d');
+          if (frictionPanel) frictionPanel.setAttribute('visible', 'false');
+          if (resultPanel3D) resultPanel3D.setAttribute('visible', 'false');
 
           // Atur ulang kelas 'clickable'
           document.querySelector("#btnReset2").classList.remove("clickable");
@@ -3873,30 +4578,31 @@
             this.raycaster.far = this.data.distance;
             const intersects = this.raycaster.intersectObjects(collidables, true);
 
-            if (intersects.length > 0 && intersects[0].distance < this.data.distance) {
-              const hitEl = intersects[0].object.el;
-              
-              if (this.data.debug) {
-                console.log('Collision detected with:', hitEl ? hitEl.id : 'unknown', 'distance:', intersects[0].distance);
-              }
-              
-              // Prevent penetration
-              this.el.object3D.position.copy(this.lastSafePosition);
-              collision = true;
-              break;
-            }
-          }
-          
-          if (!collision) {
-            this.el.object3D.getWorldPosition(this.lastSafePosition);
-          }
-        },
-      });
+          if (intersects.length > 0 && intersects[0].distance < this.data.distance) {
+            const hitEl = intersects[0].object.el;
 
-      // Info untuk pengguna
-      console.log('VR Fisika loaded successfully!');
-      console.log('If GLB models fail to load due to CORS, fallback models will be used.');
-      console.log('To use GLB models properly, serve this file from a local server (e.g., Live Server extension)');
-    </script>
-  </body>
+            if (this.data.debug) {
+              console.log('Collision detected with:', hitEl ? hitEl.id : 'unknown', 'distance:', intersects[0].distance);
+            }
+
+            // Prevent penetration
+            this.el.object3D.position.copy(this.lastSafePosition);
+            collision = true;
+            break;
+          }
+        }
+
+        if (!collision) {
+          this.el.object3D.getWorldPosition(this.lastSafePosition);
+        }
+      },
+    });
+
+    // Info untuk pengguna
+    console.log('VR Fisika loaded successfully!');
+    console.log('If GLB models fail to load due to CORS, fallback models will be used.');
+    console.log('To use GLB models properly, serve this file from a local server (e.g., Live Server extension)');
+  </script>
+</body>
+
 </html>
