@@ -9,7 +9,33 @@
 </head>
 
 <body>
-  <a-scene background="color: #1a1a1a" vr-mode-ui="enabled: true">
+  <!-- Device Selection Screen -->
+  <div id="device-selection"
+    style="position: fixed; width: 100%; height: 100%; background: #1a1a1a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999;">
+    <h1 style="color: white; font-size: 2.5em; margin-bottom: 2em;">Pilih Perangkat Anda</h1>
+    <div style="display: flex; gap: 2em;">
+      <button id="btn-desktop"
+        style="padding: 1em 2em; font-size: 1.2em; background: #3a7bd5; color: white; border: none; border-radius: 5px; cursor: pointer;">Desktop</button>
+      <button id="btn-mobile"
+        style="padding: 1em 2em; font-size: 1.2em; background: #3a7bd5; color: white; border: none; border-radius: 5px; cursor: pointer;">Mobile</button>
+    </div>
+  </div>
+
+  <!-- Virtual Gamepad for Mobile -->
+  <div id="mobile-controls"
+    style="display: none; position: fixed; bottom: 30px; left: 20px; z-index: 1000; pointer-events: none;">
+    <!-- Joystick Control -->
+    <div style="width: 120px; height: 120px; position: relative; pointer-events: auto;">
+      <div id="joystick"
+        style="width: 100%; height: 100%; background: rgba(255, 255, 255, 0.2); border-radius: 50%; position: relative; overflow: hidden;">
+        <div id="joystick-knob"
+          style="width: 70px; height: 70px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; left: 25px; top: 25px; transition: transform 0.1s ease-out;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <a-scene background="color: #1a1a1a" vr-mode-ui="enabled: true" style="display: none;">
     <!-- Assets -->
     <a-assets>
       <!-- 3D Ball Models -->
@@ -21,10 +47,9 @@
       <a-asset-item id="school-ball" src="/assets/sekolah.glb"></a-asset-item>
       <a-asset-item id="bike-ball" src="/assets/sepeda.glb"></a-asset-item>
       <a-asset-item id="world-ball" src="/assets/world.glb"></a-asset-item>
-      
+
       <!-- Default sphere material -->
-      <a-mixin id="ball-material"
-        material="metalness: 0.2; roughness: 0.3"
+      <a-mixin id="ball-material" material="metalness: 0.2; roughness: 0.3"
         geometry="primitive: sphere; segmentsWidth: 32; segmentsHeight: 16"></a-mixin>
 
       <!-- Menu Background -->
@@ -112,10 +137,9 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
       <a-entity id="ball-selector" position="0 1.5 -2" visible="false"
         animation="property: position; from: 0 0.5 -2; to: 0 1.5 -2; dur: 500; startEvents: menuopen"
         animation__close="property: position; to: 0 0.5 -2; dur: 300; startEvents: menuclose">
-        
+
         <!-- Menu Background with Glass Morphism Effect -->
-        <a-box width="5.5" height="3.5" depth="0.1" radius="0.1"
-          material="shader: standard; color: rgba(42, 42, 42, 0.8); metalness: 0.1; roughness: 0.3; transparent: true; opacity: 0.9; 
+        <a-box width="5.5" height="3.5" depth="0.1" radius="0.1" material="shader: standard; color: rgba(42, 42, 42, 0.8); metalness: 0.1; roughness: 0.3; transparent: true; opacity: 0.9; 
                   envMapIntensity: 0.5; fog: false; side: front; blend: normal;
                   metalnessMap: none; roughnessMap: none; normalMap: none; emissive: #000000; emissiveIntensity: 0;
                   shader: flat; flatShading: false; wireframe: false; wireframeLinewidth: 1;
@@ -126,18 +150,18 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
           <a-animation attribute="material.opacity" to="0.95" dur="300" begin="menuopen"></a-animation>
           <a-animation attribute="material.opacity" to="0" dur="200" begin="menuclose"></a-animation>
         </a-box>
-        
+
         <!-- Title with Decoration -->
         <a-entity position="0 1.4 0.05">
-          <a-text value="PILIH MODEL BOLA" align="center" color="#ffffff" width="8" font="exo2bold"
-            position="0 0 0" scale="1.2 1.2 1" anchor="center"
+          <a-text value="PILIH MODEL BOLA" align="center" color="#ffffff" width="8" font="exo2bold" position="0 0 0"
+            scale="1.2 1.2 1" anchor="center"
             animation="property: material.opacity; from: 0; to: 1; dur: 500; startEvents: menuopen">
           </a-text>
           <a-plane color="#4CAF50" width="3" height="0.05" position="0 -0.2 0" rotation="0 0 0"
             animation="property: scale; from: 0 1 1; to: 1 1 1; dur: 500; startEvents: menuopen">
           </a-plane>
         </a-entity>
-        
+
         <!-- Ball Previews Grid -->
         <a-entity id="ball-previews" position="0 0.3 0">
           <!-- Row 1 -->
@@ -152,7 +176,8 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
                 animation__select="property: components.ring.material.opacity; to: 0.7; dur: 200; startEvents: click">
               </a-ring>
             </a-entity>
-            <a-text value="Panah" position="0 -0.2 0" align="center" color="#ffffff" width="2" scale="0.5 0.5 1"></a-text>
+            <a-text value="Panah" position="0 -0.2 0" align="center" color="#ffffff" width="2"
+              scale="0.5 0.5 1"></a-text>
           </a-entity>
 
           <a-entity position="-0.5 0.6 0.05" class="ball-option" data-ball="block">
@@ -166,7 +191,8 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
                 animation__select="property: components.ring.material.opacity; to: 0.7; dur: 200; startEvents: click">
               </a-ring>
             </a-entity>
-            <a-text value="Balok" position="0 -0.2 0" align="center" color="#ffffff" width="2" scale="0.5 0.5 1"></a-text>
+            <a-text value="Balok" position="0 -0.2 0" align="center" color="#ffffff" width="2"
+              scale="0.5 0.5 1"></a-text>
           </a-entity>
 
           <a-entity position="0.5 0.6 0.05" class="ball-option" data-ball="class">
@@ -180,7 +206,8 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
                 animation__select="property: components.ring.material.opacity; to: 0.7; dur: 200; startEvents: click">
               </a-ring>
             </a-entity>
-            <a-text value="Kelas" position="0 -0.2 0" align="center" color="#ffffff" width="2" scale="0.5 0.5 1"></a-text>
+            <a-text value="Kelas" position="0 -0.2 0" align="center" color="#ffffff" width="2"
+              scale="0.5 0.5 1"></a-text>
           </a-entity>
 
           <a-entity position="1.5 0.6 0.05" class="ball-option" data-ball="ferrari">
@@ -194,7 +221,8 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
                 animation__select="property: components.ring.material.opacity; to: 0.7; dur: 200; startEvents: click">
               </a-ring>
             </a-entity>
-            <a-text value="Ferrari" position="0 -0.2 0" align="center" color="#ffffff" width="2" scale="0.5 0.5 1"></a-text>
+            <a-text value="Ferrari" position="0 -0.2 0" align="center" color="#ffffff" width="2"
+              scale="0.5 0.5 1"></a-text>
           </a-entity>
 
           <!-- Row 2 -->
@@ -209,7 +237,8 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
                 animation__select="property: components.ring.material.opacity; to: 0.7; dur: 200; startEvents: click">
               </a-ring>
             </a-entity>
-            <a-text value="Miyu" position="0 -0.2 0" align="center" color="#ffffff" width="2" scale="0.5 0.5 1"></a-text>
+            <a-text value="Miyu" position="0 -0.2 0" align="center" color="#ffffff" width="2"
+              scale="0.5 0.5 1"></a-text>
           </a-entity>
 
           <a-entity position="-0.5 0 0.05" class="ball-option" data-ball="school">
@@ -223,7 +252,8 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
                 animation__select="property: components.ring.material.opacity; to: 0.7; dur: 200; startEvents: click">
               </a-ring>
             </a-entity>
-            <a-text value="Sekolah" position="0 -0.2 0" align="center" color="#ffffff" width="2" scale="0.5 0.5 1"></a-text>
+            <a-text value="Sekolah" position="0 -0.2 0" align="center" color="#ffffff" width="2"
+              scale="0.5 0.5 1"></a-text>
           </a-entity>
 
           <a-entity position="0.5 0 0.05" class="ball-option" data-ball="bike">
@@ -237,7 +267,8 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
                 animation__select="property: components.ring.material.opacity; to: 0.7; dur: 200; startEvents: click">
               </a-ring>
             </a-entity>
-            <a-text value="Sepeda" position="0 -0.2 0" align="center" color="#ffffff" width="2" scale="0.5 0.5 1"></a-text>
+            <a-text value="Sepeda" position="0 -0.2 0" align="center" color="#ffffff" width="2"
+              scale="0.5 0.5 1"></a-text>
           </a-entity>
 
           <a-entity position="1.5 0 0.05" class="ball-option" data-ball="world">
@@ -251,7 +282,8 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
                 animation__select="property: components.ring.material.opacity; to: 0.7; dur: 200; startEvents: click">
               </a-ring>
             </a-entity>
-            <a-text value="Dunia" position="0 -0.2 0" align="center" color="#ffffff" width="2" scale="0.5 0.5 1"></a-text>
+            <a-text value="Dunia" position="0 -0.2 0" align="center" color="#ffffff" width="2"
+              scale="0.5 0.5 1"></a-text>
           </a-entity>
 
           <!-- Default Ball -->
@@ -265,174 +297,276 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
                 animation__select="property: components.ring.material.opacity; to: 0.7; dur: 200; startEvents: click">
               </a-ring>
             </a-entity>
-            <a-text value="Default" position="0 -0.2 0" align="center" color="#ffffff" width="2" scale="0.5 0.5 1"></a-text>
+            <a-text value="Default" position="0 -0.2 0" align="center" color="#ffffff" width="2"
+              scale="0.5 0.5 1"></a-text>
           </a-entity>
-        <a-entity position="0.5 0.25 0.06">
-          <a-box id="btnM12" class="clickable" mixin="button-style" color="#d82424"
-            event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #ff4444"
-            event-set__leave="_event: mouseleave; scale: 1 1 1; color: #d82424">
-          </a-box>
-        </a-entity>
-
-        <!-- Close Button -->
-        <a-entity position="0 -1.2 0.05">
-          <a-rounded width="1.8" height="0.5" radius="0.1" color="#d32f2f" class="clickable"
-            event-set__enter="_event: mouseenter; scale: 1.05 1.05 1.05; color: #ef5350"
-            event-set__leave="_event: mouseleave; scale: 1 1 1; color: #d32f2f">
-            <a-animation attribute="scale" to="1.05 1.05 1.05" dur="200" begin="mouseenter" fill="forwards"></a-animation>
-            <a-animation attribute="scale" to="1 1 1" dur="200" begin="mouseleave" fill="forwards"></a-animation>
-          </a-rounded>
-          <a-text value="TUTUP" position="0 0 0.06" align="center" color="#ffffff" width="3"
-            font="exo2bold" baseline="center">
-          </a-text>
-        </a-entity>
-        
-        <!-- Navigation Arrows (for mobile/VR) -->
-        <a-entity position="0 -1.6 0.05" visible="false" id="mobile-nav">
-          <a-entity position="-0.6 0 0" class="clickable" id="prev-ball">
-            <a-triangle color="#4CAF50" vertex-a="0.2 0.2 0" vertex-b="-0.2 0 0" vertex-c="0.2 -0.2 0"
-              rotation="0 0 90">
-            </a-triangle>
+          <a-entity position="0.5 0.25 0.06">
+            <a-box id="btnM12" class="clickable" mixin="button-style" color="#d82424"
+              event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #ff4444"
+              event-set__leave="_event: mouseleave; scale: 1 1 1; color: #d82424">
+            </a-box>
           </a-entity>
-          <a-entity position="0.6 0 0" class="clickable" id="next-ball">
-            <a-triangle color="#4CAF50" vertex-a="-0.2 0.2 0" vertex-b="0.2 0 0" vertex-c="-0.2 -0.2 0"
-              rotation="0 0 -90">
-            </a-triangle>
+
+          <!-- Close Button -->
+          <a-entity position="0 -1.2 0.05">
+            <a-rounded width="1.8" height="0.5" radius="0.1" color="#d32f2f" class="clickable"
+              event-set__enter="_event: mouseenter; scale: 1.05 1.05 1.05; color: #ef5350"
+              event-set__leave="_event: mouseleave; scale: 1 1 1; color: #d32f2f">
+              <a-animation attribute="scale" to="1.05 1.05 1.05" dur="200" begin="mouseenter"
+                fill="forwards"></a-animation>
+              <a-animation attribute="scale" to="1 1 1" dur="200" begin="mouseleave" fill="forwards"></a-animation>
+            </a-rounded>
+            <a-text value="TUTUP" position="0 0 0.06" align="center" color="#ffffff" width="3" font="exo2bold"
+              baseline="center">
+            </a-text>
+          </a-entity>
+
+          <!-- Navigation Arrows (for mobile/VR) -->
+          <a-entity position="0 -1.6 0.05" visible="false" id="mobile-nav">
+            <a-entity position="-0.6 0 0" class="clickable" id="prev-ball">
+              <a-triangle color="#4CAF50" vertex-a="0.2 0.2 0" vertex-b="-0.2 0 0" vertex-c="0.2 -0.2 0"
+                rotation="0 0 90">
+              </a-triangle>
+            </a-entity>
+            <a-entity position="0.6 0 0" class="clickable" id="next-ball">
+              <a-triangle color="#4CAF50" vertex-a="-0.2 0.2 0" vertex-b="0.2 0 0" vertex-c="-0.2 -0.2 0"
+                rotation="0 0 -90">
+              </a-triangle>
+            </a-entity>
+          </a-entity>
+
+          <!-- Style for the menu -->
+          <a-assets>
+            <a-mixin id="ball-preview" geometry="primitive: circle; radius: 0.2"
+              material="shader: flat; side: double"></a-mixin>
+          </a-assets>
+        </a-entity>
+
+        <!-- 3D Floating Menu System -->
+        <!-- Red Ball Menu -->
+        <a-entity id="UImerahWrapper" position="-2 0.8 -1.5">
+          <!-- Menu Background -->
+          <a-box width="2.5" height="2" depth="0.1" color="#2a2a2a" opacity="0.9" material="transparent: true"
+            animation="property: rotation; to: 0 5 0; dur: 10000; loop: true; easing: linear"></a-box>
+
+          <!-- Title -->
+          <a-text value=" BOLA MERAH" position="0 0.8 0.06" align="center" color="#ff6666" width="6"
+            font="roboto"></a-text>
+
+          <!-- Mass Control -->
+          <a-text value="Massa (kg)" position="0 0.5 0.06" align="center" color="#ffffff" width="4"></a-text>
+          <a-entity position="-0.5 0.25 0.06">
+            <a-box id="btnM11" class="clickable" mixin="button-style" color="#d82424"
+              event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #ff4444"
+              event-set__leave="_event: mouseleave; scale: 1 1 1; color: #d82424">
+            </a-box>
+            <a-text value="1" color="#fff" align="center" width="6" position="0 0 0.05"></a-text>
+          </a-entity>
+          <a-entity position="0.5 0.25 0.06">
+            <a-box id="btnM12" class="clickable" mixin="button-style" color="#d82424"
+              event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #ff4444"
+              event-set__leave="_event: mouseleave; scale: 1 1 1; color: #d82424">
+            </a-box>
+            <a-text value="2" color="#fff" align="center" width="6" position="0 0 0.05"></a-text>
+          </a-entity>
+
+          <!-- Velocity Control -->
+          <a-text value="Kecepatan (m/s)" position="0 -0.1 0.06" align="center" color="#ffffff" width="4"></a-text>
+          <a-entity position="-0.5 -0.35 0.06">
+            <a-box id="btnV11" class="clickable" mixin="button-style" color="#d82424"
+              event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #ff4444"
+              event-set__leave="_event: mouseleave; scale: 1 1 1; color: #d82424">
+            </a-box>
+            <a-text value="1" color="#fff" align="center" width="6" position="0 0 0.05"></a-text>
+          </a-entity>
+          <a-entity position="0.5 -0.35 0.06">
+            <a-box id="btnV12" class="clickable" mixin="button-style" color="#d82424"
+              event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #ff4444"
+              event-set__leave="_event: mouseleave; scale: 1 1 1; color: #d82424">
+            </a-box>
+            <a-text value="2" color="#fff" align="center" width="6" position="0 0 0.05"></a-text>
           </a-entity>
         </a-entity>
-        
-        <!-- Style for the menu -->
-        <a-assets>
-          <a-mixin id="ball-preview" geometry="primitive: circle; radius: 0.2" material="shader: flat; side: double"></a-mixin>
-        </a-assets>
-      </a-entity>
 
-      <!-- 3D Floating Menu System -->
-      <!-- Red Ball Menu -->
-      <a-entity id="UImerahWrapper" position="-2 0.8 -1.5">
-        <!-- Menu Background -->
-        <a-box width="2.5" height="2" depth="0.1" color="#2a2a2a" opacity="0.9" material="transparent: true"
-          animation="property: rotation; to: 0 5 0; dur: 10000; loop: true; easing: linear"></a-box>
+        <!-- Blue Ball Menu -->
+        <a-entity id="UIbiruWrapper" position="2 0.8 -1.5">
+          <!-- Menu Background -->
+          <a-box width="2.5" height="2" depth="0.1" color="#2a2a2a" opacity="0.9" material="transparent: true"
+            animation="property: rotation; to: 0 -5 0; dur: 10000; loop: true; easing: linear"></a-box>
 
-        <!-- Title -->
-        <a-text value=" BOLA MERAH" position="0 0.8 0.06" align="center" color="#ff6666" width="6"
-          font="roboto"></a-text>
+          <!-- Title -->
+          <a-text value=" BOLA BIRU" position="0 0.8 0.06" align="center" color="#6666ff" width="6"
+            font="roboto"></a-text>
 
-        <!-- Mass Control -->
-        <a-text value="Massa (kg)" position="0 0.5 0.06" align="center" color="#ffffff" width="4"></a-text>
-        <a-entity position="-0.5 0.25 0.06">
-          <a-box id="btnM11" class="clickable" mixin="button-style" color="#d82424"
-            event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #ff4444"
-            event-set__leave="_event: mouseleave; scale: 1 1 1; color: #d82424">
-          </a-box>
-          <a-text value="1" color="#fff" align="center" width="6" position="0 0 0.05"></a-text>
-        </a-entity>
-        <a-entity position="0.5 0.25 0.06">
-          <a-box id="btnM12" class="clickable" mixin="button-style" color="#d82424"
-            event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #ff4444"
-            event-set__leave="_event: mouseleave; scale: 1 1 1; color: #d82424">
-          </a-box>
-          <a-text value="2" color="#fff" align="center" width="6" position="0 0 0.05"></a-text>
-        </a-entity>
+          <!-- Mass Control -->
+          <a-text value="Massa (kg)" position="0 0.5 0.06" align="center" color="#ffffff" width="4"></a-text>
+          <a-entity position="-0.5 0.25 0.06">
+            <a-box id="btnM21" class="clickable" mixin="button-style" color="#2e88ff"
+              event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #4444ff"
+              event-set__leave="_event: mouseleave; scale: 1 1 1; color: #2e88ff">
+            </a-box>
+            <a-text value="1" color="#fff" align="center" width="6" position="0 0 0.05"></a-text>
+          </a-entity>
+          <a-entity position="0.5 0.25 0.06">
+            <a-box id="btnM22" class="clickable" mixin="button-style" color="#2e88ff"
+              event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #4444ff"
+              event-set__leave="_event: mouseleave; scale: 1 1 1; color: #2e88ff">
+            </a-box>
+            <a-text value="2" color="#fff" align="center" width="6" position="0 0 0.05"></a-text>
+          </a-entity>
 
-        <!-- Velocity Control -->
-        <a-text value="Kecepatan (m/s)" position="0 -0.1 0.06" align="center" color="#ffffff" width="4"></a-text>
-        <a-entity position="-0.5 -0.35 0.06">
-          <a-box id="btnV11" class="clickable" mixin="button-style" color="#d82424"
-            event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #ff4444"
-            event-set__leave="_event: mouseleave; scale: 1 1 1; color: #d82424">
-          </a-box>
-          <a-text value="1" color="#fff" align="center" width="6" position="0 0 0.05"></a-text>
-        </a-entity>
-        <a-entity position="0.5 -0.35 0.06">
-          <a-box id="btnV12" class="clickable" mixin="button-style" color="#d82424"
-            event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #ff4444"
-            event-set__leave="_event: mouseleave; scale: 1 1 1; color: #d82424">
-          </a-box>
-          <a-text value="2" color="#fff" align="center" width="6" position="0 0 0.05"></a-text>
-        </a-entity>
-      </a-entity>
-
-      <!-- Blue Ball Menu -->
-      <a-entity id="UIbiruWrapper" position="2 0.8 -1.5">
-        <!-- Menu Background -->
-        <a-box width="2.5" height="2" depth="0.1" color="#2a2a2a" opacity="0.9" material="transparent: true"
-          animation="property: rotation; to: 0 -5 0; dur: 10000; loop: true; easing: linear"></a-box>
-
-        <!-- Title -->
-        <a-text value=" BOLA BIRU" position="0 0.8 0.06" align="center" color="#6666ff" width="6"
-          font="roboto"></a-text>
-
-        <!-- Mass Control -->
-        <a-text value="Massa (kg)" position="0 0.5 0.06" align="center" color="#ffffff" width="4"></a-text>
-        <a-entity position="-0.5 0.25 0.06">
-          <a-box id="btnM21" class="clickable" mixin="button-style" color="#2e88ff"
-            event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #4444ff"
-            event-set__leave="_event: mouseleave; scale: 1 1 1; color: #2e88ff">
-          </a-box>
-          <a-text value="1" color="#fff" align="center" width="6" position="0 0 0.05"></a-text>
-        </a-entity>
-        <a-entity position="0.5 0.25 0.06">
-          <a-box id="btnM22" class="clickable" mixin="button-style" color="#2e88ff"
-            event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #4444ff"
-            event-set__leave="_event: mouseleave; scale: 1 1 1; color: #2e88ff">
-          </a-box>
-          <a-text value="2" color="#fff" align="center" width="6" position="0 0 0.05"></a-text>
+          <!-- Velocity Control -->
+          <a-text value="Kecepatan (m/s)" position="0 -0.1 0.06" align="center" color="#ffffff" width="4"></a-text>
+          <a-entity position="-0.5 -0.35 0.06">
+            <a-box id="btnV21" class="clickable" mixin="button-style" color="#2e88ff"
+              event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #4444ff"
+              event-set__leave="_event: mouseleave; scale: 1 1 1; color: #2e88ff">
+            </a-box>
+            <a-text value="-1" color="#fff" align="center" width="6" position="0 0 0.05"></a-text>
+          </a-entity>
+          <a-entity position="0.5 -0.35 0.06">
+            <a-box id="btnV22" class="clickable" mixin="button-style" color="#2e88ff"
+              event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #4444ff"
+              event-set__leave="_event: mouseleave; scale: 1 1 1; color: #2e88ff">
+            </a-box>
+            <a-text value="-2" color="#fff" align="center" width="6" position="0 0 0.05"></a-text>
+          </a-entity>
         </a-entity>
 
-        <!-- Velocity Control -->
-        <a-text value="Kecepatan (m/s)" position="0 -0.1 0.06" align="center" color="#ffffff" width="4"></a-text>
-        <a-entity position="-0.5 -0.35 0.06">
-          <a-box id="btnV21" class="clickable" mixin="button-style" color="#2e88ff"
-            event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #4444ff"
-            event-set__leave="_event: mouseleave; scale: 1 1 1; color: #2e88ff">
-          </a-box>
-          <a-text value="-1" color="#fff" align="center" width="6" position="0 0 0.05"></a-text>
+        <!-- Enhanced Play/Reset Button -->
+        <a-entity position="0 0.3 -1" rotation="-15 0 0">
+          <a-cylinder id="btnPlay" class="clickable" radius="0.4" height="0.2" color="#00aa00"
+            material="metalness: 0.2; roughness: 0.3"
+            event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #44dd44"
+            event-set__leave="_event: mouseleave; scale: 1 1 1; color: #00aa00" shadow="cast: true"
+            animation="property: rotation; to: 0 360 0; dur: 10000; loop: true; easing: linear">
+          </a-cylinder>
+          <a-text id="btnPlayText" value=" START" color="#fff" align="center" width="8" position="0 0 0.11"
+            font="roboto"></a-text>
+
+          <!-- Glow effect for play button -->
+          <a-ring radius-inner="0.45" radius-outer="0.5" color="#00ff00" opacity="0.3"
+            animation="property: scale; to: 1.2 1.2 1.2; dur: 1500; loop: true; dir: alternate; easing: easeInOutSine"></a-ring>
         </a-entity>
-        <a-entity position="0.5 -0.35 0.06">
-          <a-box id="btnV22" class="clickable" mixin="button-style" color="#2e88ff"
-            event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #4444ff"
-            event-set__leave="_event: mouseleave; scale: 1 1 1; color: #2e88ff">
-          </a-box>
-          <a-text value="-2" color="#fff" align="center" width="6" position="0 0 0.05"></a-text>
+
+        <!-- Collision Point Indicator -->
+        <a-entity id="collisionPoint" position="0 1.5 -4" visible="false">
+          <a-ring radius-inner="0.1" radius-outer="0.2" color="#ffff00" opacity="0.8"
+            animation="property: rotation; to: 0 0 360; dur: 500; loop: true; easing: linear">
+          </a-ring>
+          <a-text value=" TABRAKAN!" position="0 0.5 0" align="center" color="#ffff00" width="6"></a-text>
+        </a-entity>
+
+        <!-- Physics Info Display -->
+        <a-entity id="physicsInfo" position="0 3 -4" visible="false">
+          <a-box width="4" height="1.5" depth="0.1" color="#1a1a1a" opacity="0.9" material="transparent: true"></a-box>
+          <a-text id="momentumBefore" value="" position="0 0.4 0.06" align="center" color="#ffff00" width="3"></a-text>
+          <a-text id="momentumAfter" value="" position="0 0 0.06" align="center" color="#00ff00" width="3"></a-text>
+          <a-text id="energyInfo" value="" position="0 -0.4 0.06" align="center" color="#ff6666" width="3"></a-text>
         </a-entity>
       </a-entity>
-
-      <!-- Enhanced Play/Reset Button -->
-      <a-entity position="0 0.3 -1" rotation="-15 0 0">
-        <a-cylinder id="btnPlay" class="clickable" radius="0.4" height="0.2" color="#00aa00"
-          material="metalness: 0.2; roughness: 0.3"
-          event-set__enter="_event: mouseenter; scale: 1.1 1.1 1.1; color: #44dd44"
-          event-set__leave="_event: mouseleave; scale: 1 1 1; color: #00aa00" shadow="cast: true"
-          animation="property: rotation; to: 0 360 0; dur: 10000; loop: true; easing: linear">
-        </a-cylinder>
-        <a-text id="btnPlayText" value=" START" color="#fff" align="center" width="8" position="0 0 0.11"
-          font="roboto"></a-text>
-
-        <!-- Glow effect for play button -->
-        <a-ring radius-inner="0.45" radius-outer="0.5" color="#00ff00" opacity="0.3"
-          animation="property: scale; to: 1.2 1.2 1.2; dur: 1500; loop: true; dir: alternate; easing: easeInOutSine"></a-ring>
-      </a-entity>
-
-      <!-- Collision Point Indicator -->
-      <a-entity id="collisionPoint" position="0 1.5 -4" visible="false">
-        <a-ring radius-inner="0.1" radius-outer="0.2" color="#ffff00" opacity="0.8"
-          animation="property: rotation; to: 0 0 360; dur: 500; loop: true; easing: linear">
-        </a-ring>
-        <a-text value=" TABRAKAN!" position="0 0.5 0" align="center" color="#ffff00" width="6"></a-text>
-      </a-entity>
-
-      <!-- Physics Info Display -->
-      <a-entity id="physicsInfo" position="0 3 -4" visible="false">
-        <a-box width="4" height="1.5" depth="0.1" color="#1a1a1a" opacity="0.9" material="transparent: true"></a-box>
-        <a-text id="momentumBefore" value="" position="0 0.4 0.06" align="center" color="#ffff00" width="3"></a-text>
-        <a-text id="momentumAfter" value="" position="0 0 0.06" align="center" color="#00ff00" width="3"></a-text>
-        <a-text id="energyInfo" value="" position="0 -0.4 0.06" align="center" color="#ff6666" width="3"></a-text>
-      </a-entity>
-    </a-entity>
   </a-scene>
 
   <script>
+    // Check if device is already selected
+    const deviceType = localStorage.getItem('deviceType');
+    const deviceSelection = document.getElementById('device-selection');
+    const scene = document.querySelector('a-scene');
+    const mobileControls = document.getElementById('mobile-controls');
+
+    // If device is already selected, skip selection
+    if (deviceType) {
+      deviceSelection.style.display = 'none';
+      scene.style.display = 'block';
+      if (deviceType === 'mobile') {
+        mobileControls.style.display = 'block';
+        setupMobileControls();
+      }
+    }
+
+    // Device selection handlers
+    document.getElementById('btn-desktop').addEventListener('click', () => {
+      localStorage.setItem('deviceType', 'desktop');
+      deviceSelection.style.display = 'none';
+      scene.style.display = 'block';
+    });
+
+    document.getElementById('btn-mobile').addEventListener('click', () => {
+      localStorage.setItem('deviceType', 'mobile');
+      deviceSelection.style.display = 'none';
+      scene.style.display = 'block';
+      mobileControls.style.display = 'block';
+      setupMobileControls();
+    });
+
+    // Mobile controls setup
+    function setupMobileControls() {
+      const joystick = document.getElementById('joystick');
+      const joystickKnob = document.getElementById('joystick-knob');
+
+      let isJoystickActive = true;
+      let joystickStartX = 0;
+      let joystickStartY = 0;
+      let joystickX = 0;
+      let joystickY = 0;
+      const joystickRadius = 25; // Reduced radius for better mobile experience
+
+      // Joystick touch start
+      joystick.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        isJoystickActive = true;
+        const touch = e.touches[0];
+        const rect = joystick.getBoundingClientRect();
+        joystickStartX = rect.left + rect.width / 2;
+        joystickStartY = rect.top + rect.height / 2;
+        updateJoystick(touch);
+      }, { passive: true });
+
+      // Joystick touch move
+      document.addEventListener('touchmove', (e) => {
+        if (!isJoystickActive) return;
+        e.preventDefault();
+        updateJoystick(e.touches[0]);
+      }, { passive: true });
+
+      // Joystick touch end
+      document.addEventListener('touchend', () => {
+        isJoystickActive = true;
+        joystickX = 0;
+        joystickY = 0;
+        joystickKnob.style.transform = 'translate(25px, 25px)';
+        // Reset movement here if needed
+      });
+
+      // Update joystick position and handle movement
+      function updateJoystick(touch) {
+        const x = touch.clientX - joystickStartX;
+        const y = touch.clientY - joystickStartY;
+        const distance = Math.sqrt(x * x + y * y);
+        const angle = Math.atan2(y, x);
+
+        if (distance < joystickRadius) {
+          joystickX = x / joystickRadius;
+          joystickY = y / joystickRadius;
+          joystickKnob.style.transform = `translate(${x + 25}px, ${y + 25}px)`;
+        } else {
+          joystickX = Math.cos(angle);
+          joystickY = Math.sin(angle);
+          joystickKnob.style.transform = `translate(${Math.cos(angle) * joystickRadius + 25}px, ${Math.sin(angle) * joystickRadius + 25}px)`;
+        }
+
+        // Update player movement here based on joystickX and joystickY
+        // You'll need to integrate this with your existing movement system
+      }
+
+      // Prevent default touch behavior for joystick
+      document.addEventListener('touchstart', (e) => {
+        if (e.target === joystick) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+    }
+
     // Ball models mapping
     const BALL_MODELS = {
       'default': { type: 'primitive', color: '#ffffff' },
@@ -445,10 +579,10 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
       'bike': { type: 'gltf', model: '#bike-ball', scale: '0.1 0.1 0.1' },
       'world': { type: 'gltf', model: '#world-ball', scale: '0.1 0.1 0.1' }
     };
-    
+
     let currentBall1 = 'default';
     let currentBall2 = 'default';
-    
+
     const ball1 = document.querySelector("#ball1");
     const ball2 = document.querySelector("#ball2");
     const ballSelector = document.querySelector("#ball-selector");
@@ -660,13 +794,13 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
 
     // Initialize particles after scene loads
     setTimeout(createParticles, 1000);
-    
+
     // Ball selection handlers
     document.querySelectorAll('.ball-option').forEach(option => {
-      option.addEventListener('click', function() {
+      option.addEventListener('click', function () {
         const ballType = this.getAttribute('data-ball');
         const ballModel = BALL_MODELS[ballType];
-        
+
         if (selectedBall === 1) {
           updateBallModel(ball1, ballType);
           currentBall1 = ballType;
@@ -674,43 +808,43 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
           updateBallModel(ball2, ballType);
           currentBall2 = ballType;
         }
-        
+
         // Close the selector after selection
         ballSelector.setAttribute('visible', 'false');
       });
     });
-    
+
     // Toggle ball selector
-    document.querySelector('#ball1').addEventListener('click', function() {
+    document.querySelector('#ball1').addEventListener('click', function () {
       if (ballSelector.getAttribute('visible') === 'true') return;
       selectedBall = 1;
       ballSelector.setAttribute('position', '-1 1.5 -2');
       ballSelector.setAttribute('visible', 'true');
     });
-    
-    document.querySelector('#ball2').addEventListener('click', function() {
+
+    document.querySelector('#ball2').addEventListener('click', function () {
       if (ballSelector.getAttribute('visible') === 'true') return;
       selectedBall = 2;
       ballSelector.setAttribute('position', '1 1.5 -2');
       ballSelector.setAttribute('visible', 'true');
     });
-    
+
     // Close button
-    document.querySelector('#close-ball-selector').addEventListener('click', function() {
+    document.querySelector('#close-ball-selector').addEventListener('click', function () {
       ballSelector.setAttribute('visible', 'false');
     });
-    
+
     // Update ball model function
     function updateBallModel(ballEntity, ballType) {
       const model = BALL_MODELS[ballType];
       const sphere = ballEntity.querySelector('a-sphere');
       const gltfModel = ballEntity.querySelector('.gltf-model');
-      
+
       // Remove existing GLTF model if exists
       if (gltfModel) {
         gltfModel.parentNode.removeChild(gltfModel);
       }
-      
+
       // If default sphere, make sure it exists
       if (ballType === 'default') {
         if (!sphere) {
@@ -720,11 +854,11 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
           newSphere.setAttribute('material', 'metalness: 0.3; roughness: 0.2');
           newSphere.setAttribute('shadow', 'cast: true; receive: true');
           newSphere.classList.add('clickable');
-          
+
           // Add hover animations
           newSphere.setAttribute('animation__hover', 'property: scale; to: 1.1 1.1 1.1; dur: 200; startEvents: mouseenter');
           newSphere.setAttribute('animation__leave', 'property: scale; to: 1 1 1; dur: 200; startEvents: mouseleave');
-          
+
           ballEntity.appendChild(newSphere);
         } else {
           sphere.setAttribute('visible', 'true');
@@ -732,12 +866,12 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
         }
         return;
       }
-      
+
       // Hide default sphere if exists
       if (sphere) {
         sphere.setAttribute('visible', 'false');
       }
-      
+
       // Create new GLTF model
       const newModel = document.createElement('a-entity');
       newModel.setAttribute('gltf-model', model.model);
@@ -746,12 +880,12 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
       newModel.setAttribute('rotation', '0 0 0');
       newModel.setAttribute('shadow', 'cast: true; receive: true');
       newModel.classList.add('gltf-model', 'clickable');
-      
+
       // Add animations
       newModel.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear');
       newModel.setAttribute('animation__hover', 'property: scale; to: 1.1 1.1 1.1; dur: 200; startEvents: mouseenter');
       newModel.setAttribute('animation__leave', 'property: scale; to: 1 1 1; dur: 200; startEvents: mouseleave');
-      
+
       ballEntity.appendChild(newModel);
     }
   </script>

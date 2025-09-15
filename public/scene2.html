@@ -3,12 +3,54 @@
   <head>
     <meta charset="utf-8">
     <title>VR Fisika</title>
+    <style>
+      #joystick {
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        position: relative;
+        overflow: hidden;
+        display: none;
+        position: fixed;
+        bottom: 30px;
+        left: 30px;
+        z-index: 1000;
+      }
+      #joystick-knob {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 50%;
+        position: absolute;
+        left: 25px;
+        top: 25px;
+        transition: transform 0.1s ease-out;
+      }
+      #mobile-controls {
+        position: fixed;
+        bottom: 30px;
+        left: 20px;
+        z-index: 1000;
+        pointer-events: none;
+      }
+    </style>
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
     <script src="https://unpkg.com/aframe-event-set-component/dist/aframe-event-set-component.min.js"></script>
     <script src="https://unpkg.com/aframe-physics-system@v4.2.2/dist/aframe-physics-system.min.js"></script>
   </head>
   <body>
+    <!-- Virtual Gamepad for Mobile -->
+    <div id="mobile-controls">
+      <!-- Joystick Control -->
+      <div style="width: 120px; height: 120px; position: relative; pointer-events: auto;">
+        <div id="joystick">
+          <div id="joystick-knob"></div>
+        </div>
+      </div>
+    </div>
+
     <a-scene 
       vr-mode-ui="enabled: false" 
       embedded 
@@ -1817,10 +1859,168 @@
         }
       }
 
+      // Setup Mobile Controls
+      function setupMobileControls() {
+        const joystick = document.getElementById('joystick');
+        const joystickKnob = document.getElementById('joystick-knob');
+        const camera = document.querySelector('[camera]');
+        
+        if (!camera) {
+          console.error('Camera element not found');
+          return;
+        }
+        
+        let isJoystickActive = false;
+        let joystickStartX = 0;
+        let joystickStartY = 0;
+        let joystickX = 0;
+        let joystickY = 0;
+        const joystickRadius = 25;
+        const movementSpeed = 0.1;
+        
+        // Common function to handle both touch and mouse events
+        function handleJoystickStart(clientX, clientY) {
+          isJoystickActive = true;
+          const rect = joystick.getBoundingClientRect();
+          joystickStartX = rect.left + rect.width / 2;
+          joystickStartY = rect.top + rect.height / 2;
+          updateJoystick({ clientX, clientY });
+        }
+        
+        function handleJoystickMove(clientX, clientY) {
+          if (!isJoystickActive) return;
+          updateJoystick({ clientX, clientY });
+          updateCameraMovement();
+        }
+        
+        function handleJoystickEnd() {
+          isJoystickActive = false;
+          joystickX = 0;
+          joystickY = 0;
+          joystickKnob.style.transform = 'translate(25px, 25px)';
+        }
+        
+        // Touch events for mobile
+        joystick.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          handleJoystickStart(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: false });
+        
+        document.addEventListener('touchmove', (e) => {
+          if (!isJoystickActive) return;
+          e.preventDefault();
+          handleJoystickMove(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: false });
+        
+        document.addEventListener('touchend', handleJoystickEnd);
+        
+        // Mouse events for laptop/desktop
+        joystick.addEventListener('mousedown', (e) => {
+          e.preventDefault();
+          handleJoystickStart(e.clientX, e.clientY);
+          
+          // Add move and up listeners to document to track mouse movement outside joystick
+          document.addEventListener('mousemove', handleMouseMove);
+          document.addEventListener('mouseup', handleMouseUp);
+        });
+        
+        function handleMouseMove(e) {
+          handleJoystickMove(e.clientX, e.clientY);
+        }
+        
+        function handleMouseUp() {
+          handleJoystickEnd();
+          // Clean up event listeners
+          document.removeEventListener('mousemove', handleMouseMove);
+          document.removeEventListener('mouseup', handleMouseUp);
+        }
+        
+        // Update joystick position
+        function updateJoystick(touch) {
+          const x = touch.clientX - joystickStartX;
+          const y = touch.clientY - joystickStartY;
+          const distance = Math.sqrt(x * x + y * y);
+          const angle = Math.atan2(y, x);
+          
+          if (distance < joystickRadius) {
+            joystickX = x / joystickRadius;
+            joystickY = y / joystickRadius;
+            joystickKnob.style.transform = `translate(${x + 25}px, ${y + 25}px)`;
+          } else {
+            joystickX = Math.cos(angle);
+            joystickY = Math.sin(angle);
+            joystickKnob.style.transform = `translate(${Math.cos(angle) * joystickRadius + 25}px, ${Math.sin(angle) * joystickRadius + 25}px)`;
+          }
+        }
+        
+        // Update camera movement based on joystick input
+        function updateCameraMovement() {
+          if (!camera) return;
+          
+          const cameraEl = camera.object3D;
+          const direction = new THREE.Vector3();
+          cameraEl.getWorldDirection(direction);
+          
+          // Project direction onto XZ plane (ignore Y-axis for movement)
+          const forward = new THREE.Vector3(direction.x, 0, direction.z).normalize();
+          
+          // Calculate movement vector based on joystick input
+          const moveX = joystickX * movementSpeed;
+          const moveZ = -joystickY * movementSpeed; // Invert Y-axis for natural movement
+          
+          // Apply movement
+          if (moveX !== 0 || moveZ !== 0) {
+            // Strafe movement (left/right) - use camera right vector
+            const right = new THREE.Vector3();
+            right.crossVectors(new THREE.Vector3(0, 1, 0), forward).normalize();
+            
+            // Calculate final movement direction
+            const movement = new THREE.Vector3();
+            // Forward/backward movement based on camera forward
+            movement.addScaledVector(forward, moveZ);
+            // Left/right strafing
+            movement.addScaledVector(right, moveX);
+            
+            // Apply movement to camera position
+            const currentPosition = camera.getAttribute('position');
+            camera.setAttribute('position', {
+              x: currentPosition.x + movement.x,
+              y: currentPosition.y,  // Keep Y position the same (no flying)
+              z: currentPosition.z + movement.z
+            });
+          }
+        }
+        
+        // Show joystick for mobile devices
+        function checkDeviceType() {
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+          if (isMobile) {
+            joystick.style.display = 'block';
+          }
+        }
+        
+        // Initialize mobile controls
+        checkDeviceType();
+        
+        // Add animation frame loop for smooth movement
+        function animate() {
+          if (isJoystickActive) {
+            updateCameraMovement();
+          }
+          requestAnimationFrame(animate);
+        }
+        
+        // Start animation loop
+        animate();
+      }
+
       // Load models setelah DOM ready
       document.addEventListener('DOMContentLoaded', () => {
         loadGLBModels();
         createSpeedTrails();
+        setupEventListeners();
+        setupInputHandlers();
+        setupMobileControls();
       });
 
       // Fungsi untuk membuat efek garis kecepatan
