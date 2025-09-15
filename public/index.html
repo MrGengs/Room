@@ -39,8 +39,8 @@
         <img id="thumbScene1" crossorigin="anonymous" src="https://cdn.aframe.io/link-traversal/thumbs/forest.png" />
         <a-asset-item id="avatar-male-model" src="SittingIdle_man.fbx"></a-asset-item>
         <a-asset-item id="avatar-female-model" src="SittingIdle_woman.fbx"></a-asset-item>
-        <a-asset-item id="pohon1-model" src="assets/pohon1.glb"></a-asset-item>
-        <a-asset-item id="pohon2-model" src="assets/pohon2.glb"></a-asset-item>
+        <a-asset-item id="pohon1-model" src="assets/home/pohon1.glb"></a-asset-item>
+        <a-asset-item id="pohon2-model" src="assets/home/pohon2.glb"></a-asset-item>
         <template id="avatar-template">
           <a-entity player-info>
             <a-entity class="model" animation-mixer>
@@ -51,7 +51,7 @@
         </template>
       </a-assets>
 
-      <a-gltf-model id="world-nav-mesh" src="assets/world.glb" nav-mesh class="collidable"></a-gltf-model>
+      <a-gltf-model id="world-nav-mesh" src="assets/home/world.glb" nav-mesh class="collidable"></a-gltf-model>
 
       <a-text value="Selamat Datang Di AR-Room" align="center" position="0 2 -4" scale="1.5 1.5 1.5"></a-text>
 
@@ -83,7 +83,7 @@
 
       <a-entity id="scene">
         <!-- World GLB model -->
-        <a-gltf-model src="assets/world.glb" position="0 0.2 0" scale="1 1 1" rotation="0 0 0"></a-gltf-model>
+        <a-gltf-model src="assets/home/world.glb" position="0 0.2 0" scale="1 1 1" rotation="0 0 0"></a-gltf-model>
 
         <!-- Interior walls to prevent escape from inside world.glb -->
         <!-- These walls form the interior boundaries of the world -->

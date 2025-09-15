@@ -5,7 +5,7 @@
     <title>AR-Room</title>
     <meta name="description" content="AR">
           <a-entity id="sepeda-arrow" 
-            gltf-model="url(assets/arrow.glb)"
+            gltf-model="url(assets/scene1/arrow.glb)"
             position="0 2.5 0" 
             rotation="0 0 0"
             scale="0.5 0.5 0.5"
@@ -62,7 +62,7 @@
       <a-entity id="scene">
         <!-- School building with collision -->
         <a-entity id="school-group" position="0 -11 0">
-          <a-gltf-model src="assets/sekolah.glb" scale="2 2 2" rotation="0 0 0" class="collidable"></a-gltf-model>
+          <a-gltf-model src="assets/scene1/sekolah.glb" scale="2 2 2" rotation="0 0 0" class="collidable"></a-gltf-model>
           <!-- Smaller collision box closer to actual building -->
           <a-box
             class="collidable"
@@ -95,10 +95,10 @@
             visible="false"
           ></a-box>
           <!-- Visual model for the car -->
-          <a-entity id="ferrari" gltf-model="url(assets/ferrari.glb)" position="0 0 0" scale="1.3 1.3 1.3"></a-entity>
+          <a-entity id="ferrari" gltf-model="url(assets/scene1/ferrari.glb)" position="0 0 0" scale="1.3 1.3 1.3"></a-entity>
           <!-- Arrow indicator for car -->
           <a-entity id="car-arrow" 
-            gltf-model="url(assets/arrow.glb)"
+            gltf-model="url(assets/scene1/arrow.glb)"
             position="0 2.5 0" 
             rotation="0 0 0"
             scale="0.7 0.7 0.7"
@@ -131,7 +131,7 @@
         <!-- NPC Pusher -->
         <a-entity
           id="npc-pusher"
-          gltf-model="url(assets/push.glb)"
+          gltf-model="url(assets/scene1/push.glb)"
           position="0 0 3.1"
           rotation="0 180 0"
           scale="0.01 0.01 0.01"
@@ -157,14 +157,14 @@
           <!-- Visual model for the cart -->
           <a-entity 
             id="cart" 
-            gltf-model="url(assets/cart.glb)" 
+            gltf-model="url(assets/scene1/cart.glb)" 
             scale="0.01 0.01 0.01"
             rotation="0 180 0"
             animation-mixer="clip: Static Pose; loop: infinite">
           </a-entity>
           <!-- Arrow indicator for cart -->
           <a-entity id="cart-arrow" 
-            gltf-model="url(assets/arrow.glb)"
+            gltf-model="url(assets/scene1/arrow.glb)"
             position="0 1.5 0" 
             rotation="0 180 0"
             scale="0.3 0.3 0.3"
@@ -197,7 +197,7 @@
         <!-- NPC Pusher Cart -->
         <a-entity
           id="npc-pusher-cart"
-          gltf-model="url(assets/push.glb)"
+          gltf-model="url(assets/scene1/push.glb)"
           position="0 0 2.2"
           rotation="0 180 0"
           scale="0.01 0.01 0.01"
