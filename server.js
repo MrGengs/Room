@@ -95,11 +95,6 @@ io.on('connection', (socket) => {
 // Configure EasyRTC
 const rtc = easyrtc.listen(app, io, {
   logLevel: 'debug',
-  enableDebug: true,
-  apiPrefix: 'easyrtc/',
-  socketIo: {
-    'log level': 2
-  },
   appIceServers: [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
@@ -112,116 +107,42 @@ const rtc = easyrtc.listen(app, io, {
   ]
 });
 
-// Handle EasyRTC events
-rtc.events.on('roomCreate', (appObj, creatorConnectionObj, roomName, roomOptions, callback) => {
-  console.log('Room created:', roomName);
-  if (typeof callback === 'function') {
-    callback(null, roomName);
-  }
-});
-
-rtc.events.on('roomJoin', (connectionObj, roomName, roomParameter, callback) => {
-  console.log('User joined room:', roomName, 'Connection ID:', connectionObj.getConnectionId());
-  if (typeof callback === 'function') {
-    callback(null);
-  }
-});
-
-rtc.events.on('connection', (connectionObj) => {
-  console.log('New connection:', connectionObj.getConnectionId());
-  
-  connectionObj.events.on('disconnect', () => {
-    console.log('Connection closed:', connectionObj.getConnectionId());
+// Handle EasyRTC events using the correct API
+if (rtc && rtc.events) {
+  rtc.events.on('roomCreate', (appObj, creatorConnectionObj, roomName, roomOptions, callback) => {
+    console.log('Room created:', roomName);
+    if (typeof callback === 'function') {
+      callback(null, roomName);
+    }
   });
-  
-  connectionObj.events.on('error', (error) => {
-    console.error('Connection error:', error);
+
+  rtc.events.on('roomJoin', (connectionObj, roomName, roomParameter, callback) => {
+    console.log('User joined room:', roomName, 'Connection ID:', connectionObj.getConnectionId());
+    if (typeof callback === 'function') {
+      callback(null);
+    }
   });
-});
-const myIceServers = [
-  { urls: "stun:stun1.l.google.com:19302" },
-  { urls: "stun:stun2.l.google.com:19302" },
-  // {
-  //   "urls":"turn:[ADDRESS]:[PORT]",
-  //   "username":"[USERNAME]",
-  //   "credential":"[CREDENTIAL]"
-  // },
-  // {
-  //   "urls":"turn:[ADDRESS]:[PORT][?transport=tcp]",
-  //   "username":"[USERNAME]",
-  //   "credential":"[CREDENTIAL]"
-  // }
-];
-easyrtc.setOption("appIceServers", myIceServers);
+
+  rtc.events.on('connection', (connectionObj) => {
+    console.log('New connection:', connectionObj.getConnectionId());
+    
+    if (connectionObj && connectionObj.events) {
+      connectionObj.events.on('disconnect', () => {
+        console.log('Connection closed:', connectionObj.getConnectionId());
+      });
+      
+      connectionObj.events.on('error', (error) => {
+        console.error('Connection error:', error);
+      });
+    }
+  });
+} else {
+  console.log('EasyRTC events not available, using basic setup');
+}
+
+// Set additional EasyRTC options
 easyrtc.setOption("logLevel", "debug");
 easyrtc.setOption("demosEnable", false);
-
-// Overriding the default easyrtcAuth listener, only so we can directly access its callback
-easyrtc.events.on(
-  "easyrtcAuth",
-  (socket, easyrtcid, msg, socketCallback, callback) => {
-    easyrtc.events.defaultListeners.easyrtcAuth(
-      socket,
-      easyrtcid,
-      msg,
-      socketCallback,
-      (err, connectionObj) => {
-        if (err || !msg.msgData || !msg.msgData.credential || !connectionObj) {
-          callback(err, connectionObj);
-          return;
-        }
-
-        connectionObj.setField("credential", msg.msgData.credential, {
-          isShared: false,
-        });
-
-        console.log(
-          "[" + easyrtcid + "] Credential saved!",
-          connectionObj.getFieldValueSync("credential"),
-        );
-
-        callback(err, connectionObj);
-      },
-    );
-  },
-);
-
-// To test, lets print the credential to the console for every room join!
-easyrtc.events.on(
-  "roomJoin",
-  (connectionObj, roomName, roomParameter, callback) => {
-    console.log(
-      "[" + connectionObj.getEasyrtcid() + "] Credential retrieved!",
-      connectionObj.getFieldValueSync("credential"),
-    );
-    easyrtc.events.defaultListeners.roomJoin(
-      connectionObj,
-      roomName,
-      roomParameter,
-      callback,
-    );
-  },
-);
-
-// Start EasyRTC server
-easyrtc.listen(app, socketServer, null, (err, rtcRef) => {
-  console.log("Initiated");
-
-  rtcRef.events.on(
-    "roomCreate",
-    (appObj, creatorConnectionObj, roomName, roomOptions, callback) => {
-      console.log("roomCreate fired! Trying to create: " + roomName);
-
-      appObj.events.defaultListeners.roomCreate(
-        appObj,
-        creatorConnectionObj,
-        roomName,
-        roomOptions,
-        callback,
-      );
-    },
-  );
-});
 
 // Listen on port
 webServer.listen(port, () => {
