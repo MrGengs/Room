@@ -6,21 +6,177 @@
   <title>AR-Room</title>
   <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js"></script>
-  <script src="/easyrtc/easyrtc.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/networked-aframe@0.14.0/dist/networked-aframe.min.js"></script>
+  <script src="https://unpkg.com/networked-aframe@0.14.0/dist/networked-aframe.min.js"></script>
+  <script src="https://unpkg.com/networked-aframe@0.14.0/dist/easyrtc-adapter.js"></script>
+  <script>
+    // Global configuration
+    window.NAF_OPTIONS = {
+      updateRate: 15, // Update rate in Hz
+      useLerp: true,
+      useHttps: window.location.protocol === 'https:',
+      debug: true
+    };
+    
+    // ICE servers configuration
+    const iceServers = [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' }
+    ];
+    
+    // Initialize EasyRTC with proper configuration
+    easyrtc.enableDebug(false);
+    easyrtc.setStunServers(iceServers);
+    easyrtc.enableVideo(false);
+    easyrtc.enableAudio(false);
+    easyrtc.enableDataChannels(true);
+  </script>
   <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.0/dist/aframe-extras.min.js"></script>
   <script
     src="https://cdn.jsdelivr.net/npm/aframe-environment-component@1.5.0/dist/aframe-environment-component.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-gltf-model-plus@1.0.0/dist/gltf-model-plus.min.js"></script>
+  <style>
+    .ui-buttons {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 10000;
+      display: flex;
+      gap: 10px;
+    }
+    
+    .ui-button {
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border: 1px solid #3a7bd5;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+    }
+    
+    .ui-button:hover {
+      background: rgba(58, 123, 213, 0.9);
+    }
+    
+    .ui-button i {
+      font-size: 16px;
+    }
+  </style>
   <script>
     window.uiSettings = {
       showRandomAvatarButton: true,
       showDieButton: true,
     };
+
+    // Device Toggle Functionality
+    function setupDeviceToggle() {
+      const deviceToggle = document.getElementById('device-toggle');
+      const mobileControls = document.getElementById('mobile-controls');
+      let joystick = null;
+      
+      // Update UI based on current device mode
+      function updateDeviceUI() {
+        const currentMode = localStorage.getItem('deviceType') || 'desktop';
+        if (deviceToggle) {
+          let icon, text;
+          switch(currentMode) {
+            case 'mobile':
+              icon = '📱';
+              text = 'Switch';
+              break;
+            case 'vr':
+              icon = '🖥️';
+              text = 'Switch';
+              break;
+            default: // desktop
+              icon = '🥽';
+              text = 'Switch';
+          }
+          deviceToggle.innerHTML = `<i>${icon}</i><span>${text}</span>`;
+          
+          // Update mobile controls visibility
+          if (mobileControls) {
+            mobileControls.style.display = currentMode === 'mobile' ? 'block' : 'none';
+          }
+          
+          // Update VR mode
+          if (currentMode === 'vr') {
+            enterVR();
+          } else {
+            exitVR();
+          }
+        }
+      }
+      
+      // Toggle between device modes
+      function toggleDeviceMode() {
+        const currentMode = localStorage.getItem('deviceType') || 'desktop';
+        let newMode;
+        
+        // Cycle through modes: desktop -> mobile -> vr -> desktop
+        switch(currentMode) {
+          case 'desktop':
+            newMode = 'mobile';
+            break;
+          case 'mobile':
+            newMode = 'vr';
+            break;
+          case 'vr':
+          default:
+            newMode = 'desktop';
+        }
+        
+        localStorage.setItem('deviceType', newMode);
+        updateDeviceUI();
+        
+        // Reinitialize controls if needed
+        if (newMode === 'mobile' && mobileControls) {
+          mobileControls.style.display = 'block';
+          if (typeof setupMobileControls === 'function') {
+            setupMobileControls();
+          }
+        } else if (mobileControls) {
+          mobileControls.style.display = 'none';
+        }
+      }
+      
+      // Initialize the button
+      if (deviceToggle) {
+        deviceToggle.addEventListener('click', toggleDeviceMode);
+        updateDeviceUI();
+      }
+    }
+    
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      setupDeviceToggle();
+      
+      // Initialize Networked-Aframe after a short delay to ensure all scripts are loaded
+      if (window.NAF && window.easyrtc) {
+        setTimeout(initializeNetworkedAFrame, 1000);
+      } else {
+        console.error('Required libraries not loaded');
+      }
+    });
   </script>
   <script src="/dist/components.js"></script>
   <script src="/js/joystick.js"></script>
   <script defer src="/dist/ui.js"></script>
+  
+  <!-- UI Buttons Container -->
+  <div class="ui-buttons">
+    <!-- Random Avatar Button (will be shown by UI system) -->
+    <!-- Device Toggle Button -->
+    <button id="device-toggle" class="ui-button">
+      <i>📱</i>
+      <span>Switch to Mobile</span>
+    </button>
+  </div>
 </head>
 
 <body>
@@ -33,6 +189,8 @@
         style="padding: 1em 2em; font-size: 1.2em; background: #3a7bd5; color: white; border: none; border-radius: 5px; cursor: pointer;">Desktop</button>
       <button id="btn-mobile"
         style="padding: 1em 2em; font-size: 1.2em; background: #3a7bd5; color: white; border: none; border-radius: 5px; cursor: pointer;">Mobile</button>
+      <button id="btn-vr"
+        style="padding: 1em 2em; font-size: 1.2em; background: #9c27b0; color: white; border: none; border-radius: 5px; cursor: pointer;">VR Mode</button>
     </div>
   </div>
 
@@ -48,12 +206,13 @@
     </div>
   </div>
 
-  <a-scene style="display: none;" light="defaultLightsEnabled:false" renderer="stencil:true" networked-scene="
+  <a-scene style="display: none;" light="defaultLightsEnabled:false" renderer="stencil:true; antialias: true;" vr-mode-ui="enabled: false" webxr="requiredFeatures: local-floor; referenceSpaceType: local-floor;" networked-scene="
         connectOnLoad: false;
         room: lobby;
         debug: true;
-        adapter: wseasyrtc;
+        adapter: easyrtc;
         audio: false;
+        onConnect: onConnect;
         video: false;" shadow="type: pcfsoft"
     gltf-model="meshoptDecoderPath:https://unpkg.com/meshoptimizer@0.19.0/meshopt_decoder.js"
     raycaster="far: 100; objects: .clickable,[link];" cursor="rayOrigin: mouse">
@@ -135,6 +294,94 @@
   </a-scene>
 
   <script>
+    // Initialize Networked-Aframe after everything is loaded
+    function initializeNetworkedAFrame() {
+      console.log('Initializing Networked-Aframe...');
+      
+      // Configure the adapter
+      NAF.connection.adapter = new NAF.adapters.EasyRtcAdapter();
+      NAF.connection.adapter.setAppName('default');
+      NAF.connection.adapter.setRoom('lobby');
+      NAF.connection.adapter.setConnectOnLoad(true);
+      NAF.connection.adapter.setServerUrl(window.location.origin);
+      
+      // Connect to the server
+      const scene = document.querySelector('a-scene');
+      if (scene.hasLoaded) {
+        connectToServer();
+      } else {
+        scene.addEventListener('loaded', connectToServer);
+      }
+    }
+    
+    function connectToServer() {
+      console.log('Connecting to server...');
+      const scene = document.querySelector('a-scene');
+      const networkedScene = scene.systems['networked-scene'];
+      
+      if (networkedScene) {
+        networkedScene.connect();
+        console.log('Networked-Aframe connected successfully');
+      } else {
+        console.error('Networked-scene system not found');
+      }
+    }
+    
+    // Wait for DOM and A-Frame to be fully loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wait for A-Frame to be ready
+      if (document.querySelector('a-scene').hasLoaded) {
+        initNetworkedAFrame();
+      } else {
+        document.querySelector('a-scene').addEventListener('loaded', initNetworkedAFrame);
+      }
+    });
+
+    function initNetworkedAFrame() {
+      console.log('Initializing Networked-Aframe...');
+      
+      // Configure NAF schema
+      NAF.schemas.add({
+        template: '#avatar-template',
+        components: [
+          'position',
+          'rotation',
+          'scale',
+          'player-info',
+          'model',
+          'nametag',
+          'camera'
+        ]
+      });
+
+      // Get server URL
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const serverUrl = isLocalhost ? 'http://localhost:8080' : window.location.origin;
+      
+      console.log('Connecting to server:', serverUrl);
+      
+      // Initialize NAF
+      NAF.connection.adapter = new NAF.adapters.EasyRtcAdapter();
+      NAF.connection.adapter.setServerUrl(serverUrl);
+      NAF.connection.adapter.setApp('default');
+      NAF.connection.adapter.setRoom('lobby');
+      NAF.connection.adapter.setConnectOnLoad(true);
+      
+      NAF.connection.adapter.setServerConnectListeners({
+        connect: (clientId) => {
+          console.log('Connected to server with ID:', clientId);
+        },
+        disconnect: () => {
+          console.log('Disconnected from server');
+        }
+      });
+
+      // Connect to the server
+      NAF.connection.connect();
+    }
+  </script>
+
+  <script>
     // Check if device is already selected
     const deviceType = localStorage.getItem('deviceType');
     const deviceSelection = document.getElementById('device-selection');
@@ -147,34 +394,83 @@
     scene.style.display = 'none';
 
     // Device selection handlers
-    document.getElementById('btn-desktop').addEventListener('click', () => {
+    function setupDevice(deviceType) {
       deviceSelection.style.display = 'none';
       scene.style.display = 'block';
-      localStorage.setItem('deviceType', 'desktop');
-      // Sembunyikan mobile controls untuk desktop
-      if (mobileControls) mobileControls.style.display = 'none';
-    });
-
-    document.getElementById('btn-mobile').addEventListener('click', () => {
-      deviceSelection.style.display = 'none';
-      scene.style.display = 'block';
-      localStorage.setItem('deviceType', 'mobile');
-      // Tampilkan mobile controls untuk mobile
-      if (mobileControls) {
-        mobileControls.style.display = 'block';
-        setupMobileControls();
+      localStorage.setItem('deviceType', deviceType);
+      
+      // Handle VR mode
+      if (deviceType === 'vr') {
+        if (scene.hasLoaded) {
+          enterVR();
+        } else {
+          scene.addEventListener('loaded', enterVR);
+        }
+      } else {
+        // Handle desktop/mobile modes
+        if (mobileControls) {
+          mobileControls.style.display = deviceType === 'mobile' ? 'block' : 'none';
+          if (deviceType === 'mobile') {
+            setupMobileControls();
+          }
+        }
+      }
+    }
+    
+    // Function to enter VR mode
+    function enterVR() {
+      const sceneEl = document.querySelector('a-scene');
+      if (sceneEl) {
+        // Add VR mode class
+        document.body.classList.add('vr-mode');
+        // Enter VR if available
+        if (sceneEl.hasAttribute('vr-mode-ui')) {
+          sceneEl.setAttribute('vr-mode-ui', 'enabled: true');
+        }
+        // Hide mobile controls in VR
+        if (mobileControls) mobileControls.style.display = 'none';
+      }
+    }
+    
+    // Exit VR mode
+    function exitVR() {
+      const sceneEl = document.querySelector('a-scene');
+      if (sceneEl && sceneEl.is('vr-mode')) {
+        sceneEl.exitVR();
+      }
+      document.body.classList.remove('vr-mode');
+    }
+    
+    // Device button handlers
+    document.getElementById('btn-desktop').addEventListener('click', () => setupDevice('desktop'));
+    document.getElementById('btn-mobile').addEventListener('click', () => setupDevice('mobile'));
+    document.getElementById('btn-vr').addEventListener('click', () => setupDevice('vr'));
+    
+    // Handle VR display activate events
+    window.addEventListener('vrdisplaypresentchange', function() {
+      const sceneEl = document.querySelector('a-scene');
+      if (sceneEl && sceneEl.is('vr-mode')) {
+        document.body.classList.add('vr-mode-active');
+      } else {
+        document.body.classList.remove('vr-mode-active');
       }
     });
 
-    // Initialize mobile controls jika sudah memilih mobile sebelumnya
-    if (deviceType === 'mobile') {
+    // Initialize device based on stored preference
+    if (deviceType) {
       deviceSelection.style.display = 'none';
       scene.style.display = 'block';
-      if (mobileControls) {
-        mobileControls.style.display = 'block';
-        // Tunggu sampai scene selesai dimuat
-        scene.addEventListener('loaded', function () {
-          setTimeout(setupMobileControls, 1000);
+      
+      if (deviceType === 'mobile') {
+        if (mobileControls) {
+          mobileControls.style.display = 'block';
+          scene.addEventListener('loaded', function() {
+            setTimeout(setupMobileControls, 1000);
+          });
+        }
+      } else if (deviceType === 'vr') {
+        scene.addEventListener('loaded', function() {
+          enterVR();
         });
       }
     }
