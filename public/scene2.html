@@ -249,6 +249,55 @@
           position="0 0 -0.05">
         </a-box>
 
+        <!-- Quick Direction Buttons - Above Panel from Player POV -->
+        <a-entity position="6 1 2" rotation="0 0 0">
+          <!-- Tarik Kiri Button -->
+          <a-box
+            id="tarik-kiri-btn"
+            width="2.0"
+            height="0.5"
+            depth="0.15"
+            color="#E91E63"
+            position="-1.2 0 0"
+            class="clickable"
+            cursor-listener
+            event-set__mouseenter="color: #F06292"
+            event-set__mouseleave="color: #E91E63"
+            shadow="cast: true">
+            <a-text
+              value="← TARIK KIRI"
+              position="0 0 0.08"
+              align="center"
+              color="white"
+              font="kelsonsans"
+              width="5">
+            </a-text>
+          </a-box>
+
+          <!-- Tarik Kanan Button -->
+          <a-box
+            id="tarik-kanan-btn"
+            width="2.0"
+            height="0.5"
+            depth="0.15"
+            color="#4CAF50"
+            position="1.2 0 0"
+            class="clickable"
+            cursor-listener
+            event-set__mouseenter="color: #66BB6A"
+            event-set__mouseleave="color: #4CAF50"
+            shadow="cast: true">
+            <a-text
+              value="TARIK KANAN →"
+              position="0 0 0.08"
+              align="center"
+              color="white"
+              font="kelsonsans"
+              width="5">
+            </a-text>
+          </a-box>
+        </a-entity>
+
         <!-- Panel Title -->
         <a-text
           value="SIMULASI GAYA GESEK"
@@ -309,7 +358,7 @@
           position="0 2.0 0.1">
           <a-text
             id="massa-display"
-            value="10"
+            value="5"
             position="0 0 0.03"
             align="center"
             color="#4CAF50"
@@ -380,7 +429,7 @@
           position="0 1.2 0.1">
           <a-text
             id="gaya-tarik-display"
-            value="20"
+            value="0"
             position="0 0 0.03"
             align="center"
             color="#4CAF50"
@@ -576,6 +625,8 @@
           </a-text>
         </a-box>
 
+
+
         <!-- Result Display Panel -->
         <a-box
           id="result-panel-3d"
@@ -599,51 +650,51 @@
           <a-text
             id="result-normal-3d"
             value=""
-            position="0 0.6 0.05"
+            position="0 0.7 0.05"
             align="center"
             color="#FFC107"
             font="kelsonsans"
-            width="4">
+            width="3.5">
           </a-text>
 
           <a-text
             id="result-fsmax-3d"
             value=""
-            position="0 0.3 0.05"
+            position="0 0.4 0.05"
             align="center"
             color="#FFC107"
             font="kelsonsans"
-            width="4">
+            width="3.5">
           </a-text>
 
           <a-text
             id="result-fk-3d"
             value=""
-            position="0 0.0 0.05"
+            position="0 0.1 0.05"
             align="center"
             color="#FFC107"
             font="kelsonsans"
-            width="4">
+            width="3.5">
           </a-text>
 
           <a-text
             id="result-kesimpulan-3d"
             value=""
-            position="0 -0.3 0.05"
+            position="0 -0.2 0.05"
             align="center"
             color="#4CAF50"
             font="kelsonsans"
-            width="4">
+            width="3.5">
           </a-text>
 
           <a-text
             id="result-percepatan-3d"
             value=""
-            position="0 -0.6 0.05"
+            position="0 -0.5 0.05"
             align="center"
             color="#4CAF50"
             font="kelsonsans"
-            width="4">
+            width="3.5">
           </a-text>
 
         </a-box>
@@ -744,7 +795,81 @@
           material="depthTest: true"
           shadow="cast: true">
         </a-box>
-        
+
+        <!-- Panah gaya F (applied force) ke kanan -->
+        <a-entity
+          id="forceArrow"
+          position="0 0.5 -3"
+          rotation="0 90 0"
+          scale="2 2 2"
+          visible="false">
+          <!-- Batang panah -->
+          <a-cylinder
+            position="0 0 0"
+            radius="0.05"
+            height="1.5"
+            color="#FF0000"
+            rotation="0 0 90"
+            material="depthTest: true">
+          </a-cylinder>
+          <!-- Kepala panah -->
+          <a-cone
+            position="0.75 0 0"
+            radius-bottom="0.15"
+            height="0.3"
+            color="#FF0000"
+            rotation="0 0 -90"
+            material="depthTest: true">
+          </a-cone>
+          <!-- Label F -->
+          <a-text
+            value="F"
+            position="0 0.3 0"
+            align="center"
+            color="#FF0000"
+            width="8"
+            material="depthTest: false">
+          </a-text>
+        </a-entity>
+
+        <!-- Panah gaya gesek (fs/fk) ke kiri -->
+        <a-entity
+          id="frictionArrow"
+          position="0 0.5 3"
+          rotation="0 -90 0"
+          scale="2 2 2"
+          visible="false">
+          <!-- Batang panah -->
+          <a-cylinder
+            position="0 0 0"
+            radius="0.05"
+            height="1.0"
+            color="#0000FF"
+            rotation="0 0 90"
+            material="depthTest: true">
+          </a-cylinder>
+          <!-- Kepala panah -->
+          <a-cone
+            position="0.5 0 0"
+            radius-bottom="0.15"
+            height="0.3"
+            color="#0000FF"
+            rotation="0 0 -90"
+            material="depthTest: true">
+          </a-cone>
+          <!-- Label fs/fk -->
+          <a-text
+            id="frictionLabel"
+            value="fs"
+            position="0 0.3 0"
+            align="center"
+            color="#0000FF"
+            width="8"
+            material="depthTest: false">
+          </a-text>
+        </a-entity>
+
+
       </a-entity>
 
       <a-text
@@ -1694,9 +1819,10 @@
 
       // Fungsi untuk animasi fallback (jika GLB tidak ada)
       // Modifikasi: Buat fungsi ini lebih fleksibel
-      function animateBlock(state, acceleration = 0) {
+      function animateBlock(state, acceleration = 0, direction = 1) {
         // Prioritaskan model GLB jika sudah dimuat, jika tidak, gunakan fallback box
         const modelToAnimate = document.querySelector('#myModel').querySelector('#glbBlockModel') || document.querySelector('#blockModel');
+        const arrow = document.querySelector('#directionArrow');
 
         if (modelToAnimate) {
           // Hapus animasi sebelumnya jika ada
@@ -1710,6 +1836,26 @@
           modelToAnimate.setAttribute('position', initialPosition);
 
           if (state === 'move') {
+            // Show arrow when block is moving
+            if (arrow) {
+              arrow.setAttribute('visible', 'true');
+              // Position arrow above the block and point in direction of movement
+              arrow.setAttribute('position', `${initialPosition.x} ${initialPosition.y + 1.2} ${initialPosition.z}`);
+              // Point arrow in movement direction (negative Z direction since block moves that way)
+              arrow.setAttribute('rotation', '0 90 0'); // Point forward in movement direction
+
+              // Add pulsing animation to arrow to show it's active
+              arrow.setAttribute('animation__pulse', {
+                property: 'scale',
+                to: '2.2 2.2 2.2',
+                from: '2 2 2',
+                dur: 800,
+                direction: 'alternate',
+                loop: true,
+                easing: 'easeInOutSine'
+              });
+            }
+
             // Durasi animasi berbanding terbalik dengan percepatan
             const duration = Math.max(1000, 5000 / (1 + acceleration));
             // Jarak tempuh proporsional dengan percepatan
@@ -1717,21 +1863,44 @@
 
             // Posisi target adalah posisi awal ditambah jarak pergerakan
             // Karena parentnya dirotasi -90 derajat pada sumbu Y, pergerakan di sumbu X lokal menjadi pergerakan di sumbu Z global.
-            const targetPosition = `${initialPosition.x} ${initialPosition.y} ${initialPosition.z - distance}`;
+            // direction: 1 = ke kanan (default), -1 = ke kiri
+            const targetPosition = `${initialPosition.x} ${initialPosition.y} ${initialPosition.z - (distance * direction)}`;
 
             const animationString = `property: position; to: ${targetPosition}; dur: ${duration}; easing: easeInOutQuad; startEvents: start-animation`;
-    
+
             modelToAnimate.setAttribute('animation', animationString);
+
+            // Move arrow along with the block
+            if (arrow) {
+              // Set arrow direction based on movement direction
+              const arrowRotation = direction > 0 ? '0 90 0' : '0 -90 0';
+              arrow.setAttribute('rotation', arrowRotation);
+
+              arrow.setAttribute('animation__move', {
+                property: 'position',
+                to: `${initialPosition.x} ${initialPosition.y + 1.2} ${initialPosition.z - (distance * direction)}`,
+                dur: duration,
+                easing: 'easeInOutQuad',
+                startEvents: 'start-animation'
+              });
+            }
 
             // Memicu event untuk memulai animasi
             modelToAnimate.emit('start-animation');
+          } else {
+            // Hide arrow when block is idle/stationary
+            if (arrow) {
+              arrow.setAttribute('visible', 'false');
+              arrow.removeAttribute('animation__pulse');
+              arrow.removeAttribute('animation__move');
+            }
           }
         }
       }
 
       // Variables for 3D panel values (global scope)
-      let massa_value_3d = 10;
-      let gaya_tarik_value_3d = 20;
+      let massa_value_3d = 5;
+      let gaya_tarik_value_3d = 0;
       let koef_statis_value_3d = 0.5;
       let koef_kinetis_value_3d = 0.3;
 
@@ -1749,7 +1918,7 @@
           massaMinus.replaceWith(massaMinus.cloneNode(true));
           const newMassaMinus = document.querySelector('#massa-minus');
           newMassaMinus.addEventListener('click', () => {
-            massa_value_3d = Math.max(1, massa_value_3d - 1);
+            massa_value_3d = Math.max(1, massa_value_3d - 2);
             const display = document.querySelector('#massa-display');
             if (display) display.setAttribute('value', massa_value_3d.toString());
             console.log('Massa decreased to:', massa_value_3d);
@@ -1761,7 +1930,7 @@
           massaPlus.replaceWith(massaPlus.cloneNode(true));
           const newMassaPlus = document.querySelector('#massa-plus');
           newMassaPlus.addEventListener('click', () => {
-            massa_value_3d = Math.min(100, massa_value_3d + 1);
+            massa_value_3d = Math.min(100, massa_value_3d + 2);
             const display = document.querySelector('#massa-display');
             if (display) display.setAttribute('value', massa_value_3d.toString());
             console.log('Massa increased to:', massa_value_3d);
@@ -1777,7 +1946,7 @@
           gayaTarikMinus.replaceWith(gayaTarikMinus.cloneNode(true));
           const newGayaTarikMinus = document.querySelector('#gaya-tarik-minus');
           newGayaTarikMinus.addEventListener('click', () => {
-            gaya_tarik_value_3d = Math.max(0, gaya_tarik_value_3d - 5);
+            gaya_tarik_value_3d = Math.max(-200, gaya_tarik_value_3d - 10);
             const display = document.querySelector('#gaya-tarik-display');
             if (display) display.setAttribute('value', gaya_tarik_value_3d.toString());
             console.log('Gaya tarik decreased to:', gaya_tarik_value_3d);
@@ -1789,7 +1958,7 @@
           gayaTarikPlus.replaceWith(gayaTarikPlus.cloneNode(true));
           const newGayaTarikPlus = document.querySelector('#gaya-tarik-plus');
           newGayaTarikPlus.addEventListener('click', () => {
-            gaya_tarik_value_3d = Math.min(200, gaya_tarik_value_3d + 5);
+            gaya_tarik_value_3d = Math.min(200, gaya_tarik_value_3d + 10);
             const display = document.querySelector('#gaya-tarik-display');
             if (display) display.setAttribute('value', gaya_tarik_value_3d.toString());
             console.log('Gaya tarik increased to:', gaya_tarik_value_3d);
@@ -1853,6 +2022,41 @@
           console.log('✅ Koef kinetis plus button listener added');
         }
 
+        // Quick Direction Buttons
+        const tarikKiriBtn = document.querySelector('#tarik-kiri-btn');
+        const tarikKananBtn = document.querySelector('#tarik-kanan-btn');
+
+        if (tarikKiriBtn) {
+          tarikKiriBtn.replaceWith(tarikKiriBtn.cloneNode(true));
+          const newTarikKiriBtn = document.querySelector('#tarik-kiri-btn');
+          newTarikKiriBtn.addEventListener('click', () => {
+            console.log('👈 Tarik Kiri button clicked');
+            gaya_tarik_value_3d = -50; // Set to pull left
+            const display = document.querySelector('#gaya-tarik-display');
+            if (display) display.setAttribute('value', gaya_tarik_value_3d.toString());
+
+            // Auto calculate and animate
+            document.querySelector('#calculate-btn-3d').click();
+          });
+          console.log('✅ Tarik Kiri button listener added');
+        }
+
+        if (tarikKananBtn) {
+          tarikKananBtn.replaceWith(tarikKananBtn.cloneNode(true));
+          const newTarikKananBtn = document.querySelector('#tarik-kanan-btn');
+          newTarikKananBtn.addEventListener('click', () => {
+            console.log('👉 Tarik Kanan button clicked');
+            gaya_tarik_value_3d = 50; // Set to pull right
+            const display = document.querySelector('#gaya-tarik-display');
+            if (display) display.setAttribute('value', gaya_tarik_value_3d.toString());
+
+            // Auto calculate and animate
+            document.querySelector('#calculate-btn-3d').click();
+          });
+          console.log('✅ Tarik Kanan button listener added');
+        }
+
+
         // 3D Calculate Button
         const calculateBtn3D = document.querySelector('#calculate-btn-3d');
         if (calculateBtn3D) {
@@ -1884,25 +2088,53 @@
             let kesimpulan = "";
             let percepatan = 0;
             let statusInfo = "";
+            let direction = Math.sign(F_tarik); // 1 for right, -1 for left
+            const F_abs = Math.abs(F_tarik); // Absolute value for calculations
 
-            // 3. Determine block condition (static or moving)
-            if (F_tarik <= Fs_max) {
-              // Block remains static
+            // 3. Determine block condition (4 states sesuai storyboard)
+            if (F_abs <= Fs_max) {
+              // Block remains static - differentiate between states (a), (b), and (c)
               percepatan = 0;
-              kesimpulan = `Gaya tarik (${F_tarik.toFixed(2)} N) <= Fs,max (${Fs_max.toFixed(2)} N).`;
-              statusInfo = "BALOK TETAP DIAM! Gaya tarik tidak cukup untuk mengatasi gaya gesek statis.";
+
+              if (F_abs < Fs_max * 0.3) {
+                // State (a): Small applied force with small static friction
+                const directionText = direction > 0 ? "kanan" : "kiri";
+                kesimpulan = `State (a): Gaya tarik kecil (${F_tarik.toFixed(2)} N) ke ${directionText}, gesek statis kecil.`;
+                statusInfo = `BALOK DIAM - Gaya tarik kecil ke ${directionText}, gaya gesek statis kecil.`;
+                showForceArrows(F_tarik, F_tarik, 'static_small'); // fs = F_tarik (equilibrium)
+
+              } else if (F_abs < Fs_max * 0.8) {
+                // State (b): Larger applied force with larger static friction
+                const directionText = direction > 0 ? "kanan" : "kiri";
+                kesimpulan = `State (b): Gaya tarik sedang (${F_tarik.toFixed(2)} N) ke ${directionText}, gesek statis sedang.`;
+                statusInfo = `BALOK DIAM - Gaya tarik sedang ke ${directionText}, gaya gesek statis sedang.`;
+                showForceArrows(F_tarik, F_tarik, 'static_medium'); // fs = F_tarik (equilibrium)
+
+              } else {
+                // State (c): Block about to move with maximum static friction
+                const directionText = direction > 0 ? "kanan" : "kiri";
+                kesimpulan = `State (c): Hampir bergerak ke ${directionText}! F (${F_tarik.toFixed(2)} N) ≈ Fs,max (${Fs_max.toFixed(2)} N).`;
+                statusInfo = `BALOK HAMPIR BERGERAK ke ${directionText}! Gaya gesek statis mendekati maksimum.`;
+                showForceArrows(F_tarik, Fs_max * direction, 'static_max'); // fs approaches fs,max
+              }
 
               // Animate 3D model
               animateBlock('idle');
 
             } else {
-              // Block moves
-              percepatan = (F_tarik - Fk) / massa; // a = (F_tarik - Fk) / m
-              kesimpulan = `Gaya tarik (${F_tarik.toFixed(2)} N) > Fs,max (${Fs_max.toFixed(2)} N).`;
-              statusInfo = `BALOK BERGERAK! Dengan percepatan ${percepatan.toFixed(2)} m/s².`;
+              // State (d): Block moves with kinetic friction
+              const Fk_resistance = Fk * (-direction); // Friction opposes motion
+              percepatan = (F_tarik - Fk_resistance) / massa; // a = (F_applied - F_friction) / m
+              const directionText = direction > 0 ? "kanan" : "kiri";
+
+              kesimpulan = `State (d): BERGERAK ke ${directionText}! F (${F_tarik.toFixed(2)} N) > Fs,max (${Fs_max.toFixed(2)} N).`;
+              statusInfo = `BALOK BERGERAK ke ${directionText}! Gaya gesek kinetik ${Fk.toFixed(2)} N, percepatan ${Math.abs(percepatan).toFixed(2)} m/s².`;
+
+              // Show force arrows for moving case (use signed value for arrows)
+              showForceArrows(F_tarik, Fk_resistance, 'moving');
 
               // Animate 3D model
-              animateBlock('move', percepatan);
+              animateBlock('move', Math.abs(percepatan), direction);
             }
 
             // 4. Display results in 3D panel
@@ -1913,13 +2145,13 @@
             const resultPanel3D = document.querySelector('#result-panel-3d');
             if (resultPanel3D) resultPanel3D.setAttribute('visible', 'true');
 
-            // Update 3D result displays
+            // Update 3D result displays (ensure all values are positive)
             const resultElements3D = [
-              { selector: '#result-normal-3d', text: `N = m × g = ${N.toFixed(2)} N` },
-              { selector: '#result-fsmax-3d', text: `Fs,max = μs × N = ${Fs_max.toFixed(2)} N` },
-              { selector: '#result-fk-3d', text: `Fk = μk × N = ${Fk.toFixed(2)} N` },
+              { selector: '#result-normal-3d', text: `N = m × g = ${Math.abs(N).toFixed(2)} N` },
+              { selector: '#result-fsmax-3d', text: `Fs,max = μs × N = ${Math.abs(Fs_max).toFixed(2)} N` },
+              { selector: '#result-fk-3d', text: `Fk = μk × N = ${Math.abs(Fk).toFixed(2)} N` },
               { selector: '#result-kesimpulan-3d', text: `${kesimpulan}` },
-              { selector: '#result-percepatan-3d', text: `a = ${percepatan.toFixed(2)} m/s²` }
+              { selector: '#result-percepatan-3d', text: `a = ${Math.abs(percepatan).toFixed(2)} m/s²` }
             ];
 
             resultElements3D.forEach(({ selector, text }) => {
@@ -2027,8 +2259,8 @@
             if (resultPanel3D) resultPanel3D.setAttribute('visible', 'false');
 
             // Reset 3D panel values to defaults
-            massa_value_3d = 10;
-            gaya_tarik_value_3d = 20;
+            massa_value_3d = 5;
+            gaya_tarik_value_3d = 0;
             koef_statis_value_3d = 0.5;
             koef_kinetis_value_3d = 0.3;
 
@@ -2566,6 +2798,78 @@
         // Input handlers sudah ditangani di setupEventListeners
       }
 
+      // Function to show force arrows based on calculation state
+      function showForceArrows(appliedForce, frictionForce, state) {
+        const forceArrow = document.querySelector('#forceArrow');
+        const frictionArrow = document.querySelector('#frictionArrow');
+        const frictionLabel = document.querySelector('#frictionLabel');
+
+        if (!forceArrow || !frictionArrow) {
+          console.log('Force arrows not found in DOM');
+          return;
+        }
+
+        // Show all visual elements
+        forceArrow.setAttribute('visible', 'true');
+        frictionArrow.setAttribute('visible', 'true');
+
+        // Scale arrows based on force magnitude (relative scaling)
+        const maxForce = Math.max(appliedForce, frictionForce);
+        const forceScale = Math.max(0.5, Math.min(2.0, appliedForce / 50)); // Scale between 0.5-2.0
+        const frictionScale = Math.max(0.5, Math.min(2.0, frictionForce / 50)); // Scale between 0.5-2.0
+
+        // Update force arrow (F) - red arrow pointing right
+        forceArrow.setAttribute('scale', `${forceScale} 1 1`);
+
+        // Update friction arrow (fs/fk) - blue arrow pointing left
+        frictionArrow.setAttribute('scale', `${frictionScale} 1 1`);
+
+        // Update label based on state
+        if (state === 'static') {
+          frictionLabel.setAttribute('value', 'fs');
+        } else if (state === 'moving') {
+          frictionLabel.setAttribute('value', 'fk');
+        }
+
+        // Add pulsing animation to show active forces
+        forceArrow.setAttribute('animation__pulse', {
+          property: 'scale',
+          to: `${forceScale * 1.1} 1.1 1.1`,
+          from: `${forceScale} 1 1`,
+          dur: 1000,
+          direction: 'alternate',
+          loop: true,
+          easing: 'easeInOutSine'
+        });
+
+        frictionArrow.setAttribute('animation__pulse', {
+          property: 'scale',
+          to: `${frictionScale * 1.1} 1.1 1.1`,
+          from: `${frictionScale} 1 1`,
+          dur: 1200,
+          direction: 'alternate',
+          loop: true,
+          easing: 'easeInOutSine'
+        });
+
+        console.log(`Force arrows displayed - F: ${appliedForce}N (scale: ${forceScale}), Friction: ${frictionForce}N (scale: ${frictionScale}), State: ${state}`);
+      }
+
+      // Function to hide force arrows when resetting
+      function hideForceArrows() {
+        const forceArrow = document.querySelector('#forceArrow');
+        const frictionArrow = document.querySelector('#frictionArrow');
+
+        if (forceArrow) {
+          forceArrow.setAttribute('visible', 'false');
+          forceArrow.removeAttribute('animation__pulse');
+        }
+        if (frictionArrow) {
+          frictionArrow.setAttribute('visible', 'false');
+          frictionArrow.removeAttribute('animation__pulse');
+        }
+      }
+
       // Coba load model GLB secara opsional
       function loadGLBModels() {
         const myModelEntity = document.querySelector('#myModel');
@@ -2594,7 +2898,26 @@
         });
         
         myModelEntity.appendChild(bab2Model);
-        
+
+        // Add arrow to show movement direction
+        const arrowModel = document.createElement('a-entity');
+        arrowModel.setAttribute('id', 'directionArrow');
+        arrowModel.setAttribute('gltf-model', 'assets/scene2/arrow.glb');
+        arrowModel.setAttribute('position', '1.5 1 0'); // Above the block
+        arrowModel.setAttribute('rotation', '0 90 0'); // Point in movement direction
+        arrowModel.setAttribute('scale', '2 2 2');
+        arrowModel.setAttribute('visible', 'false'); // Initially hidden
+
+        arrowModel.addEventListener('model-loaded', () => {
+          console.log('Arrow model loaded successfully');
+        });
+
+        arrowModel.addEventListener('model-error', (e) => {
+          console.log('Arrow model failed to load');
+        });
+
+        myModelEntity.appendChild(arrowModel);
+
         // Coba load environment model
         const environment = document.querySelector('#environment');
         if (environment) {
