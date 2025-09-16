@@ -1,9 +1,12 @@
 <!doctype html>
-<html>
-
+<html lang="id">
 <head>
   <meta charset="utf-8" />
-  <title>AR-Room</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AR-Room - Virtual Space</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js"></script>
   <script src="https://unpkg.com/networked-aframe@0.14.0/dist/networked-aframe.min.js"></script>
@@ -36,9 +39,244 @@
     src="https://cdn.jsdelivr.net/npm/aframe-environment-component@1.5.0/dist/aframe-environment-component.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-gltf-model-plus@1.0.0/dist/gltf-model-plus.min.js"></script>
   <style>
-    /* Add smooth transitions */
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap');
+    
+    /* Reset and Base Styles */
     * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
       transition: all 0.3s ease, transform 0.2s ease;
+    }
+    
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: #0a0a1a;
+      color: #fff;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    /* Start Screen */
+    .start-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      background: radial-gradient(circle at center, #0f2027, #203a43, #2c5364);
+      opacity: 1;
+      transition: opacity 0.8s ease;
+    }
+    
+    .start-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .logo {
+      font-size: 3.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      background: linear-gradient(90deg, #00f7ff, #00a1ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 20px rgba(0, 247, 255, 0.3);
+      letter-spacing: 3px;
+      font-weight: 700;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+    
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 10px #00f7ff, 0 0 20px #00a1ff;
+      }
+      to {
+        text-shadow: 0 0 20px #00f7ff, 0 0 30px #00a1ff, 0 0 40px #00a1ff;
+      }
+    }
+    
+    .tagline {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.8);
+      margin-bottom: 3rem;
+      text-align: center;
+      max-width: 600px;
+      line-height: 1.6;
+    }
+    
+    .start-btn {
+      background: linear-gradient(90deg, #00f7ff, #0088ff);
+      border: none;
+      padding: 1rem 3rem;
+      border-radius: 50px;
+      color: #0a0a1a;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      box-shadow: 0 0 20px rgba(0, 247, 255, 0.3);
+    }
+    
+    .start-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, #0088ff, #00f7ff);
+      z-index: -1;
+      opacity: 0;
+      transition: 0.5s;
+    }
+    
+    .start-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 247, 255, 0.4);
+    }
+    
+    .start-btn:hover::before {
+      opacity: 1;
+    }
+    
+    .start-btn:active {
+      transform: translateY(1px);
+    }
+    
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    
+    /* Hide everything else by default */
+    body > *:not(.start-screen):not(.particles) {
+      display: none;
+    }
+    
+    body {
+      background: var(--dark-bg);
+      color: #fff;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    /* Particle Background */
+    #particles-js {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    
+    /* Main Container */
+    .main-container {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+      opacity: 0;
+      animation: fadeIn 1s ease-out forwards;
+    }
+    
+    /* Logo */
+    .logo {
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: var(--text-glow);
+      letter-spacing: 2px;
+    }
+    
+    /* Tagline */
+    .tagline {
+      font-size: 1.2rem;
+      margin-bottom: 3rem;
+      color: rgba(255, 255, 255, 0.8);
+      letter-spacing: 1px;
+    }
+    
+    /* Start Button */
+    .start-btn {
+      background: transparent;
+      color: var(--neon-cyan);
+      border: 2px solid var(--neon-cyan);
+      padding: 1rem 3rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border-radius: 50px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      box-shadow: 0 0 15px rgba(0, 255, 234, 0.3);
+      transition: all 0.3s ease;
+    }
+    
+    .start-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 234, 0.2), transparent);
+      transition: 0.5s;
+      z-index: -1;
+    }
+    
+    .start-btn:hover {
+      color: #fff;
+      box-shadow: 0 0 25px var(--neon-cyan);
+      text-shadow: 0 0 10px #fff;
+    }
+    
+    .start-btn:hover::before {
+      left: 100%;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .floating {
+      animation: float 3s ease-in-out infinite;
     }
     
     /* Add focus styles for accessibility */
@@ -88,6 +326,121 @@
     }
   </style>
   <script>
+    // Initialize particle animation
+    function initParticles() {
+      const canvas = document.createElement('canvas');
+      canvas.id = 'particles-canvas';
+      canvas.classList.add('particles');
+      document.body.appendChild(canvas);
+      
+      const ctx = canvas.getContext('2d');
+      
+      // Set canvas size
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+      
+      // Particle class
+      class Particle {
+        constructor() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.size = Math.random() * 2 + 0.5;
+          this.speedX = Math.random() * 1 - 0.5;
+          this.speedY = Math.random() * 1 - 0.5;
+          this.color = `rgba(0, 247, 255, ${Math.random() * 0.5 + 0.1})`;
+        }
+        
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          
+          if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+          if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+        }
+        
+        draw() {
+          ctx.fillStyle = this.color;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      
+      // Create particles
+      const particles = [];
+      for (let i = 0; i < 100; i++) {
+        particles.push(new Particle());
+      }
+      
+      // Animation loop
+      function animate() {
+        ctx.fillStyle = 'rgba(10, 10, 26, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        for (let i = 0; i < particles.length; i++) {
+          particles[i].update();
+          particles[i].draw();
+          
+          // Connect particles
+          for (let j = i; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < 100) {
+              ctx.strokeStyle = `rgba(0, 247, 255, ${1 - distance/100})`;
+              ctx.lineWidth = 0.5;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+        
+        requestAnimationFrame(animate);
+      }
+      
+      animate();
+    }
+    
+    // Start screen functionality
+    function initStartScreen() {
+      const startScreen = document.createElement('div');
+      startScreen.className = 'start-screen';
+      
+      startScreen.innerHTML = `
+        <div class="logo">Particle Dynamics VR</div>
+        <p class="tagline">Jelajahi dunia partikel dalam pengalaman virtual yang imersif dan interaktif</p>
+        <button class="start-btn" id="startBtn">Mulai</button>
+      `;
+      
+      document.body.insertBefore(startScreen, document.body.firstChild);
+      
+      // Handle start button click
+      const startBtn = document.getElementById('startBtn');
+      startBtn.addEventListener('click', () => {
+        // Fade out start screen
+        startScreen.classList.add('hidden');
+        
+        // After fade out, redirect to device selection
+        setTimeout(() => {
+          window.location.href = 'device.html';
+        }, 800);
+      });
+    }
+    
+    // Initialize everything when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      initParticles();
+      initStartScreen();
+    });
+    
     window.uiSettings = {
       showRandomAvatarButton: true,
       showDieButton: true,
@@ -199,7 +552,16 @@
   </div>
 </head>
 
-<body>
+<body class="fade-in">
+  <!-- Particle Background -->
+  <div id="particles-js"></div>
+  
+  <!-- Main Content -->
+  <div class="main-container" style="display: none;">
+    <h1 class="logo floating">AR-ROOM</h1>
+    <p class="tagline">Your Gateway to Virtual Reality</p>
+    <button id="startBtn" class="start-btn">Mulai</button>
+  </div>
   <!-- Device Selection Screen -->
   <div id="device-selection" class="selection-screen">
     <div class="selection-container">
@@ -508,6 +870,7 @@
     </div>
   </div>
 
+  <!-- Hidden A-Frame scene (will be shown when needed) -->
   <a-scene style="display: none;" light="defaultLightsEnabled:false" renderer="stencil:true; antialias: true;" vr-mode-ui="enabled: false" webxr="requiredFeatures: local-floor; referenceSpaceType: local-floor;" networked-scene="
         connectOnLoad: false;
         room: lobby;
@@ -737,25 +1100,47 @@
     `;
     document.head.appendChild(style);
     
-    // Check if device is already selected
+    // Check if we should show the device selection or main experience
     const deviceType = localStorage.getItem('deviceType');
     const deviceSelection = document.getElementById('device-selection');
-    const scene = document.querySelector('a-scene');
-    const mobileControls = document.getElementById('mobile-controls');
-    let joystick = null;
-
-    // Always show device selection screen
-    deviceSelection.style.display = 'flex';
-    scene.style.display = 'none';
+    const mainContainer = document.querySelector('.main-container');
+    const aScene = document.querySelector('a-scene');
+    
+    // If we have a device type, show the main experience
+    if (deviceType && aScene) {
+      // Hide the main menu and show the A-Frame scene
+      if (mainContainer) mainContainer.style.display = 'none';
+      if (deviceSelection) deviceSelection.style.display = 'none';
+      aScene.style.display = 'block';
+      
+      // Initialize the experience based on device type
+      initializeExperience(deviceType);
+    } else if (window.location.pathname.endsWith('index.html') || window.location.pathname === '/') {
+      // Show the main menu if we're on the index page without a device selected
+      if (mainContainer) mainContainer.style.display = 'flex';
+      if (deviceSelection) deviceSelection.style.display = 'none';
+      if (aScene) aScene.style.display = 'none';
+    }
 
     // Device selection handlers
     function setupDevice(deviceType) {
-      deviceSelection.style.display = 'none';
-      scene.style.display = 'block';
+      // Hide the main menu and show the A-Frame scene
+      if (mainContainer) mainContainer.style.display = 'none';
+      if (deviceSelection) deviceSelection.style.display = 'none';
+      aScene.style.display = 'block';
+      
+      // Save the device type to local storage
       localStorage.setItem('deviceType', deviceType);
       
+      // Initialize the experience based on device type
+      initializeExperience(deviceType);
+    }
+    
+    // Function to initialize the experience based on device type
+    function initializeExperience(deviceType) {
       // Handle VR mode
       if (deviceType === 'vr') {
+        if (aScene.hasLoaded) {
         if (scene.hasLoaded) {
           enterVR();
         } else {
