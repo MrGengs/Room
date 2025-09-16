@@ -127,17 +127,14 @@
   </script>
 </head>
 <body>
-  <!-- Virtual Gamepad for Mobile -->
-  <div id="mobile-controls"
-    style="position: fixed; bottom: 30px; left: 20px; z-index: 1000; display: none; touch-action: none; -webkit-tap-highlight-color: transparent;">
-    <!-- Joystick Control -->
-    <div id="joystick"
-      style="width: 120px; height: 120px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; position: relative; overflow: visible;">
-      <div id="joystick-knob"
-        style="width: 80px; height: 80px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; left: 20px; top: 20px; transition: transform 0.1s ease-out; touch-action: none; pointer-events: none;">
+
+    <!-- Virtual Gamepad for Mobile -->
+    <div id="mobile-controls" style="position: fixed; bottom: 30px; left: 20px; z-index: 1000; display: none; touch-action: none; -webkit-tap-highlight-color: transparent;">
+      <!-- Joystick Control -->
+      <div id="joystick" style="width: 120px; height: 120px; background: rgba(255, 255, 255, 0.2); border-radius: 50%; position: relative; overflow: visible;">
+        <div id="joystick-knob" style="width: 80px; height: 80px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; position: absolute; left: 20px; top: 20px; transition: transform 0.1s ease-out; touch-action: none; pointer-events: none;"></div>
       </div>
     </div>
-  </div>
 
     <a-scene 
       vr-mode-ui="enabled: false" 
@@ -201,7 +198,7 @@
         position="0 1.6 6"
         rotation="0 180 0"
         link="on: click"
-        href="index.html"
+        href="vr.html"
         title="Kembali ke Menu"
         image="#thumbScene1"
         class="clickable"
@@ -1163,178 +1160,187 @@
           </a-entity>
         </a-entity>
 
-      <!-- Kontrol untuk Bola 1 (Merah) - Input Ketik -->
-      <a-entity id="UImerahWrapper" position="-3 0.5 0" rotation="-15 20 0">
-        <a-text value="BOLA MERAH" position="0 0.8 0" align="center" color="#ff4444" width="4"
-          material="depthTest: false; transparent: true">
-        </a-text>
-
-        <!-- Kontrol Massa Bola 1 -->
-        <a-text value="Massa (kg):" position="0 0.5 0" align="center" color="white" width="3"
-          material="depthTest: false; transparent: true">
-        </a-text>
-
-        <!-- Kontrol Plus/Minus Massa Bola 1 -->
-        <a-entity position="0 0.25 0">
-          <!-- Tombol Minus -->
-          <a-entity position="-0.8 0 0">
-            <a-box id="btnM1Minus" class="clickable" depth="0.05" height="0.2" width="0.3" color="#ff4444"
-              material="depthTest: true" event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff6666"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff4444">
-            </a-box>
-            <a-text value="-" color="#fff" align="center" width="6" position="0 0 0.03"
-              material="depthTest: false; transparent: true">
-            </a-text>
+        <!-- Kontrol untuk Bola 1 (Merah) - Input Ketik -->
+        <a-entity id="UImerahWrapper" position="-3 0.5 0" rotation="-15 20 0">
+          <a-text 
+            value="BOLA MERAH" 
+            position="0 0.8 0" 
+            align="center" 
+            color="#ff4444" 
+            width="4"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
+          <!-- Kontrol Massa Bola 1 -->
+          <a-text 
+            value="Massa (kg):"
+            position="0 0.5 0" 
+            align="center" 
+            color="white" 
+            width="3"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
+          <!-- Kontrol Plus/Minus Massa Bola 1 -->
+          <a-entity position="0 0.25 0">
+            <!-- Tombol Minus -->
+            <a-entity position="-0.8 0 0">
+              <a-box 
+                id="btnM1Minus"
+                class="clickable"
+                depth="0.05" 
+                height="0.2" 
+                width="0.3" 
+                color="#ff4444"
+                material="depthTest: true"
+                event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff6666"
+                event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff4444">
+              </a-box>
+              <a-text 
+                value="-" 
+                color="#fff" 
+                align="center" 
+                width="6" 
+                position="0 0 0.03"
+                material="depthTest: false; transparent: true">
+              </a-text>
+            </a-entity>
+            
+            <!-- Display Massa -->
+            <a-entity position="0 0 0">
+              <a-box 
+                depth="0.03" 
+                height="0.2" 
+                width="0.6" 
+                color="#2a2a2a"
+                material="depthTest: true">
+              </a-box>
+              <a-text 
+                id="inputM1Text"
+                value="1.0 kg" 
+                color="#fff" 
+                align="center" 
+                width="3" 
+                position="0 0 0.02"
+                material="depthTest: false; transparent: true">
+              </a-text>
+            </a-entity>
+            
+            <!-- Tombol Plus -->
+            <a-entity position="0.8 0 0">
+              <a-box 
+                id="btnM1Plus"
+                class="clickable"
+                depth="0.05" 
+                height="0.2" 
+                width="0.3" 
+                color="#00aa00"
+                material="depthTest: true"
+                event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#33cc33"
+                event-set__leave="_event: mouseleave; scale:1 1 1; color:#00aa00">
+              </a-box>
+              <a-text 
+                value="+" 
+                color="#fff" 
+                align="center" 
+                width="6" 
+                position="0 0 0.03"
+                material="depthTest: false; transparent: true">
+              </a-text>
+            </a-entity>
           </a-entity>
-
-          <!-- Display Massa -->
-          <a-entity position="0 0 0">
-            <a-box depth="0.03" height="0.2" width="0.6" color="#2a2a2a" material="depthTest: true">
-            </a-box>
-            <a-text id="inputM1Text" value="1.0 kg" color="#fff" align="center" width="3" position="0 0 0.02"
-              material="depthTest: false; transparent: true">
-            </a-text>
-          </a-entity>
-
-          <!-- Tombol Plus -->
-          <a-entity position="0.8 0 0">
-            <a-box id="btnM1Plus" class="clickable" depth="0.05" height="0.2" width="0.3" color="#00aa00"
-              material="depthTest: true" event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#33cc33"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#00aa00">
-            </a-box>
-            <a-text value="+" color="#fff" align="center" width="6" position="0 0 0.03"
-              material="depthTest: false; transparent: true">
-            </a-text>
+          
+          <!-- Kontrol Kecepatan Bola 1 -->
+          <a-text 
+            value="Kecepatan (m/s):"
+            position="0 0.0 0" 
+            align="center" 
+            color="white" 
+            width="3"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
+          <!-- Kontrol Plus/Minus Kecepatan Bola 1 -->
+          <a-entity position="0 -0.25 0">
+            <!-- Tombol Minus -->
+            <a-entity position="-0.8 0 0">
+              <a-box 
+                id="btnV1Minus"
+                class="clickable"
+                depth="0.05" 
+                height="0.2" 
+                width="0.3" 
+                color="#ff4444"
+                material="depthTest: true"
+                event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff6666"
+                event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff4444">
+              </a-box>
+              <a-text 
+                value="-" 
+                color="#fff" 
+                align="center" 
+                width="6" 
+                position="0 0 0.03"
+                material="depthTest: false; transparent: true">
+              </a-text>
+            </a-entity>
+            
+            <!-- Display Kecepatan -->
+            <a-entity position="0 0 0">
+              <a-box 
+                depth="0.03" 
+                height="0.2" 
+                width="0.6" 
+                color="#2a2a2a"
+                material="depthTest: true">
+              </a-box>
+              <a-text 
+                id="inputV1Text"
+                value="1.0 m/s" 
+                color="#fff" 
+                align="center" 
+                width="2.5" 
+                position="0 0 0.02"
+                material="depthTest: false; transparent: true">
+              </a-text>
+            </a-entity>
+            
+            <!-- Tombol Plus -->
+            <a-entity position="0.8 0 0">
+              <a-box 
+                id="btnV1Plus"
+                class="clickable"
+                depth="0.05" 
+                height="0.2" 
+                width="0.3" 
+                color="#00aa00"
+                material="depthTest: true"
+                event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#33cc33"
+                event-set__leave="_event: mouseleave; scale:1 1 1; color:#00aa00">
+              </a-box>
+              <a-text 
+                value="+" 
+                color="#fff" 
+                align="center" 
+                width="6" 
+                position="0 0 0.03"
+                material="depthTest: false; transparent: true">
+              </a-text>
+            </a-entity>
           </a-entity>
         </a-entity>
-
-        <!-- Kontrol Kecepatan Bola 1 -->
-        <a-text value="Kecepatan (m/s):" position="0 0.0 0" align="center" color="white" width="3"
-          material="depthTest: false; transparent: true">
-        </a-text>
-
-        <!-- Kontrol Plus/Minus Kecepatan Bola 1 -->
-        <a-entity position="0 -0.25 0">
-          <!-- Tombol Minus -->
-          <a-entity position="-0.8 0 0">
-            <a-box id="btnV1Minus" class="clickable" depth="0.05" height="0.2" width="0.3" color="#ff4444"
-              material="depthTest: true" event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff6666"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff4444">
-            </a-box>
-            <a-text value="-" color="#fff" align="center" width="6" position="0 0 0.03"
-              material="depthTest: false; transparent: true">
-            </a-text>
-          </a-entity>
-
-          <!-- Display Kecepatan -->
-          <a-entity position="0 0 0">
-            <a-box depth="0.03" height="0.2" width="0.6" color="#2a2a2a" material="depthTest: true">
-            </a-box>
-            <a-text id="inputV1Text" value="1.0 m/s" color="#fff" align="center" width="2.5" position="0 0 0.02"
-              material="depthTest: false; transparent: true">
-            </a-text>
-          </a-entity>
-
-          <!-- Tombol Plus -->
-          <a-entity position="0.8 0 0">
-            <a-box id="btnV1Plus" class="clickable" depth="0.05" height="0.2" width="0.3" color="#00aa00"
-              material="depthTest: true" event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#33cc33"
-              event-set__leave="_event: mouseleave; scale:1 1 1; color:#00aa00">
-            </a-box>
-            <a-text value="+" color="#fff" align="center" width="6" position="0 0 0.03"
-              material="depthTest: false; transparent: true">
-            </a-text>
-          </a-entity>
+          
+          <!-- Kontrol Kecepatan Bola 1 -->
+          <a-text 
+            value="Kecepatan (m/s):"
+            position="0 -0.1 0" 
+            align="center" 
+            color="white" 
+            width="3"
+            material="depthTest: false; transparent: true">
+          </a-text>
+          
         </a-entity>
-      </a-entity>
-
-      <!-- Tombol kontrol input massa -->
-      <a-entity position="-0.7 0.1 0">
-        <a-box id="btnM1Minus5" class="clickable" depth="0.05" height="0.1" width="0.15" color="#ff6666"
-          material="depthTest: true" event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff9999"
-          event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff6666">
-        </a-box>
-        <a-text value="-5" color="#fff" align="center" width="5" position="0 0 0.03"
-          material="depthTest: false; transparent: true">
-        </a-text>
-      </a-entity>
-
-      <a-entity position="-0.5 0.1 0">
-        <a-box id="btnM1Minus" class="clickable" depth="0.05" height="0.12" width="0.2" color="#ff4444"
-          material="depthTest: true" event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff7777"
-          event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff4444">
-        </a-box>
-        <a-text value="-0.5" color="#fff" align="center" width="4" position="0 0 0.03"
-          material="depthTest: false; transparent: true">
-        </a-text>
-      </a-entity>
-
-      <a-entity position="0.5 0.1 0">
-        <a-box id="btnM1Plus" class="clickable" depth="0.05" height="0.12" width="0.2" color="#44ff44"
-          material="depthTest: true" event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#77ff77"
-          event-set__leave="_event: mouseleave; scale:1 1 1; color:#44ff44">
-        </a-box>
-        <a-text value="+0.5" color="#fff" align="center" width="4" position="0 0 0.03"
-          material="depthTest: false; transparent: true">
-        </a-text>
-      </a-entity>
-
-      <a-entity position="0.7 0.1 0">
-        <a-box id="btnM1Plus5" class="clickable" depth="0.05" height="0.1" width="0.15" color="#66ff66"
-          material="depthTest: true" event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#99ff99"
-          event-set__leave="_event: mouseleave; scale:1 1 1; color:#66ff66">
-        </a-box>
-        <a-text value="+5" color="#fff" align="center" width="5" position="0 0 0.03"
-          material="depthTest: false; transparent: true">
-        </a-text>
-      </a-entity>
-
-      <!-- Kontrol Kecepatan Bola 1 -->
-      <a-text value="Kecepatan (m/s):" position="0 -0.1 0" align="center" color="white" width="3"
-        material="depthTest: false; transparent: true">
-      </a-text>
-
-      <!-- Tombol kontrol input kecepatan -->
-      <a-entity position="-0.7 -0.5 0">
-        <a-box id="btnV1Minus5" class="clickable" depth="0.05" height="0.1" width="0.15" color="#ff6666"
-          material="depthTest: true" event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff9999"
-          event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff6666">
-        </a-box>
-        <a-text value="-5" color="#fff" align="center" width="5" position="0 0 0.03"
-          material="depthTest: false; transparent: true">
-        </a-text>
-      </a-entity>
-
-      <a-entity position="-0.5 -0.5 0">
-        <a-box id="btnV1Minus" class="clickable" depth="0.05" height="0.12" width="0.2" color="#ff4444"
-          material="depthTest: true" event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#ff7777"
-          event-set__leave="_event: mouseleave; scale:1 1 1; color:#ff4444">
-        </a-box>
-        <a-text value="-0.5" color="#fff" align="center" width="4" position="0 0 0.03"
-          material="depthTest: false; transparent: true">
-        </a-text>
-      </a-entity>
-
-      <a-entity position="0.5 -0.5 0">
-        <a-box id="btnV1Plus" class="clickable" depth="0.05" height="0.12" width="0.2" color="#44ff44"
-          material="depthTest: true" event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#77ff77"
-          event-set__leave="_event: mouseleave; scale:1 1 1; color:#44ff44">
-        </a-box>
-        <a-text value="+0.5" color="#fff" align="center" width="4" position="0 0 0.03"
-          material="depthTest: false; transparent: true">
-        </a-text>
-      </a-entity>
-
-      <a-entity position="0.7 -0.5 0">
-        <a-box id="btnV1Plus5" class="clickable" depth="0.05" height="0.1" width="0.15" color="#66ff66"
-          material="depthTest: true" event-set__enter="_event: mouseenter; scale:1.1 1.1 1.1; color:#99ff99"
-          event-set__leave="_event: mouseleave; scale:1 1 1; color:#66ff66">
-        </a-box>
-        <a-text value="+5" color="#fff" align="center" width="5" position="0 0 0.03"
-          material="depthTest: false; transparent: true">
-        </a-text>
-      </a-entity>
-    </a-entity>
 
         <!-- Kontrol untuk Bola 2 (Biru) -->
         <a-entity id="UIbiruWrapper" position="3 0.5 0" rotation="-15 -20 0">
@@ -2944,69 +2950,69 @@
           return;
         }
 
-      let joystick = null;
-      const movementSpeed = 0.1;
-      let isMobile = false;
-
-      // Initialize joystick
-      function initJoystick() {
-        joystick = new JoyStick('joystick', {
-          title: 'joystick',
-          width: 150,
-          height: 150,
-          internalFillColor: 'rgba(255, 255, 255, 0.5)',
-          internalLineWidth: 2,
-          internalStrokeColor: '#FFFFFF',
-          externalLineWidth: 2,
-          externalStrokeColor: 'rgba(255, 255, 255, 0.3)',
-          autoReturnToCenter: true
-        }, function (stickData) {
-          if (stickData.x !== 0 || stickData.y !== 0) {
-            updateCameraMovement(stickData.x, stickData.y);
-          }
-        });
-      }
-
-      // Update camera movement based on joystick input
-      function updateCameraMovement(x, y) {
-        if (!camera) return;
-
-        const cameraEl = camera.object3D;
-        const direction = new THREE.Vector3();
-        cameraEl.getWorldDirection(direction);
-
-        // Project direction onto XZ plane (ignore Y-axis for movement)
-        const forward = new THREE.Vector3(direction.x, 0, direction.z).normalize();
-
-        // Calculate movement vector based on joystick input (no inversion for Y-axis)
+        let joystick = null;
         const movementSpeed = 0.1;
-        const moveX = x * movementSpeed;
-        const moveZ = y * movementSpeed;
-
-        // Strafe movement (left/right) - use camera right vector
-        const right = new THREE.Vector3();
-        right.crossVectors(new THREE.Vector3(0, 1, 0), forward).normalize();
-
-        // Calculate final movement direction
-        const movement = new THREE.Vector3();
-        // Forward/backward movement based on camera forward (positive Z is forward)
-        movement.addScaledVector(forward, moveZ);
-        // Left/right strafing (positive X is right)
-        movement.addScaledVector(right, moveX);
-
-        // Apply movement to camera position
-        const currentPosition = camera.getAttribute('position');
-        camera.setAttribute('position', {
-          x: currentPosition.x + movement.x,
-          y: currentPosition.y,  // Keep Y position the same (no flying)
-          z: currentPosition.z + movement.z
-        });
-      }
-
-      // Show joystick for mobile devices
-      function checkDeviceType() {
-        const deviceType = localStorage.getItem('deviceType');
-        isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        let isMobile = false;
+        
+        // Initialize joystick
+        function initJoystick() {
+          joystick = new JoyStick('joystick', {
+            title: 'joystick',
+            width: 150,
+            height: 150,
+            internalFillColor: 'rgba(255, 255, 255, 0.5)',
+            internalLineWidth: 2,
+            internalStrokeColor: '#FFFFFF',
+            externalLineWidth: 2,
+            externalStrokeColor: 'rgba(255, 255, 255, 0.3)',
+            autoReturnToCenter: true
+          }, function (stickData) {
+            if (stickData.x !== 0 || stickData.y !== 0) {
+              updateCameraMovement(stickData.x, stickData.y);
+            }
+          });
+        }
+        
+        // Update camera movement based on joystick input
+        function updateCameraMovement(x, y) {
+          if (!camera) return;
+          
+          const cameraEl = camera.object3D;
+          const direction = new THREE.Vector3();
+          cameraEl.getWorldDirection(direction);
+          
+          // Project direction onto XZ plane (ignore Y-axis for movement)
+          const forward = new THREE.Vector3(direction.x, 0, direction.z).normalize();
+          
+          // Calculate movement vector based on joystick input (no inversion for Y-axis)
+          const movementSpeed = 0.1;
+          const moveX = x * movementSpeed;
+          const moveZ = y * movementSpeed;
+          
+          // Strafe movement (left/right) - use camera right vector
+          const right = new THREE.Vector3();
+          right.crossVectors(new THREE.Vector3(0, 1, 0), forward).normalize();
+          
+          // Calculate final movement direction
+          const movement = new THREE.Vector3();
+          // Forward/backward movement based on camera forward (positive Z is forward)
+          movement.addScaledVector(forward, moveZ);
+          // Left/right strafing (positive X is right)
+          movement.addScaledVector(right, moveX);
+          
+          // Apply movement to camera position
+          const currentPosition = camera.getAttribute('position');
+          camera.setAttribute('position', {
+            x: currentPosition.x + movement.x,
+            y: currentPosition.y,  // Keep Y position the same (no flying)
+            z: currentPosition.z + movement.z
+          });
+        }
+        
+        // Show joystick for mobile devices
+        function checkDeviceType() {
+          const deviceType = localStorage.getItem('deviceType');
+          isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
           console.log('Device type from localStorage:', deviceType);
           console.log('Is mobile device:', isMobile);
@@ -4202,6 +4208,7 @@
         
         tick: function () {
           if (!this.isAnimating) return;
+          
           const elapsed = Date.now() - this.startTime;
           const progress = Math.min(elapsed / this.data.duration, 1);
           
@@ -4822,10 +4829,28 @@
           if (intersects.length > 0 && intersects[0].distance < this.data.distance) {
             const hitEl = intersects[0].object.el;
 
-      // Info untuk pengguna
-      console.log('VR Fisika loaded successfully!');
-      console.log('If GLB models fail to load due to CORS, fallback models will be used.');
-      console.log('To use GLB models properly, serve this file from a local server (e.g., Live Server extension)');
-    </script>
-  </body>
+            if (this.data.debug) {
+              console.log('Collision detected with:', hitEl ? hitEl.id : 'unknown', 'distance:', intersects[0].distance);
+            }
+
+            // Prevent penetration
+            this.el.object3D.position.copy(this.lastSafePosition);
+            collision = true;
+            break;
+          }
+        }
+
+        if (!collision) {
+          this.el.object3D.getWorldPosition(this.lastSafePosition);
+        }
+      },
+    });
+
+    // Info untuk pengguna
+    console.log('VR Fisika loaded successfully!');
+    console.log('If GLB models fail to load due to CORS, fallback models will be used.');
+    console.log('To use GLB models properly, serve this file from a local server (e.g., Live Server extension)');
+  </script>
+</body>
+
 </html>

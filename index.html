@@ -1,7 +1,7 @@
 <html>
 
 <head>
-  <title>VR Fisika - Tumbukan dengan Menu 3D</title>
+  <title>PaDyViR - Particle Dynamics Virtual Reality</title>
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
   <script src="https://unpkg.com/aframe-event-set-component/dist/aframe-event-set-component.min.js"></script>
@@ -50,6 +50,20 @@
 </head>
 
 <body>
+  <!-- First-time visitor redirect script -->
+  <script>
+    // Check if this is the user's first visit
+    const hasVisitedBefore = localStorage.getItem('padyvir_visited');
+    const hasSeenIntro = localStorage.getItem('padyvir_intro_seen');
+    
+    // If user hasn't visited before AND hasn't seen the intro
+    if (!hasVisitedBefore && !hasSeenIntro) {
+      // First-time visitor - redirect to get started page
+      localStorage.setItem('padyvir_visited', 'true');
+      window.location.href = 'getstarted.html';
+    }
+  </script>
+
   <!-- Device Selection Screen -->
   <div id="device-selection"
     style="position: fixed; width: 100%; height: 100%; background: #1a1a1a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999;">
