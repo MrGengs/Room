@@ -2752,7 +2752,6 @@ VERIFIKASI:
         
         tick: function () {
           if (!this.isAnimating) return;
-          
           const elapsed = Date.now() - this.startTime;
           const progress = Math.min(elapsed / this.data.duration, 1);
           
