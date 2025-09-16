@@ -44,9 +44,9 @@ const setRandomAvatar = () => {
 
 const UserForm = () => {
   return (
-    <div class="flex w-full max-w-5xl flex-col gap-4 p-4">
+    <div class="flex w-full max-w-5xl flex-col gap-4 p-4 pb-8">
       <AvatarSelect avatars={avatars() ?? []} outfits={uiSettings.outfits} />
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-2 mb-4">
         <label class="font-bold" for="username">
           Your name
         </label>
@@ -60,16 +60,18 @@ const SettingsScreen = () => {
   return (
     <div class="naf-centered-fullscreen scrollable">
       <UserForm />
-      <button
-        type="button"
-        id="saveSettingsButton"
-        class="btn min-w-[100px] mt-4"
-        onClick={() => {
-          setShowSettings(false);
-        }}
-      >
-        Close
-      </button>
+      <div class="sticky bottom-0 bg-white/95 backdrop-blur-sm w-full flex justify-center py-4 border-t border-gray-200">
+        <button
+          type="button"
+          id="saveSettingsButton"
+          class="btn min-w-[100px]"
+          onClick={() => {
+            setShowSettings(false);
+          }}
+        >
+          Close
+        </button>
+      </div>
     </div>
   );
 };
@@ -78,35 +80,37 @@ const EnterScreen = () => {
   return (
     <div class="naf-centered-fullscreen scrollable">
       <UserForm />
-      <button
-        type="button"
-        id="playButton"
-        class="btn min-w-[100px] mt-4"
-        onClick={() => {
-          if (!avatarSrc()) {
-            setRandomAvatar();
-          }
+      <div class="sticky bottom-0 bg-white/95 backdrop-blur-sm w-full flex justify-center py-4 border-t border-gray-200">
+        <button
+          type="button"
+          id="playButton"
+          class="btn min-w-[100px]"
+          onClick={() => {
+            if (!avatarSrc()) {
+              setRandomAvatar();
+            }
 
-          setEntered(true);
-          const sceneEl = document.querySelector('a-scene');
-          // emit connect when the scene has loaded
-          const sceneLoadedCallback = () => {
-            setSceneLoaded(true);
-            // @ts-ignore
-            sceneEl?.emit('connect');
-          };
+            setEntered(true);
+            const sceneEl = document.querySelector('a-scene');
+            // emit connect when the scene has loaded
+            const sceneLoadedCallback = () => {
+              setSceneLoaded(true);
+              // @ts-ignore
+              sceneEl?.emit('connect');
+            };
 
-          // @ts-ignore
-          if (sceneEl.hasLoaded) {
-            sceneLoadedCallback();
-          } else {
             // @ts-ignore
-            sceneEl.addEventListener('loaded', sceneLoadedCallback);
-          }
-        }}
-      >
-        Enter
-      </button>
+            if (sceneEl.hasLoaded) {
+              sceneLoadedCallback();
+            } else {
+              // @ts-ignore
+              sceneEl.addEventListener('loaded', sceneLoadedCallback);
+            }
+          }}
+        >
+          Enter
+        </button>
+      </div>
     </div>
   );
 };

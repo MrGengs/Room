@@ -110,11 +110,15 @@
   }
 
   .naf-centered-fullscreen {
-    @apply bg-panel absolute inset-0 z-10 flex flex-col items-center gap-2 overflow-y-auto;
+    @apply bg-panel absolute inset-0 z-10 flex flex-col items-center gap-2;
+    overflow-y: auto;
+    overflow-x: hidden;
     padding-top: 2rem;
-    padding-bottom: 2rem;
+    padding-bottom: 4rem;
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 #f1f5f9;
+    height: 100vh;
+    max-height: 100vh;
   }
 
   .naf-centered-fullscreen::-webkit-scrollbar {
@@ -139,6 +143,7 @@
   .naf-centered-fullscreen.scrollable {
     justify-content: flex-start;
     align-items: center;
+    min-height: 100vh;
   }
 
   .naf-bar {
@@ -242,5 +247,18 @@
 
   .overflow-x-auto::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
+  }
+
+  /* Force full height and scroll capability */
+  body, html {
+    height: 100% !important;
+    overflow: auto !important;
+  }
+
+  /* Ensure avatar selection containers have proper spacing */
+  .avatar-selection-container {
+    max-height: none !important;
+    height: auto !important;
+    padding-bottom: 6rem !important;
   }
 }
