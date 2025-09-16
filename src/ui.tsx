@@ -44,7 +44,7 @@ const setRandomAvatar = () => {
 
 const UserForm = () => {
   return (
-    <div class="flex w-full max-w-3xl flex-col gap-4 p-4">
+    <div class="flex w-full max-w-5xl flex-col gap-4 p-4">
       <AvatarSelect avatars={avatars() ?? []} outfits={uiSettings.outfits} />
       <div class="flex flex-col gap-2">
         <label class="font-bold" for="username">
@@ -58,12 +58,12 @@ const UserForm = () => {
 
 const SettingsScreen = () => {
   return (
-    <div class="naf-centered-fullscreen">
+    <div class="naf-centered-fullscreen scrollable">
       <UserForm />
       <button
         type="button"
         id="saveSettingsButton"
-        class="btn min-w-[100px]"
+        class="btn min-w-[100px] mt-4"
         onClick={() => {
           setShowSettings(false);
         }}
@@ -76,12 +76,12 @@ const SettingsScreen = () => {
 
 const EnterScreen = () => {
   return (
-    <div class="naf-centered-fullscreen">
+    <div class="naf-centered-fullscreen scrollable">
       <UserForm />
       <button
         type="button"
         id="playButton"
-        class="btn min-w-[100px]"
+        class="btn min-w-[100px] mt-4"
         onClick={() => {
           if (!avatarSrc()) {
             setRandomAvatar();

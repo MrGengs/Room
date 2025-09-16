@@ -21,6 +21,43 @@
 
     <script src="/dist/components.js"></script>
     <script defer src="/dist/ui.js"></script>
+    
+    <style>
+      /* Ensure body and html allow scrolling for avatar selection */
+      html, body {
+        margin: 0;
+        padding: 0;
+        overflow: auto;
+        height: auto;
+        min-height: 100vh;
+      }
+      
+      /* Ensure scroll works for avatar selection overlays */
+      div[class*="naf-centered-fullscreen"] {
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Custom scrollbar */
+      div[class*="naf-centered-fullscreen"]::-webkit-scrollbar {
+        width: 12px;
+      }
+
+      div[class*="naf-centered-fullscreen"]::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 6px;
+      }
+
+      div[class*="naf-centered-fullscreen"]::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 6px;
+        border: 2px solid #f1f5f9;
+      }
+
+      div[class*="naf-centered-fullscreen"]::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+    </style>
   </head>
 
   <body>

@@ -6,8 +6,31 @@
   <title>AR-Room</title>
   <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.min.js"></script>
-  <script src="/easyrtc/easyrtc.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/networked-aframe@0.14.0/dist/networked-aframe.min.js"></script>
+  <script src="https://unpkg.com/networked-aframe@0.14.0/dist/networked-aframe.min.js"></script>
+  <script src="https://unpkg.com/networked-aframe@0.14.0/dist/easyrtc-adapter.js"></script>
+  <script>
+    // Global configuration
+    window.NAF_OPTIONS = {
+      updateRate: 15, // Update rate in Hz
+      useLerp: true,
+      useHttps: window.location.protocol === 'https:',
+      debug: true
+    };
+    
+    // ICE servers configuration
+    const iceServers = [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' }
+    ];
+    
+    // Initialize EasyRTC with proper configuration
+    easyrtc.enableDebug(false);
+    easyrtc.setStunServers(iceServers);
+    easyrtc.enableVideo(false);
+    easyrtc.enableAudio(false);
+    easyrtc.enableDataChannels(true);
+  </script>
   <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.6.0/dist/aframe-extras.min.js"></script>
   <script
     src="https://cdn.jsdelivr.net/npm/aframe-environment-component@1.5.0/dist/aframe-environment-component.min.js"></script>
@@ -152,6 +175,13 @@
     // Initialize when DOM is loaded
     document.addEventListener('DOMContentLoaded', function() {
       setupDeviceToggle();
+      
+      // Initialize Networked-Aframe after a short delay to ensure all scripts are loaded
+      if (window.NAF && window.easyrtc) {
+        setTimeout(initializeNetworkedAFrame, 1000);
+      } else {
+        console.error('Required libraries not loaded');
+      }
     });
   </script>
   <script src="/dist/components.js"></script>
@@ -482,8 +512,9 @@
         connectOnLoad: false;
         room: lobby;
         debug: true;
-        adapter: wseasyrtc;
+        adapter: easyrtc;
         audio: false;
+        onConnect: onConnect;
         video: false;" shadow="type: pcfsoft"
     gltf-model="meshoptDecoderPath:https://unpkg.com/meshoptimizer@0.19.0/meshopt_decoder.js"
     raycaster="far: 100; objects: .clickable,[link];" cursor="rayOrigin: mouse">
@@ -563,6 +594,94 @@
       <a-entity id="right-hand" networked-hand-controls="hand:right" laser-controls="hand: right"></a-entity>
     </a-entity>
   </a-scene>
+
+  <script>
+    // Initialize Networked-Aframe after everything is loaded
+    function initializeNetworkedAFrame() {
+      console.log('Initializing Networked-Aframe...');
+      
+      // Configure the adapter
+      NAF.connection.adapter = new NAF.adapters.EasyRtcAdapter();
+      NAF.connection.adapter.setAppName('default');
+      NAF.connection.adapter.setRoom('lobby');
+      NAF.connection.adapter.setConnectOnLoad(true);
+      NAF.connection.adapter.setServerUrl(window.location.origin);
+      
+      // Connect to the server
+      const scene = document.querySelector('a-scene');
+      if (scene.hasLoaded) {
+        connectToServer();
+      } else {
+        scene.addEventListener('loaded', connectToServer);
+      }
+    }
+    
+    function connectToServer() {
+      console.log('Connecting to server...');
+      const scene = document.querySelector('a-scene');
+      const networkedScene = scene.systems['networked-scene'];
+      
+      if (networkedScene) {
+        networkedScene.connect();
+        console.log('Networked-Aframe connected successfully');
+      } else {
+        console.error('Networked-scene system not found');
+      }
+    }
+    
+    // Wait for DOM and A-Frame to be fully loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wait for A-Frame to be ready
+      if (document.querySelector('a-scene').hasLoaded) {
+        initNetworkedAFrame();
+      } else {
+        document.querySelector('a-scene').addEventListener('loaded', initNetworkedAFrame);
+      }
+    });
+
+    function initNetworkedAFrame() {
+      console.log('Initializing Networked-Aframe...');
+      
+      // Configure NAF schema
+      NAF.schemas.add({
+        template: '#avatar-template',
+        components: [
+          'position',
+          'rotation',
+          'scale',
+          'player-info',
+          'model',
+          'nametag',
+          'camera'
+        ]
+      });
+
+      // Get server URL
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const serverUrl = isLocalhost ? 'http://localhost:8080' : window.location.origin;
+      
+      console.log('Connecting to server:', serverUrl);
+      
+      // Initialize NAF
+      NAF.connection.adapter = new NAF.adapters.EasyRtcAdapter();
+      NAF.connection.adapter.setServerUrl(serverUrl);
+      NAF.connection.adapter.setApp('default');
+      NAF.connection.adapter.setRoom('lobby');
+      NAF.connection.adapter.setConnectOnLoad(true);
+      
+      NAF.connection.adapter.setServerConnectListeners({
+        connect: (clientId) => {
+          console.log('Connected to server with ID:', clientId);
+        },
+        disconnect: () => {
+          console.log('Disconnected from server');
+        }
+      });
+
+      // Connect to the server
+      NAF.connection.connect();
+    }
+  </script>
 
   <script>
     // Add animation class to cards on load
