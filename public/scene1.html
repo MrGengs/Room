@@ -199,7 +199,7 @@
         </a-text>
 
         <!-- Acceleration indicator for car -->
-        <a-text id="car-acceleration-indicator" value="A: 0 m/s²" position="0 2.8 0" align="center" color="#4CAF50"
+        <a-text id="car-acceleration-indicator" value="A: 0 m/s^2" position="0 2.8 0" align="center" color="#4CAF50"
           font="kelsonsans" width="8" visible="false">
         </a-text>
         <!-- NPC Pusher -->
@@ -227,7 +227,7 @@
         </a-text>
 
         <!-- Acceleration indicator for cart -->
-        <a-text id="cart-acceleration-indicator" value="A: 0 m/s²" position="0 1.8 0" align="center" color="#4CAF50"
+        <a-text id="cart-acceleration-indicator" value="A: 0 m/s^2" position="0 1.8 0" align="center" color="#4CAF50"
           font="kelsonsans" width="8" visible="false">
         </a-text>
         <!-- NPC Pusher Cart -->
@@ -332,9 +332,9 @@
         <a-text value="CAR (1200kg)" position="0 -0.3 0.12" align="center" color="#FFC107" font="kelsonsans" width="5">
         </a-text>
 
-        <a-text value="A:" position="-1.4 -0.6 0.12" align="left" color="#E0E0E0" font="kelsonsans" width="4">
+        <a-text value="a:" position="-1.4 -0.6 0.12" align="left" color="#E0E0E0" font="kelsonsans" width="4">
         </a-text>
-        <a-text id="car-acceleration-3d" value="0 m/s²" position="-0.8 -0.6 0.12" align="left" color="#4CAF50"
+        <a-text id="car-acceleration-3d" value="0 m/s^2" position="-0.8 -0.6 0.12" align="left" color="#4CAF50"
           font="kelsonsans" width="4">
         </a-text>
 
@@ -354,9 +354,9 @@
         <a-text value="CART (50kg)" position="0 -1.2 0.12" align="center" color="#FF9800" font="kelsonsans" width="5">
         </a-text>
 
-        <a-text value="A:" position="-1.4 -1.5 0.12" align="left" color="#E0E0E0" font="kelsonsans" width="4">
+        <a-text value="a:" position="-1.4 -1.5 0.12" align="left" color="#E0E0E0" font="kelsonsans" width="4">
         </a-text>
-        <a-text id="cart-acceleration-3d" value="0 m/s²" position="-0.8 -1.5 0.12" align="left" color="#4CAF50"
+        <a-text id="cart-acceleration-3d" value="0 m/s^2" position="-0.8 -1.5 0.12" align="left" color="#4CAF50"
           font="kelsonsans" width="4">
         </a-text>
 
@@ -995,7 +995,7 @@
           if (accelIndicator) {
             // Calculate theoretical acceleration: F = ma, so a = F/m
             const theoreticalAccel = this.inputForce / this.data.mass;
-            accelIndicator.setAttribute('value', `a: ${theoreticalAccel.toFixed(2)} m/s²`);
+            accelIndicator.setAttribute('value', `a: ${theoreticalAccel.toFixed(2)} m/s^2`);
             accelIndicator.setAttribute('visible', true);
           }
         } else {
@@ -1018,13 +1018,13 @@
             if (accelEl && this.inputForce) {
               // Show theoretical acceleration based on input force: a = F/m
               const theoreticalAccel = this.inputForce / this.data.mass;
-              accelEl.setAttribute('value', `${theoreticalAccel.toFixed(2)} m/s²`);
+              accelEl.setAttribute('value', `${theoreticalAccel.toFixed(2)} m/s^2`);
             }
             if (velocityEl) velocityEl.setAttribute('value', `${this.maxValues.velocity.toFixed(2)} m/s`);
             if (distanceEl) distanceEl.setAttribute('value', `${this.maxValues.distance.toFixed(2)} m`);
           } else {
             // Show zero values when reset
-            if (accelEl) accelEl.setAttribute('value', `0.00 m/s²`);
+            if (accelEl) accelEl.setAttribute('value', `0.00 m/s^2`);
             if (velocityEl) velocityEl.setAttribute('value', `0.00 m/s`);
             if (distanceEl) distanceEl.setAttribute('value', `0.00 m`);
           }
@@ -1241,10 +1241,10 @@
       resetUI() {
         requestAnimationFrame(() => {
           const elements = [
-            { id: 'car-acceleration-3d', value: '0 m/s²' },
+            { id: 'car-acceleration-3d', value: '0 m/s^2' },
             { id: 'car-velocity-3d', value: '0 m/s' },
             { id: 'car-distance-3d', value: '0 m' },
-            { id: 'cart-acceleration-3d', value: '0 m/s²' },
+            { id: 'cart-acceleration-3d', value: '0 m/s^2' },
             { id: 'cart-velocity-3d', value: '0 m/s' },
             { id: 'cart-distance-3d', value: '0 m' }
           ];
