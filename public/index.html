@@ -3,13 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>PaDyViR - AR Room</title>
-    
-    <!-- A-Frame AR Framework -->
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/supermedium/superframe@master/components/physics-system/dist/aframe-physics-system.min.js"></script>
-    
+    <title>PaDyViR - Get Started</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
         
@@ -21,9 +15,15 @@
 
         body {
             font-family: 'Orbitron', monospace;
-            background: linear-gradient(135deg, rgba(12, 12, 12, 0.95) 0%, rgba(26, 26, 46, 0.9) 25%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.9) 75%, rgba(83, 53, 74, 0.95) 100%);
+            background: linear-gradient(135deg, 
+                rgba(5, 5, 15, 0.98) 0%, 
+                rgba(15, 15, 35, 0.95) 25%, 
+                rgba(25, 35, 65, 0.92) 50%, 
+                rgba(20, 45, 85, 0.95) 75%, 
+                rgba(35, 25, 55, 0.98) 100%);
             background-size: 400% 400%;
-            animation: gradientShift 8s ease infinite;
+            background-attachment: fixed;
+            animation: gradientShift 12s ease infinite;
             min-height: 100vh;
             overflow-x: hidden;
             overflow-y: auto;
@@ -32,13 +32,81 @@
             justify-content: center;
             align-items: center;
             color: #ffffff;
-            backdrop-filter: blur(2px);
+            backdrop-filter: blur(3px);
+            margin: 0;
+            padding: 0;
         }
 
         @keyframes gradientShift {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
+        }
+
+        @keyframes loadingEntry {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes loadingProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
+        }
+
+        @keyframes titleFloat {
+            0%, 100% { 
+                transform: perspective(600px) rotateY(0deg) translateY(0px);
+            }
+            33% { 
+                transform: perspective(600px) rotateY(2deg) translateY(-8px);
+            }
+            66% { 
+                transform: perspective(600px) rotateY(-2deg) translateY(-4px);
+            }
+        }
+
+        @keyframes subtitleEntry {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0px) scale(1);
+            }
+        }
+
+        @keyframes subtitleGlow {
+            0%, 100% { 
+                text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+                color: rgba(255, 255, 255, 0.9);
+            }
+            50% { 
+                text-shadow: 0 0 25px rgba(0, 255, 255, 0.8);
+                color: rgba(255, 255, 255, 1);
+            }
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { 
+                opacity: 0.7;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 1;
+                transform: scale(1.02);
+            }
         }
 
         /* Futuristic background particles */
@@ -54,24 +122,38 @@
 
         .particle {
             position: absolute;
-            width: 3px;
-            height: 3px;
-            background: rgba(0, 255, 255, 0.4);
+            width: clamp(2px, 0.5vw, 4px);
+            height: clamp(2px, 0.5vw, 4px);
+            background: rgba(0, 255, 255, 0.6);
             border-radius: 50%;
-            animation: float 6s linear infinite;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            animation: float 8s linear infinite;
+            box-shadow: 
+                0 0 clamp(8px, 2vw, 15px) rgba(0, 255, 255, 0.4),
+                0 0 clamp(15px, 4vw, 30px) rgba(0, 255, 255, 0.2);
         }
 
         .particle:nth-child(odd) {
-            background: rgba(255, 0, 255, 0.3);
-            animation-duration: 8s;
-            box-shadow: 0 0 8px rgba(255, 0, 255, 0.2);
+            background: rgba(255, 0, 255, 0.5);
+            animation-duration: 10s;
+            box-shadow: 
+                0 0 clamp(6px, 1.5vw, 12px) rgba(255, 0, 255, 0.3),
+                0 0 clamp(12px, 3vw, 24px) rgba(255, 0, 255, 0.15);
         }
 
         .particle:nth-child(3n) {
-            background: rgba(255, 255, 0, 0.4);
-            animation-duration: 4s;
-            box-shadow: 0 0 12px rgba(255, 255, 0, 0.25);
+            background: rgba(255, 255, 0, 0.5);
+            animation-duration: 6s;
+            box-shadow: 
+                0 0 clamp(10px, 2.5vw, 18px) rgba(255, 255, 0, 0.35),
+                0 0 clamp(18px, 4.5vw, 36px) rgba(255, 255, 0, 0.18);
+        }
+
+        .particle:nth-child(4n) {
+            background: rgba(0, 255, 0, 0.4);
+            animation-duration: 12s;
+            box-shadow: 
+                0 0 clamp(7px, 1.8vw, 14px) rgba(0, 255, 0, 0.25),
+                0 0 clamp(14px, 3.5vw, 28px) rgba(0, 255, 0, 0.12);
         }
 
         @keyframes float {
@@ -91,7 +173,7 @@
             }
         }
 
-        /* Grid overlay */
+        /* Enhanced Grid overlay */
         .grid-overlay {
             position: absolute;
             top: 0;
@@ -99,12 +181,25 @@
             width: 100%;
             height: 100%;
             background-image: 
-                linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: gridMove 20s linear infinite;
+                linear-gradient(rgba(0, 255, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.08) 1px, transparent 1px),
+                radial-gradient(circle at 25% 25%, rgba(255, 0, 255, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, rgba(0, 255, 255, 0.03) 0%, transparent 50%);
+            background-size: 
+                clamp(40px, 8vw, 80px) clamp(40px, 8vw, 80px),
+                clamp(40px, 8vw, 80px) clamp(40px, 8vw, 80px),
+                200px 200px,
+                200px 200px;
+            animation: 
+                gridMove 25s linear infinite,
+                gridPulse 8s ease-in-out infinite;
             z-index: 1;
-            opacity: 0.6;
+            opacity: 0.7;
+        }
+
+        @keyframes gridPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
         }
 
         @keyframes gridMove {
@@ -117,39 +212,110 @@
             text-align: center;
             z-index: 10;
             position: relative;
-            max-width: 90%;
-            padding: 2rem;
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            border-radius: 20px;
-            -webkit-backdrop-filter: blur(5px);
-            backdrop-filter: blur(5px);
-            backdrop-filter: blur(5px);
+            max-width: min(90vw, 600px);
+            width: 100%;
+            padding: clamp(1.5rem, 4vw, 3rem);
+            border: 2px solid transparent;
+            border-radius: 25px;
+            background: linear-gradient(145deg, 
+                rgba(0, 255, 255, 0.05) 0%,
+                rgba(255, 0, 255, 0.03) 50%,
+                rgba(0, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(15px);
             box-shadow: 
-                0 0 30px rgba(0, 255, 255, 0.1),
-                inset 0 0 30px rgba(255, 255, 255, 0.05);
+                0 0 60px rgba(0, 255, 255, 0.15),
+                0 0 120px rgba(255, 0, 255, 0.1),
+                inset 0 0 60px rgba(255, 255, 255, 0.03),
+                0 8px 32px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 25px;
+            background: linear-gradient(45deg,
+                rgba(0, 255, 255, 0.1) 0%,
+                transparent 25%,
+                transparent 75%,
+                rgba(255, 0, 255, 0.1) 100%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 27px;
+            background: linear-gradient(45deg, 
+                rgba(0, 255, 255, 0.6),
+                rgba(255, 0, 255, 0.4),
+                rgba(0, 255, 255, 0.6));
+            background-size: 300% 300%;
+            animation: borderGlow 4s ease infinite;
+            z-index: -2;
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         /* Main title */
         .main-title {
-            font-size: clamp(3rem, 8vw, 8rem);
+            font-size: clamp(2.5rem, 8vw, 7rem);
             font-weight: 900;
             font-family: 'Orbitron', monospace;
-            background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ff00, #ff0040);
+            background: linear-gradient(45deg, 
+                #00ffff 0%, 
+                #ff00ff 25%, 
+                #ffff00 50%, 
+                #00ff00 75%, 
+                #ff0040 100%);
             background-size: 400% 400%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: gradientText 3s ease-in-out infinite, titleGlow 2s ease-in-out infinite;
-            text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
-            margin-bottom: 1rem;
-            letter-spacing: 0.1em;
-            transform: perspective(500px) rotateY(0deg);
-            animation: titleEntry 2s ease-out, gradientText 3s ease-in-out infinite 2s, titleFloat 4s ease-in-out infinite 4s;
-            line-height: 1;
+            animation: gradientText 4s ease-in-out infinite, titleFloat 6s ease-in-out infinite;
+            text-shadow: 
+                0 0 40px rgba(0, 255, 255, 0.5),
+                0 0 80px rgba(255, 0, 255, 0.3);
+            margin-bottom: clamp(0.5rem, 2vw, 1.5rem);
+            letter-spacing: clamp(0.05em, 0.5vw, 0.15em);
+            line-height: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .main-title::before {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                rgba(0, 255, 255, 0.1),
+                rgba(255, 0, 255, 0.1));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            z-index: -1;
+            transform: translate(2px, 2px);
+            opacity: 0.7;
         }
 
         @keyframes gradientText {
@@ -190,15 +356,52 @@
 
         /* Subtitle */
         .subtitle {
-            font-size: clamp(1.2rem, 3vw, 2.5rem);
-            font-weight: 400;
+            font-size: clamp(1rem, 3.5vw, 2rem);
+            font-weight: 300;
             font-family: 'Rajdhani', sans-serif;
             color: rgba(255, 255, 255, 0.9);
-            margin-bottom: 3rem;
+            margin-bottom: clamp(2rem, 5vw, 4rem);
             text-transform: uppercase;
-            letter-spacing: 0.2em;
-            animation: subtitleEntry 2s ease-out 0.5s both, subtitleGlow 3s ease-in-out infinite 2.5s;
+            letter-spacing: clamp(0.1em, 0.5vw, 0.3em);
             line-height: 1.2;
+            position: relative;
+            z-index: 2;
+            animation: subtitleEntry 2.5s ease-out 0.8s both, subtitleGlow 4s ease-in-out infinite 3s;
+        }
+
+        .subtitle::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent,
+                rgba(0, 255, 255, 0.6),
+                transparent);
+            animation: lineExpand 2s ease-out 1.5s both;
+        }
+
+        .subtitle::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent,
+                rgba(255, 0, 255, 0.6),
+                transparent);
+            animation: lineExpand 2s ease-out 2s both;
+        }
+
+        @keyframes lineExpand {
+            0% { width: 0; opacity: 0; }
+            100% { width: 60px; opacity: 1; }
         }
 
         @keyframes subtitleEntry {
@@ -224,78 +427,161 @@
         /* Loading bar container */
         .loading-container {
             width: 100%;
-            max-width: 500px;
-            margin: 0 auto 2rem;
-            animation: loadingEntry 2s ease-out 1s both;
+            max-width: clamp(300px, 80vw, 500px);
+            margin: 0 auto clamp(1.5rem, 4vw, 3rem);
+            padding: clamp(1rem, 3vw, 2rem);
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            animation: loadingEntry 2.5s ease-out 1.2s both;
+            position: relative;
+            overflow: hidden;
         }
 
-        @keyframes loadingEntry {
-            0% {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
+        .loading-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(0, 255, 255, 0.1),
+                transparent);
+            animation: scanEffect 3s linear infinite;
+        }
+
+        @keyframes scanEffect {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
 
         .loading-text {
             font-family: 'Rajdhani', sans-serif;
-            font-size: 1.2rem;
-            font-weight: 300;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 1rem;
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: clamp(0.8rem, 2vw, 1.2rem);
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: clamp(0.05em, 0.3vw, 0.15em);
             line-height: 1.3;
+            position: relative;
+            z-index: 2;
         }
 
         /* Futuristic loading bar */
         .loading-bar {
             width: 100%;
-            height: 4px;
+            height: clamp(3px, 1vw, 6px);
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             position: relative;
             overflow: hidden;
+            margin: clamp(0.8rem, 2vw, 1.2rem) 0;
             box-shadow: 
-                inset 0 0 10px rgba(0, 255, 255, 0.2),
-                0 0 10px rgba(0, 255, 255, 0.1);
-            margin: 1rem 0;
+                inset 0 0 15px rgba(0, 255, 255, 0.3),
+                0 0 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .loading-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(90deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.1) 5%,
+                transparent 10%);
+            animation: gridMove 2s linear infinite;
         }
 
         .loading-progress {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, #00ffff, #ff00ff, #ffff00);
-            background-size: 200% 100%;
+            background: linear-gradient(90deg, 
+                #00ffff 0%, 
+                #ff00ff 25%, 
+                #ffff00 50%, 
+                #00ff00 75%, 
+                #00ffff 100%);
+            background-size: 300% 100%;
             border-radius: 10px;
-            animation: loadingProgress 3s ease-in-out 1.5s both, gradientMove 2s linear infinite;
+            animation: 
+                loadingProgress 4s ease-in-out 2s both, 
+                progressGlow 2s linear infinite,
+                gradientMove 3s linear infinite;
             box-shadow: 
-                0 0 20px rgba(0, 255, 255, 0.8),
-                inset 0 0 10px rgba(255, 255, 255, 0.3);
+                0 0 30px rgba(0, 255, 255, 0.8),
+                0 0 60px rgba(255, 0, 255, 0.4),
+                inset 0 0 15px rgba(255, 255, 255, 0.4);
+            position: relative;
         }
 
-        @keyframes loadingProgress {
-            0% { width: 0%; }
-            100% { width: 100%; }
+        .loading-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 20px;
+            height: 100%;
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(255, 255, 255, 0.8));
+            border-radius: 0 10px 10px 0;
+            animation: progressShine 2s ease-in-out infinite;
         }
 
-        @keyframes gradientMove {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
+        @keyframes progressGlow {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 20px rgba(0, 255, 255, 0.6),
+                    0 0 40px rgba(255, 0, 255, 0.3),
+                    inset 0 0 10px rgba(255, 255, 255, 0.3);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 40px rgba(0, 255, 255, 1),
+                    0 0 80px rgba(255, 0, 255, 0.6),
+                    inset 0 0 20px rgba(255, 255, 255, 0.5);
+            }
+        }
+
+        @keyframes progressShine {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
         }
 
         /* Progress percentage */
         .progress-text {
             font-family: 'Orbitron', monospace;
-            font-size: 1.1rem;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
             font-weight: 700;
             color: #00ffff;
-            margin-top: 1rem;
-            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            margin-top: clamp(0.8rem, 2vw, 1.2rem);
+            text-shadow: 
+                0 0 15px rgba(0, 255, 255, 0.8),
+                0 0 30px rgba(0, 255, 255, 0.4);
             line-height: 1;
+            position: relative;
+            z-index: 2;
+            animation: progressPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes progressPulse {
+            0%, 100% { 
+                text-shadow: 
+                    0 0 10px rgba(0, 255, 255, 0.6),
+                    0 0 20px rgba(0, 255, 255, 0.3);
+            }
+            50% { 
+                text-shadow: 
+                    0 0 20px rgba(0, 255, 255, 1),
+                    0 0 40px rgba(0, 255, 255, 0.6);
+            }
         }
 
         /* Status message */
@@ -319,32 +605,99 @@
         /* Enter button */
         .enter-button {
             display: none;
-            background: linear-gradient(45deg, rgba(0, 255, 255, 0.8), rgba(255, 0, 255, 0.8));
-            background-size: 200% 200%;
+            background: linear-gradient(45deg, 
+                rgba(0, 255, 255, 0.8) 0%,
+                rgba(255, 0, 255, 0.6) 25%,
+                rgba(0, 255, 255, 0.8) 50%,
+                rgba(255, 0, 255, 0.6) 75%,
+                rgba(0, 255, 255, 0.8) 100%);
+            background-size: 300% 300%;
             color: #000;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            padding: 1rem 3rem;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            padding: clamp(0.8rem, 3vw, 1.2rem) clamp(2rem, 6vw, 3.5rem);
             font-family: 'Orbitron', monospace;
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: clamp(0.05em, 0.3vw, 0.15em);
             border-radius: 50px;
             cursor: pointer;
-            margin-top: 2rem;
+            margin-top: clamp(1.5rem, 4vw, 2.5rem);
             position: relative;
             overflow: hidden;
-            transition: all 0.3s ease;
-            animation: buttonGlow 2s ease-in-out infinite, gradientShift 3s ease infinite;
-            backdrop-filter: blur(2px);
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
             box-shadow: 
-                0 0 20px rgba(0, 255, 255, 0.3),
-                0 0 40px rgba(255, 0, 255, 0.2),
-                inset 0 0 20px rgba(255, 255, 255, 0.1);
+                0 0 30px rgba(0, 255, 255, 0.4),
+                0 0 60px rgba(255, 0, 255, 0.3),
+                inset 0 0 30px rgba(255, 255, 255, 0.2),
+                0 10px 30px rgba(0, 0, 0, 0.3);
             min-height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 3;
+            animation: buttonBreathe 3s ease-in-out infinite;
+        }
+
+        .enter-button::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg,
+                rgba(0, 255, 255, 0.6),
+                rgba(255, 0, 255, 0.4),
+                rgba(0, 255, 255, 0.6));
+            background-size: 400% 400%;
+            border-radius: 52px;
+            z-index: -1;
+            animation: buttonBorderGlow 3s linear infinite;
+        }
+
+        .enter-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.4), 
+                transparent);
+            transition: 0.6s;
+            z-index: 1;
+        }
+
+        .enter-button:hover::after {
+            left: 100%;
+        }
+
+        @keyframes buttonBreathe {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 
+                    0 0 20px rgba(0, 255, 255, 0.3),
+                    0 0 40px rgba(255, 0, 255, 0.2),
+                    inset 0 0 20px rgba(255, 255, 255, 0.1),
+                    0 8px 20px rgba(0, 0, 0, 0.2);
+            }
+            50% { 
+                transform: scale(1.02);
+                box-shadow: 
+                    0 0 40px rgba(0, 255, 255, 0.5),
+                    0 0 80px rgba(255, 0, 255, 0.4),
+                    inset 0 0 30px rgba(255, 255, 255, 0.2),
+                    0 12px 40px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        @keyframes buttonBorderGlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         .enter-button:hover {
@@ -399,47 +752,6 @@
             }
         }
 
-        /* AR Control Buttons */
-        .ar-button {
-            background: linear-gradient(45deg, rgba(0, 255, 255, 0.6), rgba(255, 0, 255, 0.6));
-            background-size: 200% 200%;
-            color: #000;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 0.8rem 1.5rem;
-            font-family: 'Orbitron', monospace;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-radius: 25px;
-            cursor: pointer;
-            margin: 0.5rem;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(2px);
-            box-shadow: 
-                0 0 15px rgba(0, 255, 255, 0.2),
-                0 0 30px rgba(255, 0, 255, 0.1),
-                inset 0 0 15px rgba(255, 255, 255, 0.1);
-            min-height: 40px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .ar-button:hover {
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 
-                0 0 20px rgba(0, 255, 255, 0.4),
-                0 0 40px rgba(255, 0, 255, 0.3),
-                inset 0 0 20px rgba(255, 255, 255, 0.2);
-        }
-
-        .ar-button:active {
-            transform: translateY(0px) scale(0.98);
-        }
-
         /* AR overlay effect */
         .hologram-effect {
             position: absolute;
@@ -462,192 +774,191 @@
             100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
-        /* Responsive design */
-        @media (max-width: 768px) {
+        /* Enhanced Responsive Design */
+        
+        /* Large Desktop */
+        @media screen and (min-width: 1200px) {
             .container {
-                padding: 1.5rem;
-                max-width: 95%;
-                border-radius: 15px;
+                max-width: 700px;
+                padding: 3.5rem;
             }
             
             .main-title {
-                font-size: clamp(2rem, 10vw, 4rem);
-                margin-bottom: 0.8rem;
-                line-height: 1;
+                font-size: 7rem;
+                margin-bottom: 2rem;
             }
             
             .subtitle {
-                font-size: clamp(1rem, 4vw, 1.5rem);
-                margin-bottom: 2.5rem;
-                line-height: 1.2;
+                font-size: 2.2rem;
+                margin-bottom: 4rem;
+            }
+        }
+
+        /* Standard Desktop */
+        @media screen and (min-width: 768px) and (max-width: 1199px) {
+            .container {
+                max-width: 600px;
+                padding: 3rem;
+            }
+            
+            .main-title {
+                font-size: clamp(4rem, 6vw, 6rem);
+            }
+            
+            .subtitle {
+                font-size: clamp(1.5rem, 2.5vw, 2rem);
+            }
+        }
+
+        /* Tablet Portrait */
+        @media screen and (max-width: 768px) and (orientation: portrait) {
+            body {
+                padding: 1rem;
+            }
+            
+            .container {
+                max-width: 95vw;
+                padding: clamp(1.5rem, 4vw, 2.5rem);
+                border-radius: 20px;
+            }
+            
+            .main-title {
+                font-size: clamp(2.5rem, 8vw, 4.5rem);
+                margin-bottom: clamp(1rem, 3vw, 1.5rem);
+                letter-spacing: clamp(0.03em, 0.5vw, 0.1em);
+            }
+            
+            .subtitle {
+                font-size: clamp(1.1rem, 3.5vw, 1.8rem);
+                margin-bottom: clamp(2rem, 5vw, 3rem);
             }
             
             .loading-container {
                 max-width: 90%;
+                padding: clamp(1rem, 3vw, 1.5rem);
             }
             
             .loading-text {
-                font-size: 1.1rem;
-                line-height: 1.3;
+                font-size: clamp(1rem, 2.5vw, 1.2rem);
+            }
+            
+            .progress-text {
+                font-size: clamp(1rem, 2.5vw, 1.2rem);
             }
             
             .status-message {
-                font-size: 0.95rem;
-                line-height: 1.3;
+                font-size: clamp(0.9rem, 2.2vw, 1.1rem);
             }
             
             .enter-button {
-                padding: 1rem 2.5rem;
-                font-size: 1.1rem;
-                min-height: 48px;
+                padding: clamp(1rem, 3vw, 1.3rem) clamp(2.5rem, 6vw, 3rem);
+                font-size: clamp(1rem, 2.5vw, 1.2rem);
             }
         }
 
-        /* Mobile landscape optimizations */
+        /* Mobile Landscape - Enhanced */
         @media screen and (max-height: 500px) and (orientation: landscape) {
             body {
                 padding: 0.5rem 1rem;
             }
             
             .container {
-                padding: 1.5rem 2rem;
-                max-width: 90%;
+                max-width: 85vw;
+                padding: clamp(1rem, 3vh, 2rem) clamp(1.5rem, 4vw, 2.5rem);
                 border-radius: 15px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                min-height: 0;
+                min-height: auto;
             }
             
             .main-title {
-                font-size: clamp(2rem, 7vh, 3.5rem);
-                margin-bottom: 0.5rem;
-                letter-spacing: 0.08em;
-                line-height: 1;
+                font-size: clamp(2rem, 8vh, 3.5rem);
+                margin-bottom: clamp(0.5rem, 2vh, 1rem);
+                letter-spacing: clamp(0.03em, 0.3vw, 0.08em);
+                line-height: 0.8;
             }
             
             .subtitle {
-                font-size: clamp(1rem, 3.5vh, 1.5rem);
-                margin-bottom: 2rem;
-                letter-spacing: 0.15em;
-                line-height: 1.2;
+                font-size: clamp(0.9rem, 4vh, 1.5rem);
+                margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+                letter-spacing: clamp(0.08em, 0.4vw, 0.15em);
+            }
+            
+            .subtitle::before,
+            .subtitle::after {
+                width: 40px;
             }
             
             .loading-container {
-                max-width: 75%;
-                margin: 0 auto 1.5rem;
+                max-width: 70%;
+                padding: clamp(0.8rem, 2vh, 1.2rem);
+                margin-bottom: clamp(1rem, 3vh, 1.5rem);
             }
             
             .loading-text {
-                font-size: 1.1rem;
-                margin-bottom: 1rem;
-                line-height: 1.3;
+                font-size: clamp(0.85rem, 2.5vh, 1rem);
+                margin-bottom: clamp(0.6rem, 1.5vh, 0.8rem);
             }
             
             .loading-bar {
-                height: 4px;
-                margin: 0.8rem 0;
+                height: clamp(2px, 1vh, 4px);
+                margin: clamp(0.5rem, 1.5vh, 0.8rem) 0;
             }
             
             .progress-text {
-                font-size: 1.1rem;
-                margin-top: 1rem;
+                font-size: clamp(0.9rem, 2.5vh, 1.1rem);
+                margin-top: clamp(0.6rem, 1.5vh, 0.8rem);
             }
             
             .status-message {
-                font-size: 1rem;
-                margin-top: 1.5rem;
-                line-height: 1.3;
+                font-size: clamp(0.8rem, 2.2vh, 1rem);
+                margin-top: clamp(1rem, 2.5vh, 1.5rem);
             }
             
             .enter-button {
-                padding: 1rem 2.5rem;
-                font-size: 1.1rem;
-                margin-top: 1.5rem;
-                min-height: 48px;
+                padding: clamp(0.7rem, 2vh, 1rem) clamp(1.8rem, 5vw, 2.5rem);
+                font-size: clamp(0.9rem, 2.5vh, 1.1rem);
+                margin-top: clamp(1rem, 2.5vh, 1.5rem);
+                min-height: clamp(40px, 8vh, 48px);
             }
         }
 
-        /* Very small landscape screens (like phones in landscape) */
+        /* Very Small Mobile Landscape */
         @media screen and (max-height: 400px) and (orientation: landscape) {
-            body {
-                padding: 0.3rem 0.8rem;
-            }
-            
             .container {
-                padding: 1.2rem 1.8rem;
-                max-width: 92%;
+                max-width: 90vw;
+                padding: clamp(0.8rem, 2vh, 1.5rem);
                 border-radius: 12px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
             }
             
             .main-title {
-                font-size: clamp(1.6rem, 6vh, 2.8rem);
-                margin-bottom: 0.4rem;
-                line-height: 0.95;
+                font-size: clamp(1.6rem, 7vh, 2.8rem);
+                margin-bottom: clamp(0.3rem, 1vh, 0.8rem);
+                line-height: 0.75;
             }
             
             .subtitle {
-                font-size: clamp(0.85rem, 3vh, 1.2rem);
-                margin-bottom: 1.3rem;
-                line-height: 1.1;
+                font-size: clamp(0.8rem, 3.5vh, 1.2rem);
+                margin-bottom: clamp(1rem, 3vh, 1.8rem);
             }
             
             .loading-container {
                 max-width: 65%;
-                margin: 0 auto 1.2rem;
+                padding: clamp(0.6rem, 1.5vh, 1rem);
+                margin-bottom: clamp(0.8rem, 2vh, 1.2rem);
             }
             
             .loading-text {
-                font-size: 0.95rem;
-                margin-bottom: 0.8rem;
-                line-height: 1.2;
+                font-size: clamp(0.75rem, 2vh, 0.9rem);
+                margin-bottom: clamp(0.4rem, 1vh, 0.6rem);
             }
             
             .loading-bar {
-                height: 3px;
-                margin: 0.6rem 0;
-            }
-            
-            .progress-text {
-                font-size: 0.95rem;
-                margin-top: 0.8rem;
-            }
-            
-            .status-message {
-                font-size: 0.9rem;
-                margin-top: 1.2rem;
-                line-height: 1.2;
+                height: clamp(2px, 0.8vh, 3px);
             }
             
             .enter-button {
-                padding: 0.8rem 2rem;
-                font-size: 0.95rem;
-                margin-top: 1.2rem;
-                min-height: 44px;
-            }
-        }
-
-        /* Landscape tablets and larger screens */
-        @media screen and (min-width: 768px) and (max-height: 600px) and (orientation: landscape) {
-            .container {
-                max-width: 85%;
-                padding: 1.5rem;
-            }
-            
-            .main-title {
-                font-size: clamp(3rem, 7vh, 5rem);
-            }
-            
-            .subtitle {
-                font-size: clamp(1.2rem, 3vh, 2rem);
-                margin-bottom: 2rem;
-            }
-            
-            .loading-container {
-                max-width: 60%;
+                padding: clamp(0.6rem, 1.5vh, 0.8rem) clamp(1.5rem, 4vw, 2rem);
+                font-size: clamp(0.8rem, 2vh, 0.95rem);
+                margin-top: clamp(0.8rem, 2vh, 1.2rem);
             }
         }
 
@@ -707,72 +1018,6 @@
     </style>
 </head>
 <body>
-    <!-- AR Scene -->
-    <a-scene 
-        id="ar-scene"
-        embedded 
-        style="height: 100vh; width: 100vw; position: fixed; top: 0; left: 0; z-index: 1;"
-        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
-        physics="driver: cannon; restitution: 0.3"
-        vr-mode-ui="enabled: false"
-        device-orientation-permission-ui="enabled: false">
-        
-        <!-- AR Camera -->
-        <a-camera 
-            id="ar-camera"
-            gps-entity-place="latitude: 0; longitude: 0;"
-            look-controls="enabled: false; magicWindowTrackingEnabled: false; touchEnabled: false; mouseEnabled: false"
-            cursor="rayOrigin: mouse">
-        </a-camera>
-        
-        <!-- Lighting -->
-        <a-light type="ambient" color="#ffffff" intensity="0.4"></a-light>
-        <a-light type="directional" position="2 4 5" color="#ffffff" intensity="0.8"></a-light>
-        
-        <!-- Fallback 3D Scene for non-AR devices -->
-        <a-entity id="fallback-scene" visible="true">
-            <!-- Background -->
-            <a-sky color="#0c0c0c"></a-sky>
-            
-            <!-- 3D Particle System -->
-            <a-entity id="fallback-particles" position="0 1.6 -3">
-                <a-sphere 
-                    position="0 0 0" 
-                    radius="0.2" 
-                    color="#00ffff"
-                    animation="property: rotation; to: 360 360 0; loop: true; dur: 4000"
-                    material="shader: standard; metalness: 0.8; roughness: 0.2; emissive: #00ffff; emissiveIntensity: 0.5">
-                </a-sphere>
-                
-                <a-entity animation="property: rotation; to: 0 360 0; loop: true; dur: 3000">
-                    <a-sphere position="1 0 0" radius="0.1" color="#ff00ff" 
-                              material="shader: standard; emissive: #ff00ff; emissiveIntensity: 0.6"></a-sphere>
-                </a-entity>
-                
-                <a-entity animation="property: rotation; to: 0 -360 0; loop: true; dur: 4000">
-                    <a-sphere position="0.6 0.6 0" radius="0.08" color="#ffff00" 
-                              material="shader: standard; emissive: #ffff00; emissiveIntensity: 0.6"></a-sphere>
-                </a-entity>
-                
-                <a-entity animation="property: rotation; to: 360 0 0; loop: true; dur: 2500">
-                    <a-sphere position="0 0.8 0" radius="0.06" color="#00ff00" 
-                              material="shader: standard; emissive: #00ff00; emissiveIntensity: 0.6"></a-sphere>
-                </a-entity>
-            </a-entity>
-            
-            <!-- 3D Text -->
-            <a-text 
-                value="PaDyViR AR Room" 
-                position="0 2.5 -3" 
-                align="center" 
-                color="#00ffff"
-                text="font: roboto; width: 8; color: #00ffff; align: center">
-            </a-text>
-        </a-entity>
-    </a-scene>
-
-    <!-- UI Overlay -->
-    <div id="ui-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none;">
     <!-- Background particles -->
     <div class="particles"></div>
     
@@ -787,34 +1032,23 @@
     
     <!-- Main content -->
     <div class="container">
-        <h1 class="main-title">PaDyViR</h1>
+        <h1 class="main-title" data-text="PaDyViR">PaDyViR</h1>
         <h2 class="subtitle">Particle Dynamics Augmented Reality</h2>
         
         <div class="loading-container">
-            <div class="loading-text">Initializing AR Room</div>
+            <div class="loading-text">Initializing Augmented Environment</div>
             <div class="loading-bar">
                 <div class="loading-progress"></div>
             </div>
             <div class="progress-text">0%</div>
         </div>
         
-        <div class="status-message">Preparing AR Room experience...</div>
-        
-        <!-- AR Controls -->
-        <div id="ar-controls" style="display: none; margin-top: 1rem;">
-            <button class="ar-button" id="start-ar-btn">
-                📱 Start AR Mode
-            </button>
-            <button class="ar-button" id="toggle-3d-btn">
-                🔄 Toggle 3D View
-            </button>
-        </div>
+        <div class="status-message">Preparing AR overlay experience...</div>
         
         <!-- Enter Button -->
         <button class="enter-button" id="enter-btn">
-            🔮 Enter AR Room
+            � Launch AR Experience
         </button>
-    </div>
     </div>
 
     <script>
@@ -842,12 +1076,12 @@
             const statusMessage = document.querySelector('.status-message');
             
             const messages = [
-                'Loading AR framework...',
-                'Initializing camera access...',
-                'Setting up 3D particles...',
-                'Calibrating AR tracking...',
-                'Finalizing AR Room...',
-                'AR Room Ready!'
+                'Loading AR physics engine...',
+                'Initializing overlay components...',
+                'Setting up particle tracking...',
+                'Calibrating AR dynamics...',
+                'Finalizing AR environment...',
+                'Ready to launch AR!'
             ];
             
             let progress = 0;
@@ -869,197 +1103,43 @@
                     clearInterval(interval);
                     statusMessage.textContent = messages[messages.length - 1];
                     
-                    // Show enter button and AR controls
+                    // Show enter button instead of auto-redirect
                     setTimeout(() => {
-                        showARControls();
+                        showEnterButton();
                     }, 1000);
                 }
             }, 100);
         }
 
-        // Show AR controls when loading is complete
-        function showARControls() {
+        // Show enter button when loading is complete
+        function showEnterButton() {
             const enterBtn = document.getElementById('enter-btn');
-            const arControls = document.getElementById('ar-controls');
             const statusMessage = document.querySelector('.status-message');
             
             // Update status message
-            statusMessage.textContent = 'AR Room Ready!';
+            statusMessage.textContent = 'AR Experience Ready!';
             statusMessage.style.color = '#00ff00';
             
-            // Show button and AR controls with animation
+            // Show button with animation
             enterBtn.classList.add('show');
-            arControls.style.display = 'block';
-            arControls.style.animation = 'buttonEntry 1s ease-out forwards';
             
-            // Add click handlers
-            setupARControls();
-        }
-
-        // Setup AR control functionality
-        function setupARControls() {
-            const enterBtn = document.getElementById('enter-btn');
-            const startARBtn = document.getElementById('start-ar-btn');
-            const toggle3DBtn = document.getElementById('toggle-3d-btn');
-            const arScene = document.getElementById('ar-scene');
-            const fallbackScene = document.getElementById('fallback-scene');
-            
-            // Enter AR Room button
+            // Add click handler
             enterBtn.addEventListener('click', () => {
+                // Add click effect
                 enterBtn.style.transform = 'scale(0.95)';
+                
                 setTimeout(() => {
-                    enterARRoom();
-                }, 200);
-            });
-            
-            // Start AR Mode button
-            startARBtn.addEventListener('click', () => {
-                requestARPermissions();
-            });
-            
-            // Toggle 3D View button
-            toggle3DBtn.addEventListener('click', () => {
-                toggle3DView();
-            });
-        }
-
-        // Enter AR Room function
-        function enterARRoom() {
-            const uiOverlay = document.getElementById('ui-overlay');
-            const container = document.querySelector('.container');
-            
-            // Hide the loading UI with transition
-            container.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
-            container.style.opacity = '0';
-            container.style.transform = 'scale(0.9)';
-            
-            setTimeout(() => {
-                // Hide most UI elements but keep some controls visible
-                container.style.display = 'none';
-                
-                // Show minimal AR overlay UI
-                showAROverlay();
-                
-                // Start AR experience
-                startARExperience();
-            }, 500);
-        }
-
-        // Request AR permissions
-        function requestARPermissions() {
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(stream => {
-                        // Permission granted, enable AR mode
-                        enableARMode(stream);
-                    })
-                    .catch(err => {
-                        console.log('AR not available, using 3D mode:', err);
-                        alert('AR camera access not available. Using 3D mode instead.');
-                        enable3DMode();
-                    });
-            } else {
-                alert('AR not supported on this device. Using 3D mode.');
-                enable3DMode();
-            }
-        }
-
-        // Enable AR mode
-        function enableARMode(stream) {
-            const arScene = document.getElementById('ar-scene');
-            const fallbackScene = document.getElementById('fallback-scene');
-            
-            // Hide fallback scene, show AR scene
-            fallbackScene.setAttribute('visible', 'false');
-            
-            // Setup AR camera
-            const camera = document.getElementById('ar-camera');
-            camera.setAttribute('look-controls', 'enabled: true; magicWindowTrackingEnabled: true; touchEnabled: true; mouseEnabled: true');
-            
-            console.log('AR Mode enabled');
-        }
-
-        // Enable 3D mode
-        function enable3DMode() {
-            const fallbackScene = document.getElementById('fallback-scene');
-            const camera = document.getElementById('ar-camera');
-            
-            // Ensure fallback scene is visible
-            fallbackScene.setAttribute('visible', 'true');
-            
-            // Enable camera controls for 3D navigation
-            camera.setAttribute('look-controls', 'enabled: true; magicWindowTrackingEnabled: true; touchEnabled: true; mouseEnabled: true');
-            camera.setAttribute('wasd-controls', 'enabled: true');
-            
-            console.log('3D Mode enabled');
-        }
-
-        // Toggle 3D view
-        function toggle3DView() {
-            const fallbackScene = document.getElementById('fallback-scene');
-            const isVisible = fallbackScene.getAttribute('visible') === 'true';
-            
-            fallbackScene.setAttribute('visible', !isVisible);
-            
-            const btn = document.getElementById('toggle-3d-btn');
-            btn.textContent = isVisible ? '🔄 Show 3D View' : '🔄 Hide 3D View';
-        }
-
-        // Start AR experience
-        function startARExperience() {
-            // Enable physics and interactions
-            const particles = document.querySelectorAll('#fallback-particles a-sphere');
-            
-            particles.forEach(particle => {
-                // Add click interaction
-                particle.addEventListener('click', () => {
-                    // Animate particle on click
-                    particle.setAttribute('animation', 'property: scale; to: 1.5 1.5 1.5; dur: 300; dir: alternate; loop: 1');
+                    // Mark that user has seen the intro
+                    localStorage.setItem('padyvir_intro_seen', 'true');
                     
-                    // Reset animation after completion
+                    // Add transition effect before redirect
+                    document.body.style.transition = 'opacity 0.5s ease-out';
+                    document.body.style.opacity = '0';
+                    
                     setTimeout(() => {
-                        particle.removeAttribute('animation');
-                        particle.setAttribute('animation', particle.getAttribute('animation') || 'property: rotation; to: 360 360 0; loop: true; dur: 4000');
-                    }, 600);
-                });
-            });
-            
-            console.log('AR Room experience started');
-        }
-
-        // Show AR overlay UI
-        function showAROverlay() {
-            const uiOverlay = document.getElementById('ui-overlay');
-            
-            // Create minimal AR UI
-            const arUI = document.createElement('div');
-            arUI.id = 'ar-ui';
-            arUI.style.cssText = `
-                position: fixed;
-                top: 20px;
-                left: 20px;
-                right: 20px;
-                z-index: 20;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                pointer-events: auto;
-            `;
-            
-            arUI.innerHTML = `
-                <div style="background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 20px; color: #00ffff; font-family: 'Orbitron', monospace;">
-                    PaDyViR AR Room
-                </div>
-                <button id="exit-ar" style="background: rgba(255,0,0,0.7); border: none; padding: 10px 15px; border-radius: 15px; color: white; font-weight: bold; cursor: pointer;">
-                    ✖ Exit
-                </button>
-            `;
-            
-            uiOverlay.appendChild(arUI);
-            
-            // Add exit functionality
-            document.getElementById('exit-ar').addEventListener('click', () => {
-                location.reload();
+                        window.location.href = 'vr.html';
+                    }, 500);
+                }, 200);
             });
         }
 
