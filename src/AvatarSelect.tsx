@@ -147,8 +147,8 @@ export const AvatarSelect: Component<Props> = (props) => {
         </div>
       </Show>
 
-      <div class="w-full border border-gray-200 rounded-lg bg-gray-50 p-6">
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 min-h-[200px]">
+      <div class="w-full border border-gray-200 rounded-lg bg-gray-50 p-6 mb-6">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4 auto-rows-fr">
           <For each={props.avatars}>
             {(avatar, idx) => (
               <Show when={avatar.gender === gender() && avatar.outfit === outfit()}>

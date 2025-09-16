@@ -84,7 +84,11 @@
       /* Ensure scroll works for avatar selection overlays */
       div[class*="naf-centered-fullscreen"] {
         overflow-y: auto !important;
+        overflow-x: hidden !important;
         -webkit-overflow-scrolling: touch;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        padding-bottom: 4rem !important;
       }
 
       /* Custom scrollbar */
