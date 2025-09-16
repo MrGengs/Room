@@ -15,7 +15,7 @@
 
         body {
             font-family: 'Orbitron', monospace;
-            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #53354a 100%);
+            background: linear-gradient(135deg, rgba(12, 12, 12, 0.95) 0%, rgba(26, 26, 46, 0.9) 25%, rgba(22, 33, 62, 0.85) 50%, rgba(15, 52, 96, 0.9) 75%, rgba(83, 53, 74, 0.95) 100%);
             background-size: 400% 400%;
             animation: gradientShift 8s ease infinite;
             height: 100vh;
@@ -25,6 +25,7 @@
             justify-content: center;
             align-items: center;
             color: #ffffff;
+            backdrop-filter: blur(2px);
         }
 
         @keyframes gradientShift {
@@ -46,21 +47,24 @@
 
         .particle {
             position: absolute;
-            width: 2px;
-            height: 2px;
-            background: rgba(0, 255, 255, 0.8);
+            width: 3px;
+            height: 3px;
+            background: rgba(0, 255, 255, 0.4);
             border-radius: 50%;
             animation: float 6s linear infinite;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
         }
 
         .particle:nth-child(odd) {
-            background: rgba(255, 0, 255, 0.6);
+            background: rgba(255, 0, 255, 0.3);
             animation-duration: 8s;
+            box-shadow: 0 0 8px rgba(255, 0, 255, 0.2);
         }
 
         .particle:nth-child(3n) {
-            background: rgba(255, 255, 0, 0.7);
+            background: rgba(255, 255, 0, 0.4);
             animation-duration: 4s;
+            box-shadow: 0 0 12px rgba(255, 255, 0, 0.25);
         }
 
         @keyframes float {
@@ -88,11 +92,12 @@
             width: 100%;
             height: 100%;
             background-image: 
-                linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+                linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
             background-size: 50px 50px;
             animation: gridMove 20s linear infinite;
             z-index: 1;
+            opacity: 0.6;
         }
 
         @keyframes gridMove {
@@ -106,6 +111,14 @@
             z-index: 10;
             position: relative;
             max-width: 90%;
+            padding: 2rem;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            box-shadow: 
+                0 0 30px rgba(0, 255, 255, 0.1),
+                inset 0 0 30px rgba(255, 255, 255, 0.05);
         }
 
         /* Main title */
@@ -288,10 +301,10 @@
         /* Enter button */
         .enter-button {
             display: none;
-            background: linear-gradient(45deg, #00ffff, #ff00ff);
+            background: linear-gradient(45deg, rgba(0, 255, 255, 0.8), rgba(255, 0, 255, 0.8));
             background-size: 200% 200%;
             color: #000;
-            border: none;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             padding: 1rem 3rem;
             font-family: 'Orbitron', monospace;
             font-size: 1.2rem;
@@ -305,9 +318,10 @@
             overflow: hidden;
             transition: all 0.3s ease;
             animation: buttonGlow 2s ease-in-out infinite, gradientShift 3s ease infinite;
+            backdrop-filter: blur(2px);
             box-shadow: 
-                0 0 20px rgba(0, 255, 255, 0.5),
-                0 0 40px rgba(255, 0, 255, 0.3),
+                0 0 20px rgba(0, 255, 255, 0.3),
+                0 0 40px rgba(255, 0, 255, 0.2),
                 inset 0 0 20px rgba(255, 255, 255, 0.1);
         }
 
@@ -363,7 +377,7 @@
             }
         }
 
-        /* Holographic effect */
+        /* AR overlay effect */
         .hologram-effect {
             position: absolute;
             top: 50%;
@@ -371,10 +385,12 @@
             transform: translate(-50%, -50%);
             width: 120%;
             height: 120%;
-            background: linear-gradient(45deg, transparent 30%, rgba(0, 255, 255, 0.03) 50%, transparent 70%);
-            animation: hologramScan 4s linear infinite;
+            background: linear-gradient(45deg, transparent 20%, rgba(0, 255, 255, 0.02) 40%, rgba(255, 255, 255, 0.01) 50%, rgba(0, 255, 255, 0.02) 60%, transparent 80%);
+            animation: hologramScan 6s linear infinite;
             pointer-events: none;
             z-index: 2;
+            border-radius: 50%;
+            backdrop-filter: blur(0.5px);
         }
 
         @keyframes hologramScan {
@@ -403,7 +419,7 @@
             }
         }
 
-        /* Scan lines effect */
+        /* AR scan lines effect */
         .scan-lines {
             position: absolute;
             top: 0;
@@ -413,13 +429,14 @@
             background: repeating-linear-gradient(
                 90deg,
                 transparent,
-                transparent 2px,
-                rgba(0, 255, 255, 0.03) 2px,
-                rgba(0, 255, 255, 0.03) 4px
+                transparent 3px,
+                rgba(0, 255, 255, 0.015) 3px,
+                rgba(0, 255, 255, 0.015) 6px
             );
             pointer-events: none;
             z-index: 1;
-            animation: scanMove 3s linear infinite;
+            animation: scanMove 4s linear infinite;
+            opacity: 0.7;
         }
 
         @keyframes scanMove {
@@ -444,21 +461,21 @@
     <!-- Main content -->
     <div class="container">
         <h1 class="main-title">PaDyViR</h1>
-        <h2 class="subtitle">Particle Dynamics Virtual Reality</h2>
+        <h2 class="subtitle">Particle Dynamics Augmented Reality</h2>
         
         <div class="loading-container">
-            <div class="loading-text">Initializing Virtual Environment</div>
+            <div class="loading-text">Initializing Augmented Environment</div>
             <div class="loading-bar">
                 <div class="loading-progress"></div>
             </div>
             <div class="progress-text">0%</div>
         </div>
         
-        <div class="status-message">Preparing immersive experience...</div>
+        <div class="status-message">Preparing AR overlay experience...</div>
         
         <!-- Enter Button -->
         <button class="enter-button" id="enter-btn">
-            🚀 Enter PaDyViR
+            � Launch AR Experience
         </button>
     </div>
 
@@ -485,12 +502,12 @@
             const statusMessage = document.querySelector('.status-message');
             
             const messages = [
-                'Loading physics engine...',
-                'Initializing VR components...',
-                'Setting up particle systems...',
-                'Calibrating dynamics...',
-                'Finalizing environment...',
-                'Ready to launch!'
+                'Loading AR physics engine...',
+                'Initializing overlay components...',
+                'Setting up particle tracking...',
+                'Calibrating AR dynamics...',
+                'Finalizing AR environment...',
+                'Ready to launch AR!'
             ];
             
             let progress = 0;
@@ -526,7 +543,7 @@
             const statusMessage = document.querySelector('.status-message');
             
             // Update status message
-            statusMessage.textContent = 'Ready to launch!';
+            statusMessage.textContent = 'AR Experience Ready!';
             statusMessage.style.color = '#00ff00';
             
             // Show button with animation
