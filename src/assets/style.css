@@ -110,7 +110,40 @@
   }
 
   .naf-centered-fullscreen {
-    @apply bg-panel absolute inset-0 z-10 flex flex-col items-center justify-center gap-2;
+    @apply bg-panel absolute inset-0 z-10 flex flex-col items-center gap-2;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-top: 2rem;
+    padding-bottom: 4rem;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+    height: 100vh;
+    max-height: 100vh;
+  }
+
+  .naf-centered-fullscreen::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  .naf-centered-fullscreen::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 6px;
+  }
+
+  .naf-centered-fullscreen::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 6px;
+    border: 2px solid #f1f5f9;
+  }
+
+  .naf-centered-fullscreen::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  .naf-centered-fullscreen.scrollable {
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 100vh;
   }
 
   .naf-bar {
@@ -139,5 +172,93 @@
 
   .naf-bottom-bar-right {
     @apply naf-bar bottom-6 right-6 justify-end;
+  }
+
+  /* Custom scrollbar styles for avatar selection */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+
+  .scrollbar-track-gray-200::-webkit-scrollbar-track {
+    background-color: #e5e7eb;
+    border-radius: 4px;
+  }
+
+  .scrollbar-thumb-gray-400::-webkit-scrollbar-thumb {
+    background-color: #9ca3af;
+    border-radius: 4px;
+  }
+
+  .hover\:scrollbar-thumb-gray-600:hover::-webkit-scrollbar-thumb {
+    background-color: #4b5563;
+  }
+
+  /* Ensure scrollbars are always visible for avatar selection - vertical scroll */
+  .overflow-y-auto {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 6px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 6px;
+    border: 2px solid #f1f5f9;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  /* Keep horizontal scroll styles for other components */
+  .overflow-x-auto {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar {
+    height: 12px;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 6px;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 6px;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  /* Force full height and scroll capability */
+  body, html {
+    height: 100% !important;
+    overflow: auto !important;
+  }
+
+  /* Ensure avatar selection containers have proper spacing */
+  .avatar-selection-container {
+    max-height: none !important;
+    height: auto !important;
+    padding-bottom: 6rem !important;
   }
 }
