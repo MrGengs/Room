@@ -1033,21 +1033,21 @@
     <!-- Main content -->
     <div class="container">
         <h1 class="main-title" data-text="PaDyViR">PaDyViR</h1>
-        <h2 class="subtitle">Particle Dynamics Augmented Reality</h2>
+        <h2 class="subtitle">Particle Dynamics Virtual Reality</h2>
         
         <div class="loading-container">
-            <div class="loading-text">Initializing Augmented Environment</div>
+            <div class="loading-text">Initializing Virtual Environment</div>
             <div class="loading-bar">
                 <div class="loading-progress"></div>
             </div>
             <div class="progress-text">0%</div>
         </div>
         
-        <div class="status-message">Preparing AR overlay experience...</div>
+        <div class="status-message">Preparing Virtual Reality overlay experience...</div>
         
         <!-- Enter Button -->
         <button class="enter-button" id="enter-btn">
-            � Launch AR Experience
+            � Launch Virtual Reality Experience
         </button>
     </div>
 
@@ -1076,12 +1076,12 @@
             const statusMessage = document.querySelector('.status-message');
             
             const messages = [
-                'Loading AR physics engine...',
+                'Loading VR physics engine...',
                 'Initializing overlay components...',
                 'Setting up particle tracking...',
-                'Calibrating AR dynamics...',
-                'Finalizing AR environment...',
-                'Ready to launch AR!'
+                'Calibrating VR dynamics...',
+                'Finalizing VR environment...',
+                'Ready to launch VR!'
             ];
             
             let progress = 0;
@@ -1117,7 +1117,7 @@
             const statusMessage = document.querySelector('.status-message');
             
             // Update status message
-            statusMessage.textContent = 'AR Experience Ready!';
+            statusMessage.textContent = 'VR Experience Ready!';
             statusMessage.style.color = '#00ff00';
             
             // Show button with animation
