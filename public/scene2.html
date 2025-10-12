@@ -784,7 +784,7 @@
 
       <!-- Bab 2 - Gaya Gesek -->
       <a-entity id="bab2" visible="false">
-      <a-entity id="myModel" position="0 0.6 -3" rotation="0 -90 0" scale="0.5 0.5 0.5">
+      <a-entity id="myModel" position="0 0.55 -3" rotation="0 -90 0" scale="0.5 0.5 0.5">
         <a-box
           id="blockModel"
           class="collidable"
@@ -796,10 +796,10 @@
           shadow="cast: true">
         </a-box>
 
-        <!-- Panah gaya F (applied force) ke kanan -->
+        <!-- Panah gaya F (applied force) ke kanan - mengikuti balok -->
         <a-entity
           id="forceArrow"
-          position="0 0.5 -3"
+          position="1 0 -2"
           rotation="0 90 0"
           scale="2 2 2"
           visible="false">
@@ -832,10 +832,10 @@
           </a-text>
         </a-entity>
 
-        <!-- Panah gaya gesek (fs/fk) ke kiri -->
+        <!-- Panah gaya gesek (fs/fk) ke kiri - mengikuti balok -->
         <a-entity
           id="frictionArrow"
-          position="0 0.5 3"
+          position="1 -0.7 2"
           rotation="0 -90 0"
           scale="2 2 2"
           visible="false">
@@ -843,14 +843,14 @@
           <a-cylinder
             position="0 0 0"
             radius="0.05"
-            height="1.0"
+            height="1.5"
             color="#0000FF"
             rotation="0 0 90"
             material="depthTest: true">
           </a-cylinder>
           <!-- Kepala panah -->
           <a-cone
-            position="0.5 0 0"
+            position="0.9 0 0"
             radius-bottom="0.15"
             height="0.3"
             color="#0000FF"
@@ -862,9 +862,10 @@
             id="frictionLabel"
             value="fs"
             position="0 0.3 0"
+            rotation="0 180 0"
             align="center"
             color="#0000FF"
-            width="8"
+            width="6"
             material="depthTest: false">
           </a-text>
         </a-entity>
@@ -2139,20 +2140,19 @@
       // Fungsi untuk animasi fallback (jika GLB tidak ada)
       // Modifikasi: Buat fungsi ini lebih fleksibel
       function animateBlock(state, acceleration = 0, direction = 1) {
-        // Prioritaskan model GLB jika sudah dimuat, jika tidak, gunakan fallback box
-        const modelToAnimate = document.querySelector('#myModel').querySelector('#glbBlockModel') || document.querySelector('#blockModel');
+        // Animasikan parent myModel agar semua child (termasuk forceArrow) ikut bergerak
+        const myModel = document.querySelector('#myModel');
         const arrow = document.querySelector('#directionArrow');
 
-        if (modelToAnimate) {
+        if (myModel) {
           // Hapus animasi sebelumnya jika ada
-          modelToAnimate.removeAttribute('animation');
+          myModel.removeAttribute('animation');
 
-          // Tentukan posisi awal berdasarkan model mana yang aktif
-          const isGlb = modelToAnimate.id === 'glbBlockModel';
-          const initialPosition = isGlb ? { x: 1.5, y: 0, z: 0 } : { x: 0, y: 0, z: 0 };
+          // Posisi awal myModel
+          const initialPosition = { x: 0, y: 0.55, z: -3 };
 
           // Reset posisi ke posisi awal
-          modelToAnimate.setAttribute('position', initialPosition);
+          myModel.setAttribute('position', `${initialPosition.x} ${initialPosition.y} ${initialPosition.z}`);
 
           if (state === 'move') {
             // Show arrow when block is moving
@@ -2177,19 +2177,18 @@
 
             // Durasi animasi berbanding terbalik dengan percepatan
             const duration = Math.max(1000, 5000 / (1 + acceleration));
-            // Jarak tempuh proporsional dengan percepatan
-            const distance = 1 + acceleration * 0.5;
+            // Jarak tempuh proporsional dengan percepatan (diperbesar 2x untuk pergerakan horizontal)
+            const distance = 2 + acceleration * 0.2;
 
             // Posisi target adalah posisi awal ditambah jarak pergerakan
-            // Karena parentnya dirotasi -90 derajat pada sumbu Y, pergerakan di sumbu X lokal menjadi pergerakan di sumbu Z global.
-            // direction: 1 = ke kanan (default), -1 = ke kiri
-            const targetPosition = `${initialPosition.x} ${initialPosition.y} ${initialPosition.z - (distance * direction)}`;
+            // direction: 1 = ke kanan (positif X), -1 = ke kiri (negatif X)
+            const targetPosition = `${initialPosition.x + (distance * direction)} ${initialPosition.y} ${initialPosition.z}`;
 
             const animationString = `property: position; to: ${targetPosition}; dur: ${duration}; easing: easeInOutQuad; startEvents: start-animation`;
 
-            modelToAnimate.setAttribute('animation', animationString);
+            myModel.setAttribute('animation', animationString);
 
-            // Move arrow along with the block
+            // Move arrow along with the block (directionArrow, bukan forceArrow)
             if (arrow) {
               // Set arrow direction based on movement direction
               const arrowRotation = direction > 0 ? '0 90 0' : '0 -90 0';
@@ -2197,7 +2196,7 @@
 
               arrow.setAttribute('animation__move', {
                 property: 'position',
-                to: `${initialPosition.x} ${initialPosition.y + 1.2} ${initialPosition.z - (distance * direction)}`,
+                to: `${initialPosition.x + (distance * direction)} ${initialPosition.y + 1.2} ${initialPosition.z}`,
                 dur: duration,
                 easing: 'easeInOutQuad',
                 startEvents: 'start-animation'
@@ -2205,7 +2204,7 @@
             }
 
             // Memicu event untuk memulai animasi
-            modelToAnimate.emit('start-animation');
+            myModel.emit('start-animation');
           } else {
             // Hide arrow when block is idle/stationary
             if (arrow) {
@@ -3215,14 +3214,15 @@
 
         // Scale arrows based on force magnitude (relative scaling)
         const maxForce = Math.max(appliedForce, frictionForce);
+        const baseScale = 2; // Base scale untuk panah
         const forceScale = Math.max(0.5, Math.min(2.0, appliedForce / 50)); // Scale between 0.5-2.0
         const frictionScale = Math.max(0.5, Math.min(2.0, frictionForce / 50)); // Scale between 0.5-2.0
 
-        // Update force arrow (F) - red arrow pointing right
-        forceArrow.setAttribute('scale', `${forceScale} 1 1`);
+        // Update force arrow (F) - red arrow pointing right, scale X untuk panjang panah
+        forceArrow.setAttribute('scale', `${forceScale * baseScale} ${baseScale} ${baseScale}`);
 
         // Update friction arrow (fs/fk) - blue arrow pointing left
-        frictionArrow.setAttribute('scale', `${frictionScale} 1 1`);
+        frictionArrow.setAttribute('scale', `${frictionScale * baseScale} ${baseScale} ${baseScale}`);
 
         // Update label based on state
         if (state === 'static') {
@@ -3234,8 +3234,8 @@
         // Add pulsing animation to show active forces
         forceArrow.setAttribute('animation__pulse', {
           property: 'scale',
-          to: `${forceScale * 1.1} 1.1 1.1`,
-          from: `${forceScale} 1 1`,
+          to: `${forceScale * baseScale * 1.1} ${baseScale * 1.1} ${baseScale * 1.1}`,
+          from: `${forceScale * baseScale} ${baseScale} ${baseScale}`,
           dur: 1000,
           direction: 'alternate',
           loop: true,
@@ -3244,8 +3244,8 @@
 
         frictionArrow.setAttribute('animation__pulse', {
           property: 'scale',
-          to: `${frictionScale * 1.1} 1.1 1.1`,
-          from: `${frictionScale} 1 1`,
+          to: `${frictionScale * baseScale * 1.1} ${baseScale * 1.1} ${baseScale * 1.1}`,
+          from: `${frictionScale * baseScale} ${baseScale} ${baseScale}`,
           dur: 1200,
           direction: 'alternate',
           loop: true,
