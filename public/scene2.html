@@ -1005,14 +1005,15 @@
                 visible="false">
         </a-ring>
 
-        <!-- Glow sphere untuk impact point -->
+        <!-- Glow sphere untuk impact point - TRANSPARAN/TIDAK KELIHATAN -->
         <a-sphere id="collisionGlow"
                   position="0 0.3 -3"
                   radius="0.15"
                   color="#FFFFFF"
                   opacity="0"
-                  material="transparent: true; emissive: #FFFFFF; emissiveIntensity: 3; shader: flat"
-                  visible="false">
+                  material="transparent: true; emissive: #FFFFFF; emissiveIntensity: 0; shader: flat; visible: false"
+                  visible="false"
+                  style="display: none;">
         </a-sphere>
 
         <!-- Trail effects untuk bola -->
@@ -2065,6 +2066,9 @@
         conservationData = document.querySelector('#conservationData');
         restitutionData = document.querySelector('#restitutionData');
         
+        // PRE-LOAD dan SETUP efek untuk mengurangi delay
+        preloadCollisionEffects();
+        
         // Debug log untuk memastikan elemen panel ditemukan
         console.log('Panel elements found:', {
           resultPanel: !!resultPanel,
@@ -2714,16 +2718,16 @@
 
           console.log(`Collision positions: Ball1=${ball1CollisionPos.toFixed(3)} (r=${radius1.toFixed(3)}), Ball2=${ball2CollisionPos.toFixed(3)} (r=${radius2.toFixed(3)})`);
 
-          // Hitung durasi berdasarkan kecepatan dan massa untuk realisme
+          // Hitung durasi berdasarkan kecepatan dan massa - DIPERCEPAT untuk efek lebih smooth
           // Bola yang lebih cepat dan ringan bergerak lebih cepat
-          const baseDuration = 2500;
-          const velocityFactor1 = Math.abs(v1) / 5; // Normalize velocity
-          const velocityFactor2 = Math.abs(v2) / 5;
+          const baseDuration = 1800;  // Dipercepat dari 2500 ke 1800
+          const velocityFactor1 = Math.abs(v1) / 4; // Lebih sensitif terhadap velocity
+          const velocityFactor2 = Math.abs(v2) / 4;
           const massFactor1 = 1 / Math.sqrt(m1); // Lighter = faster
           const massFactor2 = 1 / Math.sqrt(m2);
 
-          const duration1 = Math.max(1500, baseDuration / (velocityFactor1 * massFactor1 + 0.5));
-          const duration2 = Math.max(1500, baseDuration / (velocityFactor2 * massFactor2 + 0.5));
+          const duration1 = Math.max(1000, baseDuration / (velocityFactor1 * massFactor1 + 0.5)); // Min 1000ms dari 1500ms
+          const duration2 = Math.max(1000, baseDuration / (velocityFactor2 * massFactor2 + 0.5));
 
           console.log(`Approach durations: Ball1=${duration1.toFixed(0)}ms, Ball2=${duration2.toFixed(0)}ms`);
 
@@ -2731,24 +2735,29 @@
             property: "position",
             to: `${ball1CollisionPos} 0.3 -3`,
             dur: duration1,
-            easing: "easeInQuad" // Smooth acceleration menuju collision
+            easing: "easeInCubic" // Lebih dramatic acceleration untuk impact yang lebih terasa
           });
 
           ball2.setAttribute("animation__go", {
             property: "position",
             to: `${ball2CollisionPos} 0.3 -3`,
             dur: duration2,
-            easing: "easeInQuad" // Smooth acceleration menuju collision
+            easing: "easeInCubic" // Lebih dramatic acceleration untuk impact yang lebih terasa
           });
           
-          // Set animasi setelah collision menggunakan durasi maksimum untuk sinkronisasi
+          // Set animasi setelah collision dengan timing yang lebih tepat
           const collisionTime = Math.max(duration1, duration2);
+          
+          // TRIGGER COLLISION EFFECTS EARLIER - saat bola hampir bersentuhan
+          const earlyTriggerTime = collisionTime * 0.85; // 85% dari waktu approach
+          setTimeout(() => {
+            console.log('🚀 PRE-COLLISION: Triggering effects early for smooth impact!');
+            triggerCollisionEffects();
+          }, earlyTriggerTime);
+          
           setTimeout(() => {
             console.log('Setting post-collision animations...');
             console.log(`Post-collision velocities: v1'=${v1p.toFixed(2)}, v2'=${v2p.toFixed(2)}`);
-            
-            // TRIGGER COLLISION EFFECTS
-            triggerCollisionEffects();
             
             // Efek khusus untuk tumbukan inelastis - hanya jika massa dan kecepatan sama
             if (collisionType === 'inelastic') {
@@ -2857,50 +2866,48 @@
               easing2 = "easeOutQuart";
             }
 
-            // Ball 1 post-collision animation dengan efek penyok realistis
+            // Ball 1 post-collision animation dengan efek penyok INSTANT & SMOOTH
             if (Math.abs(v1p) > 0.005) {
-              // Deformasi bola berdasarkan energi kinetik dan momentum transfer
+              // FORMULA BARU: Deformasi universal untuk semua massa dan kecepatan
               const momentumTransfer1 = Math.abs(v1p - v1) * m1;
-              const impactIntensity1 = Math.min(momentumTransfer1 / 5, 1);
+              const velocityChange1 = Math.abs(v1p - v1);
+              const massAdjustment1 = Math.sqrt(m1); // Square root untuk smoothing
+              
+              // Formula yang lebih balanced untuk semua massa
+              const baseImpact1 = (momentumTransfer1 + velocityChange1 * 2) / massAdjustment1;
+              const impactIntensity1 = Math.min(Math.max(baseImpact1 * 0.8, 0.3), 1.5); // Min 0.3, Max 1.5
+              
+              console.log(`Ball1 deformation: momentum=${momentumTransfer1.toFixed(2)}, velocity change=${velocityChange1.toFixed(2)}, mass adj=${massAdjustment1.toFixed(2)}, intensity=${impactIntensity1.toFixed(2)}`);
 
-              // Squash effect yang lebih dramatis (penyok)
-              const squashX1 = 1 + (impactIntensity1 * 0.35); // Horizontal expansion (lebih besar)
-              const squashY1 = 1 - (impactIntensity1 * 0.30); // Vertical compression (lebih dalam)
-              const squashZ1 = 1 + (impactIntensity1 * 0.35); // Depth expansion
-              const squashDuration1 = 120 + (impactIntensity1 * 80);
+              // Squash effect yang LEBIH DRAMATIS dan INSTANT
+              const squashX1 = 1 + (impactIntensity1 * 0.5); // Horizontal expansion (lebih ekstrem)
+              const squashY1 = 1 - (impactIntensity1 * 0.4); // Vertical compression (lebih dalam)
+              const squashZ1 = 1 + (impactIntensity1 * 0.5); // Depth expansion
+              const squashDuration1 = 80 + (impactIntensity1 * 50); // Lebih cepat
 
-              // Efek slow-motion pada saat impact
-              ball1.setAttribute("animation__slowdown", {
-                property: "position",
-                to: `${ball1CollisionPos} 0.3 -3`,
-                dur: 50,
-                easing: "easeOutQuad"
+              // INSTANT squash effect - NO DELAY
+              ball1.setAttribute("animation__squash", {
+                property: "scale",
+                to: `${squashX1.toFixed(2)} ${squashY1.toFixed(2)} ${squashZ1.toFixed(2)}`,
+                dur: squashDuration1,
+                easing: "easeOutExpo" // Lebih dramatis
               });
 
-              // Penyok/squash saat impact
-              setTimeout(() => {
-                ball1.setAttribute("animation__squash", {
-                  property: "scale",
-                  to: `${squashX1.toFixed(2)} ${squashY1.toFixed(2)} ${squashZ1.toFixed(2)}`,
-                  dur: squashDuration1,
-                  easing: "easeInOutQuad"
-                });
-              }, 50);
-
-              // Recovery dengan elastic bounce
+              // Recovery dengan elastic bounce - LEBIH CEPAT
               setTimeout(() => {
                 ball1.setAttribute("animation__recover", {
                   property: "scale",
                   to: "1 1 1",
-                  dur: 400,
-                  easing: "easeOutElastic"
+                  dur: 250, // Lebih cepat recovery
+                  easing: "easeOutBack" // Bounce effect yang lebih smooth
                 });
-              }, 50 + squashDuration1);
+              }, squashDuration1);
 
-              // Smooth movement dengan trail - dimulai setelah squash selesai
+              // Trail effect INSTANT
               showTrail('trail1', ball1.getAttribute('position'));
 
-              const moveDelay1 = 50 + squashDuration1;
+              // Movement animation starts IMMEDIATELY after squash
+              const moveDelay1 = squashDuration1 + 20; // Minimal delay
               setTimeout(() => {
                 ball1.setAttribute("animation__after", {
                   property: "position",
@@ -2911,7 +2918,7 @@
                 console.log(`Ball1 moving to position: ${finalPos1} in ${animationDuration1}ms`);
               }, moveDelay1);
             } else {
-              // Jika v1p sangat kecil, tetap gerakkan ke posisi final
+              // Jika v1p sangat kecil, tetap gerakkan ke posisi final INSTANTLY
               ball1.setAttribute("animation__after", {
                 property: "position",
                 to: `${finalPos1} 0.3 -3`,
@@ -2921,50 +2928,48 @@
               console.log(`Ball1 slow movement to position: ${finalPos1} (v1p ≈ ${v1p.toFixed(3)})`);
             }
             
-            // Ball 2 post-collision animation dengan efek penyok realistis
+            // Ball 2 post-collision animation dengan efek penyok INSTANT & SMOOTH
             if (Math.abs(v2p) > 0.005) {
-              // Deformasi bola berdasarkan energi kinetik dan momentum transfer
+              // FORMULA BARU: Deformasi universal untuk semua massa dan kecepatan
               const momentumTransfer2 = Math.abs(v2p - v2) * m2;
-              const impactIntensity2 = Math.min(momentumTransfer2 / 5, 1);
+              const velocityChange2 = Math.abs(v2p - v2);
+              const massAdjustment2 = Math.sqrt(m2); // Square root untuk smoothing
+              
+              // Formula yang lebih balanced untuk semua massa
+              const baseImpact2 = (momentumTransfer2 + velocityChange2 * 2) / massAdjustment2;
+              const impactIntensity2 = Math.min(Math.max(baseImpact2 * 0.8, 0.3), 1.5); // Min 0.3, Max 1.5
+              
+              console.log(`Ball2 deformation: momentum=${momentumTransfer2.toFixed(2)}, velocity change=${velocityChange2.toFixed(2)}, mass adj=${massAdjustment2.toFixed(2)}, intensity=${impactIntensity2.toFixed(2)}`);
 
-              // Squash effect yang lebih dramatis (penyok)
-              const squashX2 = 1 + (impactIntensity2 * 0.35); // Horizontal expansion (lebih besar)
-              const squashY2 = 1 - (impactIntensity2 * 0.30); // Vertical compression (lebih dalam)
-              const squashZ2 = 1 + (impactIntensity2 * 0.35); // Depth expansion
-              const squashDuration2 = 120 + (impactIntensity2 * 80);
+              // Squash effect yang LEBIH DRAMATIS dan INSTANT
+              const squashX2 = 1 + (impactIntensity2 * 0.5); // Horizontal expansion (lebih ekstrem)
+              const squashY2 = 1 - (impactIntensity2 * 0.4); // Vertical compression (lebih dalam)
+              const squashZ2 = 1 + (impactIntensity2 * 0.5); // Depth expansion
+              const squashDuration2 = 80 + (impactIntensity2 * 50); // Lebih cepat
 
-              // Efek slow-motion pada saat impact
-              ball2.setAttribute("animation__slowdown", {
-                property: "position",
-                to: `${ball2CollisionPos} 0.3 -3`,
-                dur: 50,
-                easing: "easeOutQuad"
+              // INSTANT squash effect - NO DELAY
+              ball2.setAttribute("animation__squash", {
+                property: "scale",
+                to: `${squashX2.toFixed(2)} ${squashY2.toFixed(2)} ${squashZ2.toFixed(2)}`,
+                dur: squashDuration2,
+                easing: "easeOutExpo" // Lebih dramatis
               });
 
-              // Penyok/squash saat impact
-              setTimeout(() => {
-                ball2.setAttribute("animation__squash", {
-                  property: "scale",
-                  to: `${squashX2.toFixed(2)} ${squashY2.toFixed(2)} ${squashZ2.toFixed(2)}`,
-                  dur: squashDuration2,
-                  easing: "easeInOutQuad"
-                });
-              }, 50);
-
-              // Recovery dengan elastic bounce
+              // Recovery dengan elastic bounce - LEBIH CEPAT
               setTimeout(() => {
                 ball2.setAttribute("animation__recover", {
                   property: "scale",
                   to: "1 1 1",
-                  dur: 400,
-                  easing: "easeOutElastic"
+                  dur: 250, // Lebih cepat recovery
+                  easing: "easeOutBack" // Bounce effect yang lebih smooth
                 });
-              }, 50 + squashDuration2);
+              }, squashDuration2);
 
-              // Smooth movement dengan trail - dimulai setelah squash selesai
+              // Trail effect INSTANT
               showTrail('trail2', ball2.getAttribute('position'));
 
-              const moveDelay2 = 50 + squashDuration2;
+              // Movement animation starts IMMEDIATELY after squash
+              const moveDelay2 = squashDuration2 + 20; // Minimal delay
               setTimeout(() => {
                 ball2.setAttribute("animation__after", {
                   property: "position",
@@ -2975,7 +2980,7 @@
                 console.log(`Ball2 moving to position: ${finalPos2} in ${animationDuration2}ms`);
               }, moveDelay2);
             } else {
-              // Jika v2p sangat kecil, tetap gerakkan ke posisi final
+              // Jika v2p sangat kecil, tetap gerakkan ke posisi final INSTANTLY
               ball2.setAttribute("animation__after", {
                 property: "position",
                 to: `${finalPos2} 0.3 -3`,
@@ -3873,9 +3878,11 @@
         return [v1p, v2p];
       }
 
-      // Fungsi untuk efek collision yang dramatis
+      // Fungsi untuk efek collision yang dramatis - ENHANCED SMOOTH
       function triggerCollisionEffects() {
-        // Play collision sound with safety check
+        console.log('🎆 INSTANT collision effects triggered - NO DELAY!');
+        
+        // INSTANT sound effect - no delay
         const soundEntity = document.querySelector('#collisionParticles');
         if (soundEntity && soundEntity.components && soundEntity.components.sound) {
           try {
@@ -3885,34 +3892,180 @@
           }
         }
         
-        // Enhanced collision effects based on collision type and parameters
+        // Calculate collision parameters - ENHANCED untuk semua massa
         const massRatio1 = Math.abs(m1 - m2) / Math.min(m1, m2);
         const massRatio2 = Math.abs(m2 - m1) / Math.min(m1, m2);
         const impactVelocity = Math.abs(v1) + Math.abs(v2);
+        
+        // FORMULA BARU: Lebih sensitif untuk semua kombinasi massa dan kecepatan
+        const totalMomentum = Math.abs(m1 * v1) + Math.abs(m2 * v2);
+        const totalMass = m1 + m2;
+        const velocityFactor = Math.max(impactVelocity, 1); // Minimum 1 untuk efek baseline
+        const massFactor = Math.sqrt(totalMass); // Akar kuadrat untuk smoothing
+        
+        // Intensity yang lebih balanced untuk semua skenario
+        const baseIntensity = (totalMomentum / totalMass) * velocityFactor / massFactor;
+        const collisionIntensity = Math.min(Math.max(baseIntensity * 2, 1), 8); // Min 1, Max 8
 
-        // Calculate damage for inelastic collisions
+        console.log(`💥 UNIVERSAL Collision intensity: ${collisionIntensity.toFixed(2)}`);
+        console.log(`   - Total momentum: ${totalMomentum.toFixed(2)}, Total mass: ${totalMass.toFixed(2)}`);
+        console.log(`   - Impact velocity: ${impactVelocity.toFixed(2)}, Velocity factor: ${velocityFactor.toFixed(2)}`);
+        console.log(`   - Mass factor: ${massFactor.toFixed(2)}, Base intensity: ${baseIntensity.toFixed(2)}`);
+
+        // INSTANT FLASH LIGHT - No delay, maximum impact
+        const flashLight = document.querySelector('#collisionFlash');
+        if (flashLight) {
+          // Set to maximum intensity INSTANTLY
+          const flashIntensity = 5.0 + collisionIntensity;
+          flashLight.setAttribute('light', `intensity: ${flashIntensity.toFixed(2)}; color: #FFD700`);
+          
+          // Super fast flash fade - more dramatic
+          flashLight.setAttribute('animation__flash', {
+            property: 'light.intensity',
+            to: '0',
+            dur: 200,
+            easing: 'easeOutExpo'  // Exponential fade for impact
+          });
+        }
+
+        // INSTANT SHOCKWAVE - Multiple rings for super smooth effect
+        const shockwave = document.querySelector('#collisionShockwave');
+        if (shockwave) {
+          shockwave.setAttribute('visible', 'true');
+          shockwave.setAttribute('opacity', '1.0');
+          shockwave.setAttribute('radius-inner', '0.05');
+          shockwave.setAttribute('radius-outer', '0.1');
+          shockwave.setAttribute('material', 'color: #FFD700; emissive: #FFD700; emissiveIntensity: 2');
+
+          // Super fast expanding shockwave
+          shockwave.setAttribute('animation__expand', {
+            property: 'radius-outer',
+            to: '2.5',
+            dur: 400,
+            easing: 'easeOutExpo'
+          });
+
+          shockwave.setAttribute('animation__fade', {
+            property: 'opacity',
+            to: '0',
+            dur: 400,
+            easing: 'easeOutQuad'
+          });
+
+          setTimeout(() => {
+            shockwave.setAttribute('visible', 'false');
+          }, 450);
+        }
+
+        // COLLISION GLOW SPHERE - DISABLED (TRANSPARAN PER REQUEST USER)
+        const glow = document.querySelector('#collisionGlow');
+        if (glow) {
+          // Tetap transparan dan tidak terlihat seperti yang diminta user
+          glow.setAttribute('visible', 'false');
+          glow.setAttribute('opacity', '0');
+          glow.setAttribute('material', 'visible: false; opacity: 0; transparent: true');
+          console.log('💫 CollisionGlow tetap transparan seperti yang diminta user');
+        }
+        
+        // INSTANT PARTICLE EXPLOSION - ADAPTIVE untuk semua massa
+        const particles = document.querySelector('#collisionParticles');
+        if (particles) {
+          particles.setAttribute('visible', true);
+          particles.setAttribute('position', '0 0.3 -3');
+          
+          // ADAPTIVE particle system berdasarkan collision intensity
+          const adaptiveParticleCount = Math.floor(300 + (collisionIntensity * 100)); // 300-1100 particles
+          const adaptiveVelocity = Math.floor(12 + (collisionIntensity * 3)); // 12-36 velocity
+          const adaptiveSpread = Math.floor(6 + (collisionIntensity * 2)); // 6-22 spread
+          const adaptiveSize = (0.15 + (collisionIntensity * 0.05)).toFixed(3); // 0.15-0.55 size
+          
+          console.log(`🎆 Adaptive particles: count=${adaptiveParticleCount}, velocity=${adaptiveVelocity}, spread=${adaptiveSpread}, size=${adaptiveSize}`);
+          
+          particles.setAttribute('particle-system', {
+            preset: 'spark',
+            particleCount: adaptiveParticleCount,
+            maxAge: 1.8,
+            accelerationValue: '0, -25, 0',
+            velocityValue: `${adaptiveVelocity} ${adaptiveVelocity} ${adaptiveVelocity}`,
+            velocitySpread: `${adaptiveSpread} ${adaptiveSpread-2} ${adaptiveSpread}`,
+            size: `${adaptiveSize}, 0.005`,
+            color: '#FFFFFF, #FFD700, #FF6347, #FF0000, #FFA500, #FF1493, #00FFFF',
+            opacity: '1.0, 0.0'
+          });
+        }
+
+        // INSTANT MULTIPLE SCREEN SHAKES - More dramatic
+        const camera = document.querySelector('[camera]');
+        if (camera) {
+          const shakeIntensity = Math.min(collisionIntensity * 0.3, 2.0);
+          
+          // First immediate shake - strongest
+          camera.setAttribute('animation__shake1', {
+            property: 'rotation',
+            to: `${shakeIntensity} ${shakeIntensity * 0.8} ${shakeIntensity * 0.6}`,
+            dur: 40,  // Even faster
+            easing: 'easeOutQuad'
+          });
+          
+          // Second shake - opposite direction
+          setTimeout(() => {
+            camera.setAttribute('animation__shake2', {
+              property: 'rotation',
+              to: `${-shakeIntensity * 0.6} ${-shakeIntensity * 0.4} ${-shakeIntensity * 0.8}`,
+              dur: 30,
+              easing: 'easeOutQuad'
+            });
+          }, 40);
+          
+          // Third micro-shake for realism
+          setTimeout(() => {
+            camera.setAttribute('animation__shake3', {
+              property: 'rotation',
+              to: `${shakeIntensity * 0.3} ${-shakeIntensity * 0.2} ${shakeIntensity * 0.4}`,
+              dur: 20,
+              easing: 'easeOutQuad'
+            });
+          }, 70);
+          
+          // Final return to center with slight bounce
+          setTimeout(() => {
+            camera.setAttribute('animation__shake-back', {
+              property: 'rotation',
+              to: '0 0 0',
+              dur: 200,
+              easing: 'easeOutBounce'
+            });
+          }, 90);
+        }
+
+        // INSTANT ADDITIONAL RING WAVES for ultra smooth effect
+        for (let i = 0; i < 3; i++) {
+          setTimeout(() => {
+            createAdditionalShockwaveRing(i, collisionIntensity);
+          }, i * 50); // Staggered rings every 50ms
+        }
+
+        // Apply enhanced deformation based on collision type
         if (collisionType === 'inelastic' && impactVelocity > 0.5) {
-          // Apply damage to ball1
+          // Apply damage to balls
           if (ball1 && ball1.components && ball1.components['ball-damage']) {
             const damageType1 = ball1.components['ball-damage'].calculateDamageType(massRatio1, impactVelocity);
             ball1.components['ball-damage'].applyDamage(damageType1, {x: 0, y: 1, z: -3});
             console.log(`Ball1 damage applied: ${damageType1}`);
           }
 
-          // Apply damage to ball2
           if (ball2 && ball2.components && ball2.components['ball-damage']) {
             const damageType2 = ball2.components['ball-damage'].calculateDamageType(massRatio2, impactVelocity);
             ball2.components['ball-damage'].applyDamage(damageType2, {x: 0, y: 1, z: -3});
             console.log(`Ball2 damage applied: ${damageType2}`);
           }
 
-          // Enhanced particle effects for damage
+          // Enhanced debris for high-impact collisions
           if (impactVelocity > 2) {
-            // Create additional debris particles
             createDebrisEffect({x: 0, y: 1, z: -3}, impactVelocity);
           }
         } else {
-          // Standard deformation for elastic collisions or low-impact inelastic
+          // Enhanced deformation for elastic collisions
           if (ball1 && ball1.components && ball1.components['ball-deformation']) {
             ball1.components['ball-deformation'].deform('impact');
           }
@@ -3921,140 +4074,108 @@
           }
         }
         
-        // Calculate collision intensity based on momentum change
-        const momentumChange = Math.abs((m1 * v1 + m2 * v2));
-        const collisionIntensity = Math.min(momentumChange / 2, 5);
-
-        // Enhanced lighting flash based on intensity
-        const flashLight = document.querySelector('#collisionFlash');
-        if (flashLight) {
-          const flashIntensity = 2.0 + collisionIntensity;
-          flashLight.setAttribute('animation__flash', {
-            property: 'light.intensity',
-            to: flashIntensity.toFixed(2),
-            dur: 60,
-            easing: 'easeOutQuad'
-          });
-
-          setTimeout(() => {
-            flashLight.setAttribute('animation__fade', {
-              property: 'light.intensity',
-              to: '0',
-              dur: 500,
-              easing: 'easeOutCubic'
-            });
-          }, 60);
-        }
-
-        // Shockwave ring effect
-        const shockwave = document.querySelector('#collisionShockwave');
-        if (shockwave) {
-          shockwave.setAttribute('visible', 'true');
-          shockwave.setAttribute('opacity', '0.8');
-          shockwave.setAttribute('radius-inner', '0.1');
-          shockwave.setAttribute('radius-outer', '0.15');
-
-          // Expand shockwave
-          shockwave.setAttribute('animation__expand', {
-            property: 'radius-outer',
-            to: '1.5',
-            dur: 600,
-            easing: 'easeOutQuad'
-          });
-
-          shockwave.setAttribute('animation__fade', {
-            property: 'opacity',
-            to: '0',
-            dur: 600,
-            easing: 'easeOutQuad'
-          });
-
-          setTimeout(() => {
-            shockwave.setAttribute('visible', 'false');
-          }, 650);
-        }
-
-        // Glow sphere effect at impact point
-        const glow = document.querySelector('#collisionGlow');
-        if (glow) {
-          glow.setAttribute('visible', 'true');
-          glow.setAttribute('opacity', '0.9');
-          glow.setAttribute('radius', '0.2');
-
-          // Pulse and fade
-          glow.setAttribute('animation__pulse', {
-            property: 'radius',
-            to: '0.4',
-            dur: 200,
-            easing: 'easeOutQuad'
-          });
-
-          glow.setAttribute('animation__fade', {
-            property: 'opacity',
-            to: '0',
-            dur: 400,
-            easing: 'easeOutCubic'
-          });
-
-          setTimeout(() => {
-            glow.setAttribute('visible', 'false');
-          }, 450);
-        }
-        
-        // Show particle explosion at collision point
-        const particles = document.querySelector('#collisionParticles');
-        if (particles) {
-          particles.setAttribute('visible', true);
-          particles.setAttribute('position', '0 0.3 -3'); // Collision point
-          
-          // Start particle emission
-          particles.setAttribute('particle-system', {
-            preset: 'spark',
-            particleCount: 400,
-            maxAge: 3,
-            accelerationValue: '0, -18, 0',
-            velocityValue: '12 12 12',
-            velocitySpread: '6 6 6',
-            size: '0.25, 0.01',
-            color: '#FFD700, #FF6347, #FF0000, #FFFFFF, #FFA500, #FF1493',
-            opacity: '1.0, 0.0'
-          });
-        }
-        
-        // Screen shake effect untuk drama dengan multiple pulses
-        const camera = document.querySelector('[camera]');
-        if (camera) {
-          // First shake
-          camera.setAttribute('animation__shake1', {
-            property: 'rotation',
-            to: '1.0 1.0 1.0',
-            dur: 60,
-            easing: 'easeInOutQuad'
-          });
-          
-          setTimeout(() => {
-            camera.setAttribute('animation__shake2', {
-              property: 'rotation',
-              to: '-0.5 -0.5 -0.5',
-              dur: 40,
-              easing: 'easeInOutQuad'
-            });
-          }, 60);
-          
-          setTimeout(() => {
-            camera.setAttribute('animation__shake-back', {
-              property: 'rotation',
-              to: '0 0 0',
-              dur: 350,
-              easing: 'easeOutBounce'
-            });
-          }, 100);
-        }
-        
-        // Hide particles after effect
+        // Hide particles after shorter duration
         setTimeout(() => {
           if (particles) particles.setAttribute('visible', false);
-        }, 3000);
+        }, 2000);  // Faster cleanup
+
+        console.log('✅ All collision effects applied INSTANTLY with enhanced smoothness!');
+      }
+
+      // Pre-load collision effects untuk menghilangkan delay pertama kali
+      function preloadCollisionEffects() {
+        console.log('🔄 Pre-loading collision effects for instant response...');
+        
+        // Pre-cache all effect elements
+        const flashLight = document.querySelector('#collisionFlash');
+        const shockwave = document.querySelector('#collisionShockwave');
+        const glow = document.querySelector('#collisionGlow');
+        const particles = document.querySelector('#collisionParticles');
+        
+        // Initialize flash light
+        if (flashLight) {
+          flashLight.setAttribute('light', 'intensity: 0; color: #FFD700');
+          console.log('✅ Flash light pre-loaded');
+        }
+        
+        // Initialize shockwave
+        if (shockwave) {
+          shockwave.setAttribute('visible', 'false');
+          shockwave.setAttribute('material', 'color: #FFD700; emissive: #FFD700; emissiveIntensity: 2; transparent: true');
+          console.log('✅ Shockwave pre-loaded');
+        }
+        
+        // Initialize glow - PERMANENTLY DISABLED (USER REQUEST: TRANSPARAN)
+        if (glow) {
+          glow.setAttribute('visible', 'false');
+          glow.setAttribute('opacity', '0');
+          glow.setAttribute('material', 'visible: false; opacity: 0; transparent: true; emissiveIntensity: 0');
+          console.log('✅ Glow sphere pre-loaded sebagai TRANSPARAN sesuai permintaan user');
+        }
+        
+        // Initialize particles system
+        if (particles) {
+          particles.setAttribute('visible', false);
+          // Pre-configure particle system untuk instant activation
+          particles.setAttribute('particle-system', {
+            preset: 'spark',
+            particleCount: 0,  // Start with 0, akan diubah saat collision
+            maxAge: 1.8,
+            accelerationValue: '0, -25, 0',
+            velocityValue: '18 18 18',
+            velocitySpread: '10 8 10',
+            size: '0.3, 0.005',
+            color: '#FFFFFF, #FFD700, #FF6347, #FF0000, #FFA500, #FF1493, #00FFFF',
+            opacity: '1.0, 0.0'
+          });
+          console.log('✅ Particle system pre-loaded');
+        }
+        
+        // Pre-load audio untuk menghindari audio delay
+        const soundEntity = document.querySelector('#collisionParticles');
+        if (soundEntity && soundEntity.components && soundEntity.components.sound) {
+          console.log('✅ Audio system pre-loaded');
+        }
+        
+        console.log('🚀 All collision effects pre-loaded for INSTANT response!');
+      }
+
+      // Helper function to create additional shockwave rings
+      function createAdditionalShockwaveRing(index, intensity) {
+        const ring = document.createElement('a-ring');
+        ring.setAttribute('position', '0 0.3 -3');
+        ring.setAttribute('rotation', '-90 0 0');
+        ring.setAttribute('radius-inner', '0.05');
+        ring.setAttribute('radius-outer', '0.1');
+        ring.setAttribute('opacity', `${0.6 - index * 0.15}`);
+        ring.setAttribute('material', `color: #00FFFF; emissive: #00FFFF; emissiveIntensity: ${2 - index * 0.5}; transparent: true`);
+
+        // Unique expansion for each ring
+        const maxRadius = 1.8 + (index * 0.4) + (intensity * 0.2);
+        const duration = 350 + (index * 50);
+
+        ring.setAttribute('animation__expand', {
+          property: 'radius-outer',
+          to: maxRadius.toString(),
+          dur: duration,
+          easing: 'easeOutQuart'
+        });
+
+        ring.setAttribute('animation__fade', {
+          property: 'opacity',
+          to: '0',
+          dur: duration,
+          easing: 'easeOutQuad'
+        });
+
+        document.querySelector('a-scene').appendChild(ring);
+
+        // Clean up ring
+        setTimeout(() => {
+          if (ring.parentNode) {
+            ring.parentNode.removeChild(ring);
+          }
+        }, duration + 50);
       }
 
       // Create debris effect for high-impact collisions
@@ -4581,15 +4702,15 @@
 
                 console.log(`Collision positions: Ball1=${ball1CollisionPos_vr.toFixed(3)} (r=${radius1_vr.toFixed(3)}), Ball2=${ball2CollisionPos_vr.toFixed(3)} (r=${radius2_vr.toFixed(3)})`);
 
-                // Hitung durasi berdasarkan kecepatan
-                const baseDuration_vr = 2500;
-                const velocityFactor1_vr = Math.abs(v1) / 5;
-                const velocityFactor2_vr = Math.abs(v2) / 5;
+                // Hitung durasi berdasarkan kecepatan - DIPERCEPAT (VR)
+                const baseDuration_vr = 1800;  // Dipercepat dari 2500 ke 1800
+                const velocityFactor1_vr = Math.abs(v1) / 4; // Lebih sensitif
+                const velocityFactor2_vr = Math.abs(v2) / 4;
                 const massFactor1_vr = 1 / Math.sqrt(m1);
                 const massFactor2_vr = 1 / Math.sqrt(m2);
 
-                const duration1_vr = Math.max(1500, baseDuration_vr / (velocityFactor1_vr * massFactor1_vr + 0.5));
-                const duration2_vr = Math.max(1500, baseDuration_vr / (velocityFactor2_vr * massFactor2_vr + 0.5));
+                const duration1_vr = Math.max(1000, baseDuration_vr / (velocityFactor1_vr * massFactor1_vr + 0.5)); // Min 1000ms
+                const duration2_vr = Math.max(1000, baseDuration_vr / (velocityFactor2_vr * massFactor2_vr + 0.5));
 
                 console.log(`Approach durations: Ball1=${duration1_vr.toFixed(0)}ms, Ball2=${duration2_vr.toFixed(0)}ms`);
 
@@ -4597,24 +4718,29 @@
                   property: "position",
                   to: `${ball1CollisionPos_vr} 0.3 -3`,
                   dur: duration1_vr,
-                  easing: "easeInQuad"
+                  easing: "easeInCubic" // Lebih dramatic acceleration (VR)
                 });
 
                 ball2.setAttribute("animation__go", {
                   property: "position",
                   to: `${ball2CollisionPos_vr} 0.3 -3`,
                   dur: duration2_vr,
-                  easing: "easeInQuad"
+                  easing: "easeInCubic" // Lebih dramatic acceleration (VR)
                 });
 
-                // Set animasi setelah collision menggunakan durasi maksimum untuk sinkronisasi
+                // Set animasi setelah collision dengan timing yang lebih tepat (VR)
                 const collisionTime_vr = Math.max(duration1_vr, duration2_vr);
+                
+                // TRIGGER COLLISION EFFECTS EARLY (VR) - saat bola hampir bersentuhan
+                const earlyTriggerTime_vr = collisionTime_vr * 0.85; // 85% dari waktu approach
+                setTimeout(() => {
+                  console.log('🚀 PRE-COLLISION (VR): Triggering effects early for smooth impact!');
+                  triggerCollisionEffects();
+                }, earlyTriggerTime_vr);
+                
                 setTimeout(() => {
                   console.log('Setting post-collision animations (VR path)...');
                   console.log(`Post-collision velocities: v1'=${v1p_vr.toFixed(2)}, v2'=${v2p_vr.toFixed(2)}`);
-
-                  // TRIGGER COLLISION EFFECTS
-                  triggerCollisionEffects();
 
                   // Efek khusus untuk tumbukan inelastis
                   if (collisionType === 'inelastic') {
@@ -4703,44 +4829,39 @@
                     easing2_vr = "easeOutQuart";
                   }
 
-                  // Ball 1 post-collision animation
+                    // Ball 1 post-collision animation dengan efek penyok INSTANT & SMOOTH (VR)
                   if (Math.abs(v1p_vr) > 0.005) {
                     const momentumTransfer1_vr = Math.abs(v1p_vr - v1) * m1;
-                    const impactIntensity1_vr = Math.min(momentumTransfer1_vr / 5, 1);
+                    const impactIntensity1_vr = Math.min(momentumTransfer1_vr / 3, 1.2); // Sama seperti non-VR - lebih sensitif
 
-                    const squashX1_vr = 1 + (impactIntensity1_vr * 0.35);
-                    const squashY1_vr = 1 - (impactIntensity1_vr * 0.30);
-                    const squashZ1_vr = 1 + (impactIntensity1_vr * 0.35);
-                    const squashDuration1_vr = 120 + (impactIntensity1_vr * 80);
+                    const squashX1_vr = 1 + (impactIntensity1_vr * 0.5); // Horizontal expansion (lebih ekstrem)
+                    const squashY1_vr = 1 - (impactIntensity1_vr * 0.4); // Vertical compression (lebih dalam)
+                    const squashZ1_vr = 1 + (impactIntensity1_vr * 0.5); // Depth expansion
+                    const squashDuration1_vr = 80 + (impactIntensity1_vr * 50); // Lebih cepat
 
-                    ball1.setAttribute("animation__slowdown", {
-                      property: "position",
-                      to: `${ball1CollisionPos_vr} 0.3 -3`,
-                      dur: 50,
-                      easing: "easeOutQuad"
+                    // INSTANT squash effect - NO DELAY (VR)
+                    ball1.setAttribute("animation__squash", {
+                      property: "scale",
+                      to: `${squashX1_vr.toFixed(2)} ${squashY1_vr.toFixed(2)} ${squashZ1_vr.toFixed(2)}`,
+                      dur: squashDuration1_vr,
+                      easing: "easeOutExpo" // Lebih dramatis
                     });
 
-                    setTimeout(() => {
-                      ball1.setAttribute("animation__squash", {
-                        property: "scale",
-                        to: `${squashX1_vr.toFixed(2)} ${squashY1_vr.toFixed(2)} ${squashZ1_vr.toFixed(2)}`,
-                        dur: squashDuration1_vr,
-                        easing: "easeInOutQuad"
-                      });
-                    }, 50);
-
+                    // Recovery dengan elastic bounce - LEBIH CEPAT (VR)
                     setTimeout(() => {
                       ball1.setAttribute("animation__recover", {
                         property: "scale",
                         to: "1 1 1",
-                        dur: 400,
-                        easing: "easeOutElastic"
+                        dur: 250, // Lebih cepat recovery
+                        easing: "easeOutBack" // Bounce effect yang lebih smooth
                       });
-                    }, 50 + squashDuration1_vr);
+                    }, squashDuration1_vr);
 
+                    // Trail effect INSTANT (VR)
                     showTrail('trail1', ball1.getAttribute('position'));
 
-                    const moveDelay1_vr = 50 + squashDuration1_vr;
+                    // Movement animation starts IMMEDIATELY after squash (VR)
+                    const moveDelay1_vr = squashDuration1_vr + 20; // Minimal delay
                     setTimeout(() => {
                       ball1.setAttribute("animation__after", {
                         property: "position",
@@ -4751,6 +4872,7 @@
                       console.log(`Ball1 moving to position (VR): ${finalPos1_vr} in ${animationDuration1_vr}ms`);
                     }, moveDelay1_vr);
                   } else {
+                    // Ball1 slow movement case (VR)
                     ball1.setAttribute("animation__after", {
                       property: "position",
                       to: `${finalPos1_vr} 0.3 -3`,
@@ -4760,44 +4882,39 @@
                     console.log(`Ball1 slow movement (VR) to position: ${finalPos1_vr} (v1p ≈ ${v1p_vr.toFixed(3)})`);
                   }
 
-                  // Ball 2 post-collision animation
+                  // Ball 2 post-collision animation dengan efek penyok INSTANT & SMOOTH (VR)
                   if (Math.abs(v2p_vr) > 0.005) {
                     const momentumTransfer2_vr = Math.abs(v2p_vr - v2) * m2;
-                    const impactIntensity2_vr = Math.min(momentumTransfer2_vr / 5, 1);
+                    const impactIntensity2_vr = Math.min(momentumTransfer2_vr / 3, 1.2); // Sama seperti non-VR - lebih sensitif
 
-                    const squashX2_vr = 1 + (impactIntensity2_vr * 0.35);
-                    const squashY2_vr = 1 - (impactIntensity2_vr * 0.30);
-                    const squashZ2_vr = 1 + (impactIntensity2_vr * 0.35);
-                    const squashDuration2_vr = 120 + (impactIntensity2_vr * 80);
+                    const squashX2_vr = 1 + (impactIntensity2_vr * 0.5); // Horizontal expansion (lebih ekstrem)
+                    const squashY2_vr = 1 - (impactIntensity2_vr * 0.4); // Vertical compression (lebih dalam)
+                    const squashZ2_vr = 1 + (impactIntensity2_vr * 0.5); // Depth expansion
+                    const squashDuration2_vr = 80 + (impactIntensity2_vr * 50); // Lebih cepat
 
-                    ball2.setAttribute("animation__slowdown", {
-                      property: "position",
-                      to: `${ball2CollisionPos_vr} 0.3 -3`,
-                      dur: 50,
-                      easing: "easeOutQuad"
+                    // INSTANT squash effect - NO DELAY (VR)
+                    ball2.setAttribute("animation__squash", {
+                      property: "scale",
+                      to: `${squashX2_vr.toFixed(2)} ${squashY2_vr.toFixed(2)} ${squashZ2_vr.toFixed(2)}`,
+                      dur: squashDuration2_vr,
+                      easing: "easeOutExpo" // Lebih dramatis
                     });
 
-                    setTimeout(() => {
-                      ball2.setAttribute("animation__squash", {
-                        property: "scale",
-                        to: `${squashX2_vr.toFixed(2)} ${squashY2_vr.toFixed(2)} ${squashZ2_vr.toFixed(2)}`,
-                        dur: squashDuration2_vr,
-                        easing: "easeInOutQuad"
-                      });
-                    }, 50);
-
+                    // Recovery dengan elastic bounce - LEBIH CEPAT (VR)
                     setTimeout(() => {
                       ball2.setAttribute("animation__recover", {
                         property: "scale",
                         to: "1 1 1",
-                        dur: 400,
-                        easing: "easeOutElastic"
+                        dur: 250, // Lebih cepat recovery
+                        easing: "easeOutBack" // Bounce effect yang lebih smooth
                       });
-                    }, 50 + squashDuration2_vr);
+                    }, squashDuration2_vr);
 
+                    // Trail effect INSTANT (VR)
                     showTrail('trail2', ball2.getAttribute('position'));
 
-                    const moveDelay2_vr = 50 + squashDuration2_vr;
+                    // Movement animation starts IMMEDIATELY after squash (VR)
+                    const moveDelay2_vr = squashDuration2_vr + 20; // Minimal delay
                     setTimeout(() => {
                       ball2.setAttribute("animation__after", {
                         property: "position",
@@ -5428,7 +5545,7 @@
         init: function () {
           this.otherBall = null;
           this.isColliding = false;
-          this.penetrationThreshold = 0.01; // Minimum penetration to trigger resolution
+          this.penetrationThreshold = 0.001; // Minimum penetration to trigger resolution (lebih sensitif)
         },
 
         tick: function (time, deltaTime) {
@@ -5467,13 +5584,29 @@
         },
 
         getBallRadius: function (ballEl) {
-          // Get radius from geometry or calculate from scale
+          // Get radius from geometry attribute
+          const scale = ballEl.object3D.scale;
+
+          // Use average of x and z scale to account for squash deformation
+          const avgScale = (scale.x + scale.z) / 2;
+
+          // Get actual radius from geometry attribute (set by updateBallSizes)
+          const radius = ballEl.getAttribute('radius');
+
+          if (radius) {
+            // Use the radius that was set based on mass calculation
+            return parseFloat(radius) * avgScale;
+          }
+
+          // Fallback: try to get from geometry object
           const geometry = ballEl.getAttribute('geometry');
           if (geometry && geometry.radius) {
-            return geometry.radius * ballEl.object3D.scale.x;
+            return geometry.radius * avgScale;
           }
-          // Default fallback based on visual scale
-          return 0.25 * ballEl.object3D.scale.x;
+
+          // Last resort fallback - should not normally reach here
+          console.warn('Ball radius not found, using default');
+          return 0.25 * avgScale;
         },
 
         resolvePenetration: function (myPos, otherPos, penetration, dx, dy, dz, distance) {
@@ -5492,23 +5625,28 @@
           const ny = dy / distance;
           const nz = dz / distance;
 
-          // Apply smooth separation with damping for realistic effect
+          // Apply very strong separation to prevent penetration completely
+          // Higher penetration = stronger force (untuk mencegah tembus pada massa besar)
           const separationAmount = penetration * separationRatio;
-          const damping = 0.3; // Smooth interpolation factor (0-1, lower = smoother)
+          const baseDamping = 1.0; // Maximum strength (1.0 = instant full correction)
 
-          // Move this ball away smoothly
+          // Add extra force for large penetrations (bola massa besar yang cepat)
+          const penetrationBoost = Math.min(penetration * 5, 0.5); // Max boost 0.5
+          const damping = Math.min(baseDamping + penetrationBoost, 1.0);
+
+          // Move this ball away with maximum force
           myPos.x += nx * separationAmount * damping;
           myPos.y += ny * separationAmount * damping;
           myPos.z += nz * separationAmount * damping;
 
-          // Move other ball away smoothly in opposite direction
+          // Move other ball away with maximum force in opposite direction
           otherPos.x -= nx * separationAmount * damping;
           otherPos.y -= ny * separationAmount * damping;
           otherPos.z -= nz * separationAmount * damping;
 
           // Optional: Log for debugging (disable in production)
           if (this.data.debug) {
-            console.log(`Separation applied: penetration=${penetration.toFixed(4)}, distance=${distance.toFixed(4)}`);
+            console.log(`Separation applied: penetration=${penetration.toFixed(4)}, distance=${distance.toFixed(4)}, damping=${damping.toFixed(3)}`);
           }
         }
       });
