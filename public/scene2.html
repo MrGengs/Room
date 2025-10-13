@@ -494,26 +494,50 @@
       </a-entity>
     </a-entity>
 
-    <!-- Bab 3 - Tumbukan -->
-    <a-entity id="bab3" visible="false">
-      <!-- Bola-bola untuk simulasi tumbukan -->
-      <a-sphere id="ball1" class="collidable" position="-3 0.3 -3" radius="0.25" color="#cc2f2f"
-        material="depthTest: true" shadow="cast: true" ball-deformation="intensity: 0.2; duration: 300"
-        ball-damage="massRatio: 1.0; impactVelocity: 1.0; damageThreshold: 2.0"
-        inelastic-collision="mass: 1.0; restitution: 0.0; damageEnabled: true">
-      </a-sphere>
-      <a-text id="label1" value="m1 = 1kg&#10;v1 = 1m/s" position="-3 1 -3" align="center" color="white"
-        material="depthTest: false; transparent: true">
-      </a-text>
-
-      <a-sphere id="ball2" class="collidable" position="3 0.3 -3" radius="0.25" color="#4545ff"
-        material="depthTest: true" shadow="cast: true" ball-deformation="intensity: 0.2; duration: 300"
-        ball-damage="massRatio: 1.0; impactVelocity: 1.0; damageThreshold: 2.0"
-        inelastic-collision="mass: 1.0; restitution: 0.0; damageEnabled: true">
-      </a-sphere>
-      <a-text id="label2" value="m2 = 1kg&#10;v2 = -1m/s" position="3 1 -3" align="center" color="white"
-        material="depthTest: false; transparent: true">
-      </a-text>
+      <!-- Bab 3 - Tumbukan -->
+      <a-entity id="bab3" visible="false">
+        <!-- Bola-bola untuk simulasi tumbukan -->
+        <a-sphere
+          id="ball1"
+          class="collidable"
+          position="-3 0.3 -3"
+          radius="0.25"
+          color="#cc2f2f"
+          material="depthTest: true"
+          shadow="cast: true"
+          ball-deformation="intensity: 0.2; duration: 300"
+          ball-damage="massRatio: 1.0; impactVelocity: 1.0; damageThreshold: 2.0"
+          inelastic-collision="mass: 1.0; restitution: 0.0; damageEnabled: true">
+        </a-sphere>
+        <a-text 
+          id="label1" 
+          value="m1 = 1kg&#10;v1 = 1m/s" 
+          position="-3 1 -3" 
+          align="center"
+          color="white"
+          material="depthTest: false; transparent: true">
+        </a-text>
+        
+        <a-sphere
+          id="ball2"
+          class="collidable"
+          position="3 0.3 -3"
+          radius="0.25"
+          color="#4545ff"
+          material="depthTest: true"
+          shadow="cast: true"
+          ball-deformation="intensity: 0.2; duration: 300"
+          ball-damage="massRatio: 1.0; impactVelocity: 1.0; damageThreshold: 2.0"
+          inelastic-collision="mass: 1.0; restitution: 0.0; damageEnabled: true">
+        </a-sphere>
+        <a-text 
+          id="label2" 
+          value="m2 = 1kg&#10;v2 = -1m/s" 
+          position="3 1 -3" 
+          align="center"
+          color="white"
+          material="depthTest: false; transparent: true">
+        </a-text>
 
       <!-- Particle system untuk efek collision - Enhanced -->
       <a-entity id="collisionParticles" position="0 0.3 -3" visible="false" particle-system="preset: spark;
@@ -581,111 +605,224 @@
           material="depthTest: false; transparent: true; shader: flat">
         </a-text>
 
-        <!-- Jenis Tumbukan Section -->
-        <a-text value="═══ JENIS TUMBUKAN ═══" position="0 0.38 0" align="center" color="#DF0E23" width="3.0"
-          material="depthTest: false; transparent: true">
-        </a-text>
+          <!-- Jenis Tumbukan Section -->
+          <a-text
+            value="═══ JENIS TUMBUKAN ═══"
+            position="0 0.38 0"
+            align="center"
+            color="#88ddff"
+            width="3.0"
+            material="depthTest: false; transparent: true">
+          </a-text>
 
-        <!-- Info Jenis Tumbukan -->
-        <a-text value="Pilih jenis tumbukan untuk simulasi:" position="0 0.24 0" align="center" color="#FF2F44"
-          width="2.5" material="depthTest: false; transparent: true">
-        </a-text>
+          <!-- Info Jenis Tumbukan -->
+          <a-text
+            value="Pilih jenis tumbukan untuk simulasi:"
+            position="0 0.24 0"
+            align="center"
+            color="#aaddff"
+            width="2.5"
+            material="depthTest: false; transparent: true">
+          </a-text>
 
-        <!-- Elastic Button - Modern Style -->
-        <a-entity position="-0.65 0.05 0">
-          <!-- Outer Glow -->
-          <a-box depth="0.06" height="0.28" width="0.9" color="#00ff88" opacity="0.2" position="0 0 -0.01">
-          </a-box>
-          <!-- Main Button -->
-          <a-box id="btnElastic" class="clickable" depth="0.05" height="0.26" width="0.88" color="#00dd77"
-            material="depthTest: true; metalness: 0.6; roughness: 0.3"
-            event-set__enter="_event: mouseenter; scale:1.08 1.08 1.08; material.color: #00ff99; material.emissive: #00ff88; material.emissiveIntensity: 0.5"
-            event-set__leave="_event: mouseleave; scale:1 1 1; material.color: #00dd77; material.emissive: #000000; material.emissiveIntensity: 0">
-          </a-box>
-          <a-text value="✓ ELASTIS" color="#ffffff" align="center" width="2.5" position="0 0.06 0.03"
-            material="depthTest: false; transparent: true; shader: flat">
-          </a-text>
-          <a-text value="(Energi terjaga)" color="#ccffcc" align="center" width="1.8" position="0 -0.04 0.03"
-            material="depthTest: false; transparent: true; shader: flat">
-          </a-text>
-        </a-entity>
+          <!-- Elastic Button - Modern Style -->
+          <a-entity position="-0.65 0.05 0">
+            <!-- Outer Glow -->
+            <a-box
+              depth="0.06"
+              height="0.28"
+              width="0.9"
+              color="#00ff88"
+              opacity="0.2"
+              position="0 0 -0.01">
+            </a-box>
+            <!-- Main Button -->
+            <a-box
+              id="btnElastic"
+              class="clickable"
+              depth="0.05"
+              height="0.26"
+              width="0.88"
+              color="#00dd77"
+              material="depthTest: true; metalness: 0.6; roughness: 0.3"
+              event-set__enter="_event: mouseenter; scale:1.08 1.08 1.08; material.color: #00ff99; material.emissive: #00ff88; material.emissiveIntensity: 0.5"
+              event-set__leave="_event: mouseleave; scale:1 1 1; material.color: #00dd77; material.emissive: #000000; material.emissiveIntensity: 0">
+            </a-box>
+            <a-text
+              value="✓ ELASTIS"
+              color="#ffffff"
+              align="center"
+              width="2.5"
+              position="0 0.06 0.03"
+              material="depthTest: false; transparent: true; shader: flat">
+            </a-text>
+            <a-text
+              value="(Energi terjaga)"
+              color="#ccffcc"
+              align="center"
+              width="1.8"
+              position="0 -0.04 0.03"
+              material="depthTest: false; transparent: true; shader: flat">
+            </a-text>
+          </a-entity>
 
-        <!-- Inelastic Button - Modern Style -->
-        <a-entity position="0.65 0.05 0">
-          <!-- Outer Glow -->
-          <a-box depth="0.06" height="0.28" width="0.9" color="#ff6600" opacity="0.2" position="0 0 -0.01">
-          </a-box>
-          <!-- Main Button -->
-          <a-box id="btnInelastic" class="clickable" depth="0.05" height="0.26" width="0.88" color="#ff5500"
-            material="depthTest: true; metalness: 0.6; roughness: 0.3"
-            event-set__enter="_event: mouseenter; scale:1.08 1.08 1.08; material.color: #ff7722; material.emissive: #ff6600; material.emissiveIntensity: 0.5"
-            event-set__leave="_event: mouseleave; scale:1 1 1; material.color: #ff5500; material.emissive: #000000; material.emissiveIntensity: 0">
-          </a-box>
-          <a-text value="✗ INELASTIS" color="#ffffff" align="center" width="2.3" position="0 0.06 0.03"
-            material="depthTest: false; transparent: true; shader: flat">
-          </a-text>
-          <a-text value="(Energi hilang)" color="#ffccaa" align="center" width="1.8" position="0 -0.04 0.03"
-            material="depthTest: false; transparent: true; shader: flat">
-          </a-text>
-        </a-entity>
+          <!-- Inelastic Button - Modern Style -->
+          <a-entity position="0.65 0.05 0">
+            <!-- Outer Glow -->
+            <a-box
+              depth="0.06"
+              height="0.28"
+              width="0.9"
+              color="#ff6600"
+              opacity="0.2"
+              position="0 0 -0.01">
+            </a-box>
+            <!-- Main Button -->
+            <a-box
+              id="btnInelastic"
+              class="clickable"
+              depth="0.05"
+              height="0.26"
+              width="0.88"
+              color="#ff5500"
+              material="depthTest: true; metalness: 0.6; roughness: 0.3"
+              event-set__enter="_event: mouseenter; scale:1.08 1.08 1.08; material.color: #ff7722; material.emissive: #ff6600; material.emissiveIntensity: 0.5"
+              event-set__leave="_event: mouseleave; scale:1 1 1; material.color: #ff5500; material.emissive: #000000; material.emissiveIntensity: 0">
+            </a-box>
+            <a-text
+              value="✗ INELASTIS"
+              color="#ffffff"
+              align="center"
+              width="2.3"
+              position="0 0.06 0.03"
+              material="depthTest: false; transparent: true; shader: flat">
+            </a-text>
+            <a-text
+              value="(Energi hilang)"
+              color="#ffccaa"
+              align="center"
+              width="1.8"
+              position="0 -0.04 0.03"
+              material="depthTest: false; transparent: true; shader: flat">
+            </a-text>
+          </a-entity>
 
         <!-- Divider with Gradient Effect -->
         <a-plane width="2.8" height="0.025" color="#00ccff" opacity="0.6" position="0 -0.22 0">
         </a-plane>
 
-        <!-- Demo Massa Label -->
-        <a-text value="⚡ DEMO MASSA" position="0 -0.35 0" align="center" color="#DF0E23" width="3.0"
-          material="depthTest: false; transparent: true">
-        </a-text>
-
-        <!-- Info Demo Massa -->
-        <a-text value="Pilih perbandingan massa untuk demo cepat:" position="0 -0.47 0" align="center" color="#FF2F44"
-          width="2.4" material="depthTest: false; transparent: true">
-        </a-text>
-
-        <!-- Mass Demo Buttons - Modern Compact with Better Labels -->
-        <a-entity position="-0.82 -0.68 0">
-          <a-box id="btnHeavyLight" class="clickable" depth="0.05" height="0.22" width="0.72" color="#ff9900"
-            radius="0.02" material="depthTest: true; metalness: 0.5; roughness: 0.4"
-            event-set__enter="_event: mouseenter; scale:1.12 1.12 1.12; material.color: #ffbb33; material.emissive: #ff9900; material.emissiveIntensity: 0.4"
-            event-set__leave="_event: mouseleave; scale:1 1 1; material.color: #ff9900; material.emissive: #000000; material.emissiveIntensity: 0">
-          </a-box>
-          <a-text value="BERAT → RINGAN" color="#ffffff" align="center" width="2.2" position="0 0.04 0.03"
-            material="depthTest: false; transparent: true; shader: flat">
+          <!-- Demo Massa Label -->
+          <a-text
+            value="⚡ DEMO MASSA"
+            position="0 -0.35 0"
+            align="center"
+            color="#88ddff"
+            width="3.0"
+            material="depthTest: false; transparent: true">
           </a-text>
-          <a-text value="(m₁ > m₂)" color="#ffddaa" align="center" width="1.8" position="0 -0.05 0.03"
-            material="depthTest: false; transparent: true; shader: flat">
+
+          <!-- Info Demo Massa -->
+          <a-text
+            value="Pilih perbandingan massa untuk demo cepat:"
+            position="0 -0.47 0"
+            align="center"
+            color="#aaddff"
+            width="2.4"
+            material="depthTest: false; transparent: true">
           </a-text>
+
+          <!-- Mass Demo Buttons - Modern Compact with Better Labels -->
+          <a-entity position="-0.82 -0.68 0">
+            <a-box
+              id="btnHeavyLight"
+              class="clickable"
+              depth="0.05"
+              height="0.22"
+              width="0.72"
+              color="#ff9900"
+              radius="0.02"
+              material="depthTest: true; metalness: 0.5; roughness: 0.4"
+              event-set__enter="_event: mouseenter; scale:1.12 1.12 1.12; material.color: #ffbb33; material.emissive: #ff9900; material.emissiveIntensity: 0.4"
+              event-set__leave="_event: mouseleave; scale:1 1 1; material.color: #ff9900; material.emissive: #000000; material.emissiveIntensity: 0">
+            </a-box>
+            <a-text
+              value="BERAT → RINGAN"
+              color="#ffffff"
+              align="center"
+              width="2.2"
+              position="0 0.04 0.03"
+              material="depthTest: false; transparent: true; shader: flat">
+            </a-text>
+            <a-text
+              value="(m₁ > m₂)"
+              color="#ffddaa"
+              align="center"
+              width="1.8"
+              position="0 -0.05 0.03"
+              material="depthTest: false; transparent: true; shader: flat">
+            </a-text>
+          </a-entity>
+
+          <a-entity position="0 -0.68 0">
+            <a-box
+              id="btnEqualMass"
+              class="clickable"
+              depth="0.05"
+              height="0.22"
+              width="0.72"
+              color="#00cc00"
+              material="depthTest: true; metalness: 0.5; roughness: 0.4"
+              event-set__enter="_event: mouseenter; scale:1.12 1.12 1.12; material.color: #00ff33; material.emissive: #00cc00; material.emissiveIntensity: 0.4"
+              event-set__leave="_event: mouseleave; scale:1 1 1; material.color: #00cc00; material.emissive: #000000; material.emissiveIntensity: 0">
+            </a-box>
+            <a-text
+              value="MASSA SAMA"
+              color="#ffffff"
+              align="center"
+              width="2.2"
+              position="0 0.04 0.03"
+              material="depthTest: false; transparent: true; shader: flat">
+            </a-text>
+            <a-text
+              value="(m₁ = m₂)"
+              color="#ccffcc"
+              align="center"
+              width="1.8"
+              position="0 -0.05 0.03"
+              material="depthTest: false; transparent: true; shader: flat">
+            </a-text>
+          </a-entity>
+
+          <a-entity position="0.82 -0.68 0">
+            <a-box
+              id="btnLightHeavy"
+              class="clickable"
+              depth="0.05"
+              height="0.22"
+              width="0.72"
+              color="#dd00dd"
+              material="depthTest: true; metalness: 0.5; roughness: 0.4"
+              event-set__enter="_event: mouseenter; scale:1.12 1.12 1.12; material.color: #ff33ff; material.emissive: #dd00dd; material.emissiveIntensity: 0.4"
+              event-set__leave="_event: mouseleave; scale:1 1 1; material.color: #dd00dd; material.emissive: #000000; material.emissiveIntensity: 0">
+            </a-box>
+            <a-text
+              value="RINGAN → BERAT"
+              color="#ffffff"
+              align="center"
+              width="2.2"
+              position="0 0.04 0.03"
+              material="depthTest: false; transparent: true; shader: flat">
+            </a-text>
+            <a-text
+              value="(m₁ < m₂)"
+              color="#ffccff"
+              align="center"
+              width="1.8"
+              position="0 -0.05 0.03"
+              material="depthTest: false; transparent: true; shader: flat">
+            </a-text>
+          </a-entity>
         </a-entity>
-
-        <a-entity position="0 -0.68 0">
-          <a-box id="btnEqualMass" class="clickable" depth="0.05" height="0.22" width="0.72" color="#00cc00"
-            material="depthTest: true; metalness: 0.5; roughness: 0.4"
-            event-set__enter="_event: mouseenter; scale:1.12 1.12 1.12; material.color: #00ff33; material.emissive: #00cc00; material.emissiveIntensity: 0.4"
-            event-set__leave="_event: mouseleave; scale:1 1 1; material.color: #00cc00; material.emissive: #000000; material.emissiveIntensity: 0">
-          </a-box>
-          <a-text value="MASSA SAMA" color="#ffffff" align="center" width="2.2" position="0 0.04 0.03"
-            material="depthTest: false; transparent: true; shader: flat">
-          </a-text>
-          <a-text value="(m₁ = m₂)" color="#ccffcc" align="center" width="1.8" position="0 -0.05 0.03"
-            material="depthTest: false; transparent: true; shader: flat">
-          </a-text>
-        </a-entity>
-
-        <a-entity position="0.82 -0.68 0">
-          <a-box id="btnLightHeavy" class="clickable" depth="0.05" height="0.22" width="0.72" color="#dd00dd"
-            material="depthTest: true; metalness: 0.5; roughness: 0.4"
-            event-set__enter="_event: mouseenter; scale:1.12 1.12 1.12; material.color: #ff33ff; material.emissive: #dd00dd; material.emissiveIntensity: 0.4"
-            event-set__leave="_event: mouseleave; scale:1 1 1; material.color: #dd00dd; material.emissive: #000000; material.emissiveIntensity: 0">
-          </a-box>
-          <a-text value="RINGAN → BERAT" color="#ffffff" align="center" width="2.2" position="0 0.04 0.03"
-            material="depthTest: false; transparent: true; shader: flat">
-          </a-text>
-          <a-text value="(m₁ < m₂)" color="#ffccff" align="center" width="1.8" position="0 -0.05 0.03"
-            material="depthTest: false; transparent: true; shader: flat">
-          </a-text>
-        </a-entity>
-      </a-entity>
 
       <!-- Kontrol untuk Bola 1 (Merah) - Modern Design -->
       <a-entity id="UImerahWrapper" position="-3.5 0.5 0.5" rotation="-5 35 0">
@@ -698,15 +835,25 @@
         <a-plane width="1.72" height="1.17" color="#ff3333" opacity="0.4" position="0 0 -0.04">
         </a-plane>
 
-        <!-- Title with Icon -->
-        <a-text value="🔴 BOLA MERAH" position="0 0.5 0" align="center" color="#ff5555" width="3"
-          material="depthTest: false; transparent: true; shader: flat">
-        </a-text>
-
-        <!-- Massa Section -->
-        <a-text value="⚖ MASSA" position="0 0.28 0" align="center" color="#ffaaaa" width="2.8"
-          material="depthTest: false; transparent: true; shader: flat">
-        </a-text>
+          <!-- Title with Icon -->
+          <a-text
+            value="🔴 BOLA MERAH"
+            position="0 0.5 0"
+            align="center"
+            color="#ff5555"
+            width="3"
+            material="depthTest: false; transparent: true; shader: flat">
+          </a-text>
+          
+          <!-- Massa Section -->
+          <a-text
+            value="⚖ MASSA"
+            position="0 0.28 0"
+            align="center"
+            color="#ffaaaa"
+            width="2.8"
+            material="depthTest: false; transparent: true; shader: flat">
+          </a-text>
 
         <a-entity position="0 0.08 0">
           <!-- Minus Button - Modern -->
@@ -721,15 +868,26 @@
             </a-text>
           </a-entity>
 
-          <!-- Display - Modern Glass -->
-          <a-entity position="0 0 0">
-            <a-box depth="0.02" height="0.2" width="0.52" color="#1a1a1a" opacity="0.95"
-              material="depthTest: true; metalness: 0.3; roughness: 0.6">
-            </a-box>
-            <a-text id="inputM1Text" value="1.0 kg" color="#ffeeee" align="center" width="2.8" position="0 0 0.015"
-              material="depthTest: false; transparent: true; shader: flat">
-            </a-text>
-          </a-entity>
+            <!-- Display - Modern Glass -->
+            <a-entity position="0 0 0">
+              <a-box
+                depth="0.02"
+                height="0.2"
+                width="0.52"
+                color="#1a1a1a"
+                opacity="0.95"
+                material="depthTest: true; metalness: 0.3; roughness: 0.6">
+              </a-box>
+              <a-text
+                id="inputM1Text"
+                value="1.0 kg"
+                color="#ffeeee"
+                align="center"
+                width="2.8"
+                position="0 0 0.015"
+                material="depthTest: false; transparent: true; shader: flat">
+              </a-text>
+            </a-entity>
 
           <!-- Plus Button - Modern -->
           <a-entity position="0.48 0 0">
@@ -744,10 +902,15 @@
           </a-entity>
         </a-entity>
 
-        <!-- Kecepatan Section -->
-        <a-text value="🚀 KECEPATAN" position="0 -0.17 0" align="center" color="#ffaaaa" width="2.5"
-          material="depthTest: false; transparent: true; shader: flat">
-        </a-text>
+          <!-- Kecepatan Section -->
+          <a-text
+            value="🚀 KECEPATAN"
+            position="0 -0.17 0"
+            align="center"
+            color="#ffaaaa"
+            width="2.5"
+            material="depthTest: false; transparent: true; shader: flat">
+          </a-text>
 
         <a-entity position="0 -0.37 0">
           <!-- Minus Button - Modern -->
@@ -762,15 +925,26 @@
             </a-text>
           </a-entity>
 
-          <!-- Display - Modern Glass -->
-          <a-entity position="0 0 0">
-            <a-box depth="0.02" height="0.2" width="0.52" color="#1a1a1a" opacity="0.95"
-              material="depthTest: true; metalness: 0.3; roughness: 0.6">
-            </a-box>
-            <a-text id="inputV1Text" value="1.0 m/s" color="#ffeeee" align="center" width="2.3" position="0 0 0.015"
-              material="depthTest: false; transparent: true; shader: flat">
-            </a-text>
-          </a-entity>
+            <!-- Display - Modern Glass -->
+            <a-entity position="0 0 0">
+              <a-box
+                depth="0.02"
+                height="0.2"
+                width="0.52"
+                color="#1a1a1a"
+                opacity="0.95"
+                material="depthTest: true; metalness: 0.3; roughness: 0.6">
+              </a-box>
+              <a-text
+                id="inputV1Text"
+                value="1.0 m/s"
+                color="#ffeeee"
+                align="center"
+                width="2.3"
+                position="0 0 0.015"
+                material="depthTest: false; transparent: true; shader: flat">
+              </a-text>
+            </a-entity>
 
           <!-- Plus Button - Modern -->
           <a-entity position="0.48 0 0">
@@ -797,15 +971,25 @@
         <a-plane width="1.72" height="1.17" color="#3333ff" opacity="0.4" position="0 0 -0.04">
         </a-plane>
 
-        <!-- Title with Icon -->
-        <a-text value="🔵 BOLA BIRU" position="0 0.5 0" align="center" color="#5555ff" width="3"
-          material="depthTest: false; transparent: true; shader: flat">
-        </a-text>
-
-        <!-- Massa Section -->
-        <a-text value="⚖ MASSA" position="0 0.28 0" align="center" color="#aaaaff" width="2.8"
-          material="depthTest: false; transparent: true; shader: flat">
-        </a-text>
+          <!-- Title with Icon -->
+          <a-text
+            value="🔵 BOLA BIRU"
+            position="0 0.5 0"
+            align="center"
+            color="#5555ff"
+            width="3"
+            material="depthTest: false; transparent: true; shader: flat">
+          </a-text>
+          
+          <!-- Massa Section -->
+          <a-text
+            value="⚖ MASSA"
+            position="0 0.28 0"
+            align="center"
+            color="#aaaaff"
+            width="2.8"
+            material="depthTest: false; transparent: true; shader: flat">
+          </a-text>
 
         <a-entity position="0 0.08 0">
           <a-entity position="-0.48 0 0">
@@ -819,14 +1003,25 @@
             </a-text>
           </a-entity>
 
-          <a-entity position="0 0 0">
-            <a-box depth="0.02" height="0.2" width="0.52" color="#1a1a1a" opacity="0.95"
-              material="depthTest: true; metalness: 0.3; roughness: 0.6">
-            </a-box>
-            <a-text id="inputM2Text" value="1.0 kg" color="#eeeeff" align="center" width="2.8" position="0 0 0.015"
-              material="depthTest: false; transparent: true; shader: flat">
-            </a-text>
-          </a-entity>
+            <a-entity position="0 0 0">
+              <a-box
+                depth="0.02"
+                height="0.2"
+                width="0.52"
+                color="#1a1a1a"
+                opacity="0.95"
+                material="depthTest: true; metalness: 0.3; roughness: 0.6">
+              </a-box>
+              <a-text
+                id="inputM2Text"
+                value="1.0 kg"
+                color="#eeeeff"
+                align="center"
+                width="2.8"
+                position="0 0 0.015"
+                material="depthTest: false; transparent: true; shader: flat">
+              </a-text>
+            </a-entity>
 
           <a-entity position="0.48 0 0">
             <a-box id="btnM2Plus" class="clickable" depth="0.04" height="0.2" width="0.28" color="#00bb00"
@@ -840,10 +1035,15 @@
           </a-entity>
         </a-entity>
 
-        <!-- Kecepatan Section -->
-        <a-text value="🚀 KECEPATAN" position="0 -0.17 0" align="center" color="#aaaaff" width="2.5"
-          material="depthTest: false; transparent: true; shader: flat">
-        </a-text>
+          <!-- Kecepatan Section -->
+          <a-text
+            value="🚀 KECEPATAN"
+            position="0 -0.17 0"
+            align="center"
+            color="#aaaaff"
+            width="2.5"
+            material="depthTest: false; transparent: true; shader: flat">
+          </a-text>
 
         <a-entity position="0 -0.37 0">
           <a-entity position="-0.48 0 0">
@@ -857,14 +1057,25 @@
             </a-text>
           </a-entity>
 
-          <a-entity position="0 0 0">
-            <a-box depth="0.02" height="0.2" width="0.52" color="#1a1a1a" opacity="0.95"
-              material="depthTest: true; metalness: 0.3; roughness: 0.6">
-            </a-box>
-            <a-text id="inputV2Text" value="-1.0 m/s" color="#eeeeff" align="center" width="2.3" position="0 0 0.015"
-              material="depthTest: false; transparent: true; shader: flat">
-            </a-text>
-          </a-entity>
+            <a-entity position="0 0 0">
+              <a-box
+                depth="0.02"
+                height="0.2"
+                width="0.52"
+                color="#1a1a1a"
+                opacity="0.95"
+                material="depthTest: true; metalness: 0.3; roughness: 0.6">
+              </a-box>
+              <a-text
+                id="inputV2Text"
+                value="-1.0 m/s"
+                color="#eeeeff"
+                align="center"
+                width="2.3"
+                position="0 0 0.015"
+                material="depthTest: false; transparent: true; shader: flat">
+              </a-text>
+            </a-entity>
 
           <a-entity position="0.48 0 0">
             <a-box id="btnV2Plus" class="clickable" depth="0.04" height="0.2" width="0.28" color="#00bb00"
@@ -3573,128 +3784,128 @@
       console.log('Demo values set. Click Reset button to clear animation if needed.');
     }
 
-    // Clickable component for VR interactions
-    AFRAME.registerComponent('clickable', {
-      init: function () {
-        // Handle VR cursor/controller clicks and mouse clicks
-        this.el.addEventListener('click', (evt) => {
-          const id = this.el.id;
-          console.log('Clickable element clicked:', id);
-
-          // Trigger button specific actions
-          switch (id) {
-            // Tombol Play/Reset
-            case 'btnPlay':
-              console.log('Play button clicked, done =', done);
-              if (done) {
-                resetBab3();
-                return;
-              }
-
-              if (animating) return;
-
-              animating = true;
-              done = false;
-              document.querySelector("#UImerahWrapper").setAttribute("visible", "false");
-              document.querySelector("#UIbiruWrapper").setAttribute("visible", "false");
-              document.querySelector("#settingsPanel").setAttribute("visible", "false");
-              document.querySelector("#btnPlay").classList.remove("clickable");
-
-              console.log(`\n=== HASIL TUMBUKAN ===`);
-              console.log(`Input: m1=${m1}kg, v1=${v1}m/s, m2=${m2}kg, v2=${v2}m/s`);
-
-              // Hitung kecepatan setelah tumbukan
-              const [v1p, v2p] = hitungKecepatan(m1, v1, m2, v2);
-              console.log(`Output: v1'=${v1p.toFixed(3)}m/s, v2'=${v2p.toFixed(3)}m/s`);
-              console.log(`Momentum: ${(m1 * v1 + m2 * v2).toFixed(3)} → ${(m1 * v1p + m2 * v2p).toFixed(3)} kg⋅m/s`);
-
-              // Set animasi menuju collision point (bersentuhan, tidak overlap)
-              ball1.setAttribute("animation__go", {
-                property: "position",
-                to: "0.25 1 -3", // Ball1 center di +0.25, edge kiri di 0
-                dur: 2000,
-                easing: "linear"
-              });
-
-              ball2.setAttribute("animation__go", {
-                property: "position",
-                to: "-0.25 1 -3", // Ball2 center di -0.25, edge kanan di 0
-                dur: 2000,
-                easing: "linear"
-              });
-
-              // Set animasi setelah collision
-              setTimeout(() => {
-                console.log('Setting post-collision animations...');
-                console.log(`Post-collision velocities: v1'=${v1p.toFixed(2)}, v2'=${v2p.toFixed(2)}`);
-
-                // Animasi berdasarkan kecepatan akhir dengan skala yang lebih realistic
-                const distanceScale = 0.8; // Faktor skala untuk jarak
-
-                if (Math.abs(v1p) > 0.01) {
-                  const finalPos1 = v1p * distanceScale;
-                  ball1.setAttribute("animation__after", {
-                    property: "position",
-                    to: `${finalPos1} 0.3 -3`,
-                    dur: Math.abs(v1p) * 200 + 1000, // Durasi proporsional dengan kecepatan
-                    easing: "easeOutQuad"
-                  });
-                  console.log(`Ball1 moving to position: ${finalPos1}`);
-                } else {
-                  ball1.setAttribute("position", "0 0.3 -3");
-                  console.log('Ball1 staying at collision point (v1p ≈ 0)');
+      // Clickable component for VR interactions
+      AFRAME.registerComponent('clickable', {
+        init: function () {
+          // Handle VR cursor/controller clicks and mouse clicks
+          this.el.addEventListener('click', (evt) => {
+            const id = this.el.id;
+            console.log('Clickable element clicked:', id);
+            
+            // Trigger button specific actions
+            switch(id) {
+              // Tombol Play/Reset
+              case 'btnPlay':
+                console.log('Play button clicked, done =', done);
+                if (done) {
+                  resetBab3();
+                  return;
                 }
 
-                if (Math.abs(v2p) > 0.01) {
-                  const finalPos2 = v2p * distanceScale;
-                  ball2.setAttribute("animation__after", {
-                    property: "position",
-                    to: `${finalPos2} 0.3 -3`,
-                    dur: Math.abs(v2p) * 200 + 1000, // Durasi proporsional dengan kecepatan
-                    easing: "easeOutQuad"
-                  });
-                  console.log(`Ball2 moving to position: ${finalPos2}`);
-                } else {
-                  ball2.setAttribute("position", "0 0.3 -3");
-                  console.log('Ball2 staying at collision point (v2p ≈ 0)');
+                if (animating) return;
+
+                animating = true;
+                done = false;
+                document.querySelector("#UImerahWrapper").setAttribute("visible", "false");
+                document.querySelector("#UIbiruWrapper").setAttribute("visible", "false");
+                document.querySelector("#settingsPanel").setAttribute("visible", "false");
+                document.querySelector("#btnPlay").classList.remove("clickable"); 
+                
+                console.log(`\n=== HASIL TUMBUKAN ===`);
+                console.log(`Input: m1=${m1}kg, v1=${v1}m/s, m2=${m2}kg, v2=${v2}m/s`);
+                
+                // Hitung kecepatan setelah tumbukan
+                const [v1p, v2p] = hitungKecepatan(m1, v1, m2, v2);
+                console.log(`Output: v1'=${v1p.toFixed(3)}m/s, v2'=${v2p.toFixed(3)}m/s`);
+                console.log(`Momentum: ${(m1*v1 + m2*v2).toFixed(3)} → ${(m1*v1p + m2*v2p).toFixed(3)} kg⋅m/s`);
+                
+                // Set animasi menuju collision point (bersentuhan, tidak overlap)
+                ball1.setAttribute("animation__go", {
+                  property: "position",
+                  to: "0.25 1 -3", // Ball1 center di +0.25, edge kiri di 0
+                  dur: 2000,
+                  easing: "linear"
+                });
+
+                ball2.setAttribute("animation__go", {
+                  property: "position",
+                  to: "-0.25 1 -3", // Ball2 center di -0.25, edge kanan di 0
+                  dur: 2000,
+                  easing: "linear"
+                });
+                
+                // Set animasi setelah collision
+                setTimeout(() => {
+                  console.log('Setting post-collision animations...');
+                  console.log(`Post-collision velocities: v1'=${v1p.toFixed(2)}, v2'=${v2p.toFixed(2)}`);
+                  
+                  // Animasi berdasarkan kecepatan akhir dengan skala yang lebih realistic
+                  const distanceScale = 0.8; // Faktor skala untuk jarak
+                  
+                  if (Math.abs(v1p) > 0.01) {
+                    const finalPos1 = v1p * distanceScale;
+                    ball1.setAttribute("animation__after", {
+                      property: "position", 
+                      to: `${finalPos1} 0.3 -3`, 
+                      dur: Math.abs(v1p) * 200 + 1000, // Durasi proporsional dengan kecepatan
+                      easing: "easeOutQuad"
+                    });
+                    console.log(`Ball1 moving to position: ${finalPos1}`);
+                  } else {
+                    ball1.setAttribute("position", "0 0.3 -3");
+                    console.log('Ball1 staying at collision point (v1p ≈ 0)');
+                  }
+                  
+                  if (Math.abs(v2p) > 0.01) {
+                    const finalPos2 = v2p * distanceScale;
+                    ball2.setAttribute("animation__after", {
+                      property: "position", 
+                      to: `${finalPos2} 0.3 -3`, 
+                      dur: Math.abs(v2p) * 200 + 1000, // Durasi proporsional dengan kecepatan
+                      easing: "easeOutQuad"
+                    });
+                    console.log(`Ball2 moving to position: ${finalPos2}`);
+                  } else {
+                    ball2.setAttribute("position", "0 0.3 -3");
+                    console.log('Ball2 staying at collision point (v2p ≈ 0)');
+                  }
+
+                  animating = false;
+                  done = true;
+                  document.querySelector("#btnPlayText").setAttribute("value", "Reset");
+                  document.querySelector("#btnPlay").classList.add("clickable");
+                  
+                  console.log('🔄 Second animation path finished, showing reset button and result panel');
+                  
+                  // Restore UI visibility setelah animasi selesai
+                  document.querySelector("#UImerahWrapper").setAttribute("visible", "true");
+                  document.querySelector("#UIbiruWrapper").setAttribute("visible", "true");
+                  console.log('✅ UI controls restored after second animation path');
+                  
+                  // Tampilkan panel hasil
+                  showResultPanel(); 
+                }, 2100);
+                break;
+              default:
+                // For other buttons, try to trigger existing event listeners
+                const button = document.querySelector(`#${id}`);
+                if (button && button.click) {
+                  button.click();
                 }
-
-                animating = false;
-                done = true;
-                document.querySelector("#btnPlayText").setAttribute("value", "Reset");
-                document.querySelector("#btnPlay").classList.add("clickable");
-
-                console.log('🔄 Second animation path finished, showing reset button and result panel');
-
-                // Restore UI visibility setelah animasi selesai
-                document.querySelector("#UImerahWrapper").setAttribute("visible", "true");
-                document.querySelector("#UIbiruWrapper").setAttribute("visible", "true");
-                console.log('✅ UI controls restored after second animation path');
-
-                // Tampilkan panel hasil
-                showResultPanel();
-              }, 2100);
-              break;
-            default:
-              // For other buttons, try to trigger existing event listeners
-              const button = document.querySelector(`#${id}`);
-              if (button && button.click) {
-                button.click();
-              }
-              break;
-          }
-        });
-
-        // Add visual feedback on hover (for VR cursor)
-        this.el.addEventListener('mouseenter', () => {
-          this.el.setAttribute('scale', '1.1 1.1 1.1');
-        });
-
-        this.el.addEventListener('mouseleave', () => {
-          this.el.setAttribute('scale', '1 1 1');
-        });
-      }
-    });
+                break;
+            }
+          });
+          
+          // Add visual feedback on hover (for VR cursor)
+          this.el.addEventListener('mouseenter', () => {
+            this.el.setAttribute('scale', '1.1 1.1 1.1');
+          });
+          
+          this.el.addEventListener('mouseleave', () => {
+            this.el.setAttribute('scale', '1 1 1');
+          });
+        }
+      });
 
     // Smooth movement component untuk animasi yang lebih fluid
     AFRAME.registerComponent('smooth-movement', {
@@ -4213,13 +4424,13 @@
           }, 2000);
         }
 
-        // Play collision sound
-        const sound = particles.components.sound;
-        if (sound) {
-          sound.playSound();
+          // Play collision sound
+          const sound = particles.components.sound;
+          if (sound) {
+            sound.playSound();
+          }
         }
-      }
-    });
+      });
 
     // Audio components for different damage types
     AFRAME.registerComponent('crack-sound', {
