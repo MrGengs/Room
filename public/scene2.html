@@ -226,7 +226,7 @@
       </a-light>
 
       <!-- Compact 3D Friction Force Control Panel -->
-      <a-entity id="friction-panel-3d" position="-4 3.5 -4.5" rotation="0 30 0" visible="false">
+      <a-entity id="friction-panel-3d" position="-5 3.5 -4.5" rotation="0 30 0" visible="false">
         <!-- Main Panel Frame with Depth -->
         <a-box
           id="panel-frame"
@@ -249,54 +249,6 @@
           position="0 0 -0.05">
         </a-box>
 
-        <!-- Quick Direction Buttons - Above Panel from Player POV -->
-        <a-entity position="6 1 2" rotation="0 0 0">
-          <!-- Tarik Kiri Button -->
-          <a-box
-            id="tarik-kiri-btn"
-            width="2.0"
-            height="0.5"
-            depth="0.15"
-            color="#E91E63"
-            position="-1.2 0 0"
-            class="clickable"
-            cursor-listener
-            event-set__mouseenter="color: #F06292"
-            event-set__mouseleave="color: #E91E63"
-            shadow="cast: true">
-            <a-text
-              value="← TARIK KIRI"
-              position="0 0 0.08"
-              align="center"
-              color="white"
-              font="kelsonsans"
-              width="5">
-            </a-text>
-          </a-box>
-
-          <!-- Tarik Kanan Button -->
-          <a-box
-            id="tarik-kanan-btn"
-            width="2.0"
-            height="0.5"
-            depth="0.15"
-            color="#4CAF50"
-            position="1.2 0 0"
-            class="clickable"
-            cursor-listener
-            event-set__mouseenter="color: #66BB6A"
-            event-set__mouseleave="color: #4CAF50"
-            shadow="cast: true">
-            <a-text
-              value="TARIK KANAN →"
-              position="0 0 0.08"
-              align="center"
-              color="white"
-              font="kelsonsans"
-              width="5">
-            </a-text>
-          </a-box>
-        </a-entity>
 
         <!-- Panel Title -->
         <a-text
@@ -701,6 +653,168 @@
 
       </a-entity>
 
+      <!-- Template Values Panel - Right Side of Control Panel -->
+      <a-entity id="template-panel-3d" position="5 3.5 -5" rotation="0 -30 0" visible="false">
+        <!-- Main Panel Frame with Depth -->
+        <a-box
+          id="template-panel-frame"
+          width="3.5"
+          height="6.5"
+          depth="0.15"
+          color="#2a2a2a"
+          opacity="0.95"
+          shadow="cast: true; receive: true"
+          class="clickable">
+        </a-box>
+
+        <!-- Panel Border for 3D Effect -->
+        <a-box
+          width="3.7"
+          height="6.7"
+          depth="0.1"
+          color="#1a1a1a"
+          opacity="0.8"
+          position="0 0 -0.05">
+        </a-box>
+
+        <!-- Panel Title -->
+        <a-text
+          value="TEMPLATE NILAI"
+          position="0 2.9 0.3"
+          align="center"
+          color="#00E676"
+          font="kelsonsans"
+          width="5">
+        </a-text>
+
+        <!-- Massa Template Section -->
+        <a-text
+          value="Massa (kg)"
+          position="0 2.2 0.12"
+          align="center"
+          color="#9C27B0"
+          font="kelsonsans"
+          width="4">
+        </a-text>
+
+        <!-- Massa Template Buttons - Row 1: 5, 10, 15, 20, 25 -->
+        <a-entity position="0 1.8 0">
+          <a-box id="massa-tmpl-5" width="0.55" height="0.25" depth="0.08" color="#9C27B0" position="-1.26 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #BA68C8" event-set__mouseleave="color: #9C27B0" shadow="cast: true">
+            <a-text value="5" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="massa-tmpl-10" width="0.55" height="0.25" depth="0.08" color="#9C27B0" position="-0.63 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #BA68C8" event-set__mouseleave="color: #9C27B0" shadow="cast: true">
+            <a-text value="10" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="massa-tmpl-15" width="0.55" height="0.25" depth="0.08" color="#9C27B0" position="0 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #BA68C8" event-set__mouseleave="color: #9C27B0" shadow="cast: true">
+            <a-text value="15" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="massa-tmpl-20" width="0.55" height="0.25" depth="0.08" color="#9C27B0" position="0.63 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #BA68C8" event-set__mouseleave="color: #9C27B0" shadow="cast: true">
+            <a-text value="20" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="massa-tmpl-25" width="0.55" height="0.25" depth="0.08" color="#9C27B0" position="1.26 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #BA68C8" event-set__mouseleave="color: #9C27B0" shadow="cast: true">
+            <a-text value="25" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+        </a-entity>
+
+        <!-- Massa Template Buttons - Row 2: 30, 35, 40, 45, 50 -->
+        <a-entity position="0 1.4 0">
+          <a-box id="massa-tmpl-30" width="0.55" height="0.25" depth="0.08" color="#9C27B0" position="-1.26 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #BA68C8" event-set__mouseleave="color: #9C27B0" shadow="cast: true">
+            <a-text value="30" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="massa-tmpl-35" width="0.55" height="0.25" depth="0.08" color="#9C27B0" position="-0.63 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #BA68C8" event-set__mouseleave="color: #9C27B0" shadow="cast: true">
+            <a-text value="35" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="massa-tmpl-40" width="0.55" height="0.25" depth="0.08" color="#9C27B0" position="0 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #BA68C8" event-set__mouseleave="color: #9C27B0" shadow="cast: true">
+            <a-text value="40" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="massa-tmpl-45" width="0.55" height="0.25" depth="0.08" color="#9C27B0" position="0.63 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #BA68C8" event-set__mouseleave="color: #9C27B0" shadow="cast: true">
+            <a-text value="45" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="massa-tmpl-50" width="0.55" height="0.25" depth="0.08" color="#9C27B0" position="1.26 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #BA68C8" event-set__mouseleave="color: #9C27B0" shadow="cast: true">
+            <a-text value="50" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+        </a-entity>
+
+        <!-- Separator Line -->
+        <a-box
+          width="3.2"
+          height="0.02"
+          depth="0.05"
+          color="#00E676"
+          opacity="0.5"
+          position="0 1.1 0.12">
+        </a-box>
+
+        <!-- Gaya Tarik Template Section -->
+        <a-text
+          value="Gaya Tarik (N)"
+          position="0 0.7 0.12"
+          align="center"
+          color="#FF6F00"
+          font="kelsonsans"
+          width="4">
+        </a-text>
+
+        <!-- Gaya Tarik Template Buttons - Row 1: 0, 10, 20, 30, 40, 50 -->
+        <a-entity position="0 0.3 0">
+          <a-box id="gaya-tmpl-0" width="0.48" height="0.25" depth="0.08" color="#FF6F00" position="-1.4 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #FF9800" event-set__mouseleave="color: #FF6F00" shadow="cast: true">
+            <a-text value="0" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="gaya-tmpl-10" width="0.48" height="0.25" depth="0.08" color="#FF6F00" position="-0.84 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #FF9800" event-set__mouseleave="color: #FF6F00" shadow="cast: true">
+            <a-text value="10" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="gaya-tmpl-20" width="0.48" height="0.25" depth="0.08" color="#FF6F00" position="-0.28 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #FF9800" event-set__mouseleave="color: #FF6F00" shadow="cast: true">
+            <a-text value="20" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="gaya-tmpl-30" width="0.48" height="0.25" depth="0.08" color="#FF6F00" position="0.28 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #FF9800" event-set__mouseleave="color: #FF6F00" shadow="cast: true">
+            <a-text value="30" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="gaya-tmpl-40" width="0.48" height="0.25" depth="0.08" color="#FF6F00" position="0.84 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #FF9800" event-set__mouseleave="color: #FF6F00" shadow="cast: true">
+            <a-text value="40" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="gaya-tmpl-50" width="0.48" height="0.25" depth="0.08" color="#FF6F00" position="1.4 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #FF9800" event-set__mouseleave="color: #FF6F00" shadow="cast: true">
+            <a-text value="50" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+        </a-entity>
+
+        <!-- Gaya Tarik Template Buttons - Row 2: 75, 100, 125, 150 -->
+        <a-entity position="0 -0.1 0">
+          <a-box id="gaya-tmpl-75" width="0.48" height="0.25" depth="0.08" color="#FF6F00" position="-0.84 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #FF9800" event-set__mouseleave="color: #FF6F00" shadow="cast: true">
+            <a-text value="75" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="gaya-tmpl-100" width="0.48" height="0.25" depth="0.08" color="#FF6F00" position="-0.28 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #FF9800" event-set__mouseleave="color: #FF6F00" shadow="cast: true">
+            <a-text value="100" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="gaya-tmpl-125" width="0.48" height="0.25" depth="0.08" color="#FF6F00" position="0.28 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #FF9800" event-set__mouseleave="color: #FF6F00" shadow="cast: true">
+            <a-text value="125" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="gaya-tmpl-150" width="0.48" height="0.25" depth="0.08" color="#FF6F00" position="0.84 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #FF9800" event-set__mouseleave="color: #FF6F00" shadow="cast: true">
+            <a-text value="150" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+        </a-entity>
+
+        <!-- Gaya Tarik Template Buttons - Row 3: 175, 200 (centered) -->
+        <a-entity position="0 -0.5 0">
+          <a-box id="gaya-tmpl-175" width="0.48" height="0.25" depth="0.08" color="#FF6F00" position="-0.28 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #FF9800" event-set__mouseleave="color: #FF6F00" shadow="cast: true">
+            <a-text value="175" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+          <a-box id="gaya-tmpl-200" width="0.48" height="0.25" depth="0.08" color="#FF6F00" position="0.28 0 0.12" class="clickable" cursor-listener event-set__mouseenter="color: #FF9800" event-set__mouseleave="color: #FF6F00" shadow="cast: true">
+            <a-text value="200" position="0 0 0.05" align="center" color="white" font="kelsonsans" width="5"></a-text>
+          </a-box>
+        </a-entity>
+
+        <!-- Info Text -->
+        <a-text
+          value="Klik untuk set nilai"
+          position="0 -1.2 0.12"
+          align="center"
+          color="#888888"
+          font="kelsonsans"
+          width="3">
+        </a-text>
+
+      </a-entity>
+
       <!-- Kamera dengan gaze cursor -->
       <a-entity
         id="rig"
@@ -799,24 +913,24 @@
         <!-- Panah gaya F (applied force) ke kanan - mengikuti balok -->
         <a-entity
           id="forceArrow"
-          position="1 0 -2"
+          position="1 0.5 -2"
           rotation="0 90 0"
-          scale="2 2 2"
+          scale="1.5 1.5 1.5"
           visible="false">
           <!-- Batang panah -->
           <a-cylinder
             position="0 0 0"
-            radius="0.05"
-            height="1.5"
+            radius="0.04"
+            height="1.2"
             color="#FF0000"
             rotation="0 0 90"
             material="depthTest: true">
           </a-cylinder>
           <!-- Kepala panah -->
           <a-cone
-            position="0.75 0 0"
-            radius-bottom="0.15"
-            height="0.3"
+            position="0.6 0 0"
+            radius-bottom="0.12"
+            height="0.25"
             color="#FF0000"
             rotation="0 0 -90"
             material="depthTest: true">
@@ -824,10 +938,10 @@
           <!-- Label F -->
           <a-text
             value="F"
-            position="0 0.3 0"
+            position="0 0.25 0"
             align="center"
             color="#FF0000"
-            width="8"
+            width="6"
             material="depthTest: false">
           </a-text>
         </a-entity>
@@ -835,24 +949,24 @@
         <!-- Panah gaya gesek (fs/fk) ke kiri - mengikuti balok -->
         <a-entity
           id="frictionArrow"
-          position="1 -0.7 2"
+          position="1 -0.5 2"
           rotation="0 -90 0"
-          scale="2 2 2"
+          scale="1.5 1.5 1.5"
           visible="false">
           <!-- Batang panah -->
           <a-cylinder
             position="0 0 0"
-            radius="0.05"
-            height="1.5"
+            radius="0.04"
+            height="1.2"
             color="#0000FF"
             rotation="0 0 90"
             material="depthTest: true">
           </a-cylinder>
           <!-- Kepala panah -->
           <a-cone
-            position="0.9 0 0"
-            radius-bottom="0.15"
-            height="0.3"
+            position="0.6 0 0"
+            radius-bottom="0.12"
+            height="0.25"
             color="#0000FF"
             rotation="0 0 -90"
             material="depthTest: true">
@@ -861,7 +975,7 @@
           <a-text
             id="frictionLabel"
             value="fs"
-            position="0 0.3 0"
+            position="0 0.25 0"
             rotation="0 180 0"
             align="center"
             color="#0000FF"
@@ -873,15 +987,39 @@
 
       </a-entity>
 
-      <a-text
-        id="statusText"
-        value="Masukkan nilai pada panel di kiri untuk memulai simulasi."
-        position="0 2.2 -3"
-        align="center"
-        color="white"
-        width="4"
-        material="depthTest: false; transparent: true">
-      </a-text>
+      <!-- Status Text with Frame/Background -->
+      <a-entity position="0 2.2 -3">
+        <!-- Background Frame/Panel -->
+        <a-plane
+          width="5"
+          height="0.8"
+          color="#1a1a1a"
+          opacity="0.85"
+          material="transparent: true"
+          position="0 0 -0.05">
+        </a-plane>
+
+        <!-- Border/Frame -->
+        <a-plane
+          width="5.1"
+          height="0.85"
+          color="#00E676"
+          opacity="0.6"
+          material="transparent: true"
+          position="0 0 -0.06">
+        </a-plane>
+
+        <!-- Status Text -->
+        <a-text
+          id="statusText"
+          value="Masukkan nilai pada panel di kiri untuk memulai simulasi."
+          position="0 0 0"
+          align="center"
+          color="white"
+          width="4"
+          material="depthTest: false; transparent: true">
+        </a-text>
+      </a-entity>
 
       <a-entity position="-0.5 0.2 -1" rotation="-30 0 0">
         <a-box
@@ -926,7 +1064,6 @@
           material="depthTest: false; transparent: true">
         </a-text>
       </a-entity>
-    </a-entity>
 
       <!-- Bab 3 - Tumbukan -->
       <a-entity id="bab3" visible="false">
