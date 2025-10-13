@@ -446,8 +446,8 @@
             let icon, text;
             switch (currentMode) {
               case 'mobile':
-                icon = '🖥️';
-                text = 'Switch to Desktop';
+                icon = '📱';
+                text = 'Switch to VR';
                 // Show mobile controls when in mobile mode
                 if (mobileControls) {
                   mobileControls.style.display = 'block';
@@ -458,14 +458,14 @@
                 }
                 break;
               case 'vr':
-                icon = '🖥️';
-                text = 'Switch to Desktop';
+                icon = '🎮';
+                text = 'Switch to desktop';
                 // Hide mobile controls in VR mode
                 if (mobileControls) mobileControls.style.display = 'none';
                 break;
               default: // desktop
-                icon = '🎮';
-                text = 'Switch to VR';
+                icon = '🖥️';
+                text = 'Switch to Mobile';
                 // Hide mobile controls in desktop mode
                 if (mobileControls) mobileControls.style.display = 'none';
             }
