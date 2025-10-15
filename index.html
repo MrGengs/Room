@@ -46,10 +46,75 @@
     div[class*="naf-centered-fullscreen"]::-webkit-scrollbar-thumb:hover {
       background: #94a3b8;
     }
+
+    /* VR Button Repositioning - Kanan Tengah Layar */
+    .a-enter-vr-button {
+      right: 20px !important;
+      bottom: auto !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      width: 70px !important;
+      height: 70px !important;
+      border-radius: 50% !important;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+      border: 3px solid rgba(255,255,255,0.3) !important;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4) !important;
+      transition: all 0.3s ease !important;
+      z-index: 9999 !important;
+    }
+
+    .a-enter-vr-button:hover {
+      transform: translateY(-50%) scale(1.1) !important;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6) !important;
+    }
+
+    /* Custom VR Button for better accessibility */
+    #custom-vr-btn {
+      position: fixed;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 9998;
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+      transition: all 0.3s ease;
+      border: 3px solid rgba(255,255,255,0.3);
+    }
+
+    #custom-vr-btn:hover {
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+    }
+
+    #custom-vr-btn:active {
+      transform: translateY(-50%) scale(0.95);
+    }
+
+    #custom-vr-btn span {
+      font-size: 36px;
+      user-select: none;
+    }
+
+    /* Hide custom button when in VR mode */
+    body.vr-mode #custom-vr-btn {
+      display: none;
+    }
   </style>
 </head>
 
 <body>
+  <!-- Custom VR Button - Kanan Tengah -->
+  <div id="custom-vr-btn" title="Enter VR Mode">
+    <span>🥽</span>
+  </div>
+
   <!-- First-time visitor redirect script -->
   <script>
     // Check if this is the user's first visit
@@ -1005,6 +1070,103 @@ v₂ = -1m/s" position="0 0 0.03" align="center" color="#ffffff" font="roboto" w
       newModel.setAttribute('animation__leave', 'property: scale; to: 1 1 1; dur: 200; startEvents: mouseleave');
 
       ballEntity.appendChild(newModel);
+    }
+
+    // Custom VR Button Setup
+    function setupVRButton() {
+      const vrButton = document.getElementById('custom-vr-btn');
+      const scene = document.querySelector('a-scene');
+
+      if (!vrButton || !scene) return;
+
+      vrButton.addEventListener('click', function() {
+        if (scene.is('vr-mode')) {
+          // Exit VR and clear localStorage flag
+          scene.exitVR();
+          localStorage.removeItem('vrModeActive');
+          document.body.classList.remove('vr-mode');
+          vrButton.style.display = 'flex';
+          console.log('Exited VR mode - cleared localStorage flag');
+        } else {
+          // Enter VR and set localStorage flag
+          scene.enterVR();
+          localStorage.setItem('vrModeActive', 'true');
+          document.body.classList.add('vr-mode');
+          vrButton.style.display = 'none';
+          console.log('Entered VR mode - set localStorage flag');
+        }
+      });
+
+      // Listen to VR mode events
+      scene.addEventListener('enter-vr', function() {
+        document.body.classList.add('vr-mode');
+        vrButton.style.display = 'none';
+        localStorage.setItem('vrModeActive', 'true');
+        console.log('Entered VR mode');
+      });
+
+      scene.addEventListener('exit-vr', function() {
+        document.body.classList.remove('vr-mode');
+        vrButton.style.display = 'flex';
+        localStorage.removeItem('vrModeActive');
+        console.log('Exited VR mode');
+      });
+
+      // Auto-enter VR if flag is set in localStorage
+      const vrModeActive = localStorage.getItem('vrModeActive');
+      if (vrModeActive === 'true') {
+        console.log('VR mode was active, re-entering VR mode...');
+        // Wait longer for scene to fully load before entering VR (2 seconds for safety)
+        setTimeout(() => {
+          scene.enterVR();
+        }, 2000);
+      }
+    }
+
+    // Setup VR-Safe Navigation - Exit VR Before Navigation
+    function setupVRSafeNavigation() {
+      const scene = document.querySelector('a-scene');
+      if (!scene) return;
+
+      // Intercept all a-link clicks
+      const links = document.querySelectorAll('a-link, [link]');
+
+      links.forEach(link => {
+        link.addEventListener('click', function(evt) {
+          // Get href from link attribute
+          const linkAttr = this.getAttribute('link');
+          const href = this.getAttribute('href') ||
+                      (linkAttr ? linkAttr.split(';').find(s => s.includes('href')).split(':')[1].trim() : null);
+
+          if (href && scene.is('vr-mode')) {
+            // Exit VR first to prevent stuck state
+            evt.preventDefault();
+            evt.stopPropagation();
+
+            console.log('Exiting VR before navigation to:', href);
+            scene.exitVR();
+
+            // Wait for VR exit to complete, then navigate
+            setTimeout(() => {
+              window.location.href = href;
+            }, 500);
+          }
+        });
+      });
+
+      console.log('VR-safe navigation setup complete for', links.length, 'links');
+    }
+
+    // Initialize VR button and navigation on scene load
+    const sceneEl = document.querySelector('a-scene');
+    if (sceneEl.hasLoaded) {
+      setupVRButton();
+      setupVRSafeNavigation();
+    } else {
+      sceneEl.addEventListener('loaded', function() {
+        setupVRButton();
+        setupVRSafeNavigation();
+      });
     }
   </script>
 </body>
