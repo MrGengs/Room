@@ -646,72 +646,116 @@
         <!-- Result Display Panel -->
         <a-box
           id="result-panel-3d"
-          width="4.0"
-          height="2.5"
-          depth="0.1"
+          width="5.5"
+          height="3.5"
+          depth="0.15"
           color="#1a1a1a"
-          position="0 -2.5 0.12"
-          opacity="0.9"
-          visible="false">
+          position="-5 -1 4"
+          rotation="0 50 0"
+          opacity="0.95"
+          visible="false"
+          shadow="cast: true; receive: true">
+
+          <!-- Header Background -->
+          <a-box
+            width="5.3"
+            height="0.4"
+            depth="0.05"
+            color="#00E676"
+            opacity="0.2"
+            position="0 1.45 0.05">
+          </a-box>
 
           <a-text
             value="HASIL KALKULASI"
-            position="0 1.0 0.05"
+            position="0 1.45 0.08"
             align="center"
             color="#00E676"
             font="kelsonsans"
-            width="5">
+            width="6">
           </a-text>
 
-          <a-text
+          <!-- Separator Line -->
+          <a-box
+            width="5.0"
+            height="0.02"
+            depth="0.03"
+            color="#00E676"
+            opacity="0.5"
+            position="0 1.15 0.08">
+          </a-box>
+
+          <!-- Background boxes untuk setiap baris hasil -->
+          <a-box
+            width="5.0"
+            height="0.45"
+            depth="0.04"
+            color="#2a2a2a"
+            opacity="0.8"
+            position="0 0.7 0.06">
+          </a-box>
+
+          <a-box
+            width="5.0"
+            height="0.45"
+            depth="0.04"
+            color="#2a2a2a"
+            opacity="0.8"
+            position="0 0.15 0.06">
+          </a-box>
+
+          <a-box
+            width="5.0"
+            height="0.45"
+            depth="0.04"
+            color="#2a2a2a"
+            opacity="0.8"
+            position="0 -0.4 0.06">
+          </a-box>
+
+          <a-box
+            width="5.0"
+            height="0.45"
+            depth="0.04"
+            color="#2a2a2a"
+            opacity="0.8"
+            position="0 -0.95 0.06">
+          </a-box>
+
+          <a-box
+            width="5.0"
+            height="0.45"
+            depth="0.04"
+            color="#2a2a2a"
+            opacity="0.8"
+            position="0 -1.5 0.06">
+          </a-box>
+
+          <!-- Elemen hasil menggunakan entity agar bisa switch antara text dan canvas texture -->
+          <a-entity
             id="result-normal-3d"
-            value=""
-            position="0 0.7 0.05"
-            align="center"
-            color="#FFC107"
-            font="kelsonsans"
-            width="3.5">
-          </a-text>
+            position="0 0.7 0.08">
+          </a-entity>
 
-          <a-text
+          <a-entity
             id="result-fsmax-3d"
-            value=""
-            position="0 0.4 0.05"
-            align="center"
-            color="#FFC107"
-            font="kelsonsans"
-            width="3.5">
-          </a-text>
+            position="0 0.15 0.08">
+          </a-entity>
 
-          <a-text
+          <a-entity
             id="result-fk-3d"
-            value=""
-            position="0 0.1 0.05"
-            align="center"
-            color="#FFC107"
-            font="kelsonsans"
-            width="3.5">
-          </a-text>
+            position="0 -0.4 0.08">
+          </a-entity>
 
-          <a-text
+          <a-entity
             id="result-kesimpulan-3d"
-            value=""
-            position="0 -0.2 0.05"
-            align="center"
-            color="#4CAF50"
-            font="kelsonsans"
-            width="3.5">
-          </a-text>
+            position="0 -0.95 0.08">
+          </a-entity>
 
-          <a-text
+          <a-entity
             id="result-percepatan-3d"
-            value=""
-            position="0 -0.5 0.05"
-            align="center"
-            color="#4CAF50"
-            font="kelsonsans"
-            width="3.5">
-          </a-text>
+            position="0 -1.5 0.08">
+          </a-entity>
 
         </a-box>
 
@@ -2424,6 +2468,134 @@
       let koef_statis_value_3d = 0.5;
       let koef_kinetis_value_3d = 0.3;
 
+      // ===== CANVAS TEXTURE SYSTEM UNTUK NOTASI MATEMATIKA =====
+      // Function untuk render teks dengan simbol Unicode (termasuk μ) ke canvas
+      function createMathTextCanvas(text, fontSize = 128, textColor = '#FFC107') {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Setup font dengan fallback yang mendukung Unicode - BOLD untuk lebih jelas
+        const fontFamily = 'Arial, "Segoe UI", "Noto Sans", sans-serif';
+        ctx.font = `bold ${fontSize}px ${fontFamily}`;
+
+        // Ukur teks
+        const metrics = ctx.measureText(text);
+        const textWidth = metrics.width;
+        const padding = 40; // Padding lebih besar
+
+        // Set ukuran canvas (power of 2 untuk texture WebGL) - LEBIH BESAR
+        canvas.width = Math.pow(2, Math.ceil(Math.log2(textWidth + padding * 2)));
+        canvas.height = Math.pow(2, Math.ceil(Math.log2(fontSize + padding * 2)));
+
+        // Clear & set background transparent
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Render teks di tengah dengan BOLD
+        ctx.font = `bold ${fontSize}px ${fontFamily}`;
+        ctx.fillStyle = textColor;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        // Anti-aliasing untuk kualitas lebih baik
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
+        ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+        return canvas;
+      }
+
+      // Global canvas cache untuk efisiensi
+      const canvasCache = {};
+
+      // Cache untuk tracking elemen yang sudah di-render (prevent flickering)
+      const renderedElements = {};
+
+      // Function untuk update teks matematika menggunakan canvas
+      function updateMathText(elementId, text, fontSize = 128, color = '#FFC107') {
+        const element = document.querySelector(elementId);
+        if (!element) {
+          console.warn(`Element ${elementId} tidak ditemukan`);
+          return;
+        }
+
+        // Cek apakah konten sama dengan sebelumnya (prevent flickering)
+        const contentKey = `${elementId}-${text}-${fontSize}-${color}`;
+        if (renderedElements[contentKey]) {
+          console.log(`⏭️ Skipping ${elementId} - already rendered`);
+          return; // Sudah di-render, skip untuk menghindari flickering
+        }
+
+        // Cek apakah ada simbol Unicode μ
+        const hasGreekLetters = /[μαβγδεζηθικλνξοπρστυφχψω]/i.test(text);
+
+        if (hasGreekLetters) {
+          console.log(`✨ Rendering ${elementId} dengan canvas texture: "${text}"`);
+
+          // Gunakan canvas texture dengan font size LEBIH BESAR
+          const cacheKey = `${text}-${fontSize}-${color}`;
+
+          let canvas;
+          if (canvasCache[cacheKey]) {
+            canvas = canvasCache[cacheKey];
+          } else {
+            canvas = createMathTextCanvas(text, fontSize, color);
+            canvasCache[cacheKey] = canvas;
+          }
+
+          // Convert canvas ke data URL
+          const dataURL = canvas.toDataURL('image/png');
+
+          // Sesuaikan ukuran plane berdasarkan aspect ratio dengan HEIGHT tetap
+          const aspectRatio = canvas.width / canvas.height;
+          const height = 0.45; // Tinggi tetap untuk semua baris (disesuaikan agar sama dengan text biasa)
+          const width = height * aspectRatio; // Lebar proporsional berdasarkan konten
+
+          // Set geometry sebagai plane
+          element.setAttribute('geometry', {
+            primitive: 'plane',
+            width: width,
+            height: height
+          });
+
+          // Set material dengan canvas texture
+          element.setAttribute('material', {
+            shader: 'flat',
+            src: dataURL,
+            transparent: true,
+            opacity: 1,
+            side: 'double',
+            alphaTest: 0.5,
+            depthTest: true,
+            depthWrite: true
+          });
+
+          // Hapus atribut text jika ada
+          element.removeAttribute('text');
+          element.removeAttribute('value');
+
+        } else {
+          console.log(`📝 Rendering ${elementId} dengan text biasa: "${text}"`);
+
+          // Gunakan text component A-Frame dengan ukuran disesuaikan
+          element.setAttribute('text', {
+            value: text,
+            align: 'center',
+            color: color,
+            width: 4.2,
+            wrapCount: 100,
+            font: 'roboto'
+          });
+
+          // Hapus geometry dan material jika ada
+          element.removeAttribute('geometry');
+          element.removeAttribute('material');
+        }
+
+        // Tandai sudah di-render
+        renderedElements[contentKey] = true;
+      }
+
       // Function to setup 3D panel controls
       function setup3DPanelControls() {
         console.log('🔧 Setting up 3D panel controls...');
@@ -2620,22 +2792,22 @@
               if (F_abs < Fs_max * 0.3) {
                 // State (a): Small applied force with small static friction
                 const directionText = direction > 0 ? "kanan" : "kiri";
-                kesimpulan = `State (a): Gaya tarik kecil (${F_tarik.toFixed(2)} N) ke ${directionText}, gesek statis kecil.`;
-                statusInfo = `BALOK DIAM - Gaya tarik kecil ke ${directionText}, gaya gesek statis kecil.`;
+                kesimpulan = `F (${Math.abs(F_tarik).toFixed(2)} N) ≤ Fs,max (${Fs_max.toFixed(2)} N) - Status: Diam`;
+                statusInfo = `DIAM - Gaya tarik kecil ke ${directionText}, gaya gesek statis kecil.`;
                 showForceArrows(F_tarik, F_tarik, 'static_small'); // fs = F_tarik (equilibrium)
 
               } else if (F_abs < Fs_max * 0.8) {
                 // State (b): Larger applied force with larger static friction
                 const directionText = direction > 0 ? "kanan" : "kiri";
-                kesimpulan = `State (b): Gaya tarik sedang (${F_tarik.toFixed(2)} N) ke ${directionText}, gesek statis sedang.`;
-                statusInfo = `BALOK DIAM - Gaya tarik sedang ke ${directionText}, gaya gesek statis sedang.`;
+                kesimpulan = `F (${Math.abs(F_tarik).toFixed(2)} N) ≤ Fs,max (${Fs_max.toFixed(2)} N) - Status: Diam`;
+                statusInfo = `DIAM - Gaya tarik sedang ke ${directionText}, gaya gesek statis sedang.`;
                 showForceArrows(F_tarik, F_tarik, 'static_medium'); // fs = F_tarik (equilibrium)
 
               } else {
                 // State (c): Block about to move with maximum static friction
                 const directionText = direction > 0 ? "kanan" : "kiri";
-                kesimpulan = `State (c): Hampir bergerak ke ${directionText}! F (${F_tarik.toFixed(2)} N) ≈ Fs,max (${Fs_max.toFixed(2)} N).`;
-                statusInfo = `BALOK HAMPIR BERGERAK ke ${directionText}! Gaya gesek statis mendekati maksimum.`;
+                kesimpulan = `F (${Math.abs(F_tarik).toFixed(2)} N) ≈ Fs,max (${Fs_max.toFixed(2)} N) - Status: Diam (hampir bergerak)`;
+                statusInfo = `DIAM (HAMPIR BERGERAK) - Gaya gesek statis mendekati maksimum ke ${directionText}.`;
                 showForceArrows(F_tarik, Fs_max * direction, 'static_max'); // fs approaches fs,max
               }
 
@@ -2648,8 +2820,8 @@
               percepatan = (F_tarik - Fk_resistance) / massa; // a = (F_applied - F_friction) / m
               const directionText = direction > 0 ? "kanan" : "kiri";
 
-              kesimpulan = `State (d): BERGERAK ke ${directionText}! F (${F_tarik.toFixed(2)} N) > Fs,max (${Fs_max.toFixed(2)} N).`;
-              statusInfo = `BALOK BERGERAK ke ${directionText}! Gaya gesek kinetik ${Fk.toFixed(2)} N, percepatan ${Math.abs(percepatan).toFixed(2)} m/s².`;
+              kesimpulan = `F (${Math.abs(F_tarik).toFixed(2)} N) > Fs,max (${Fs_max.toFixed(2)} N) - Status: Bergerak ke ${directionText}`;
+              statusInfo = `BERGERAK ke ${directionText}! Gaya gesek kinetik ${Fk.toFixed(2)} N, percepatan ${Math.abs(percepatan).toFixed(2)} m/s².`;
 
               // Show force arrows for moving case (use signed value for arrows)
               showForceArrows(F_tarik, Fk_resistance, 'moving');
@@ -2666,18 +2838,25 @@
             const resultPanel3D = document.querySelector('#result-panel-3d');
             if (resultPanel3D) resultPanel3D.setAttribute('visible', 'true');
 
-            // Update 3D result displays (ensure all values are positive)
-            const resultElements3D = [
-              { selector: '#result-normal-3d', text: `N = m × g = ${Math.abs(N).toFixed(2)} N` },
-              { selector: '#result-fsmax-3d', text: `Fs,max = μs × N = ${Math.abs(Fs_max).toFixed(2)} N` },
-              { selector: '#result-fk-3d', text: `Fk = μk × N = ${Math.abs(Fk).toFixed(2)} N` },
-              { selector: '#result-kesimpulan-3d', text: `${kesimpulan}` },
-              { selector: '#result-percepatan-3d', text: `a = ${Math.abs(percepatan).toFixed(2)} m/s²` }
-            ];
+            // Clear render cache untuk kalkulasi baru (prevent showing old results)
+            for (let key in renderedElements) {
+              if (key.includes('result-')) {
+                delete renderedElements[key];
+              }
+            }
 
-            resultElements3D.forEach(({ selector, text }) => {
-              const element = document.querySelector(selector);
-              if (element) element.setAttribute('value', text);
+            // Update 3D result displays dengan Canvas Texture untuk simbol μ
+            const resultTexts = {
+              '#result-normal-3d': { text: `N = m × g = ${massa.toFixed(2)} × ${g.toFixed(2)} = ${Math.abs(N).toFixed(2)} N`, color: '#FFC107' },
+              '#result-fsmax-3d': { text: `Fs,max = μs × N = ${mu_s.toFixed(2)} × ${Math.abs(N).toFixed(2)} = ${Math.abs(Fs_max).toFixed(2)} N`, color: '#FFC107' },
+              '#result-fk-3d': { text: `Fk = μk × N = ${mu_k.toFixed(2)} × ${Math.abs(N).toFixed(2)} = ${Math.abs(Fk).toFixed(2)} N`, color: '#FFC107' },
+              '#result-kesimpulan-3d': { text: `${kesimpulan}`, color: '#4CAF50' },
+              '#result-percepatan-3d': { text: `a = ${Math.abs(percepatan).toFixed(2)} m/s²`, color: '#4CAF50' }
+            };
+
+            // Gunakan updateMathText dengan font size LEBIH BESAR (128px untuk keterbacaan optimal)
+            Object.entries(resultTexts).forEach(([selector, { text, color }]) => {
+              updateMathText(selector, text, 128, color);
             });
 
             console.log('✅ 3D calculation completed and results displayed');
@@ -2727,8 +2906,8 @@
             if (F_tarik <= Fs_max) {
               // Balok tetap diam
               percepatan = 0;
-              kesimpulan = `Gaya tarik (${F_tarik.toFixed(2)} N) <= Fs,max (${Fs_max.toFixed(2)} N).`;
-              statusInfo = "BALOK TETAP DIAM! Gaya tarik tidak cukup untuk mengatasi gaya gesek statis.";
+              kesimpulan = `F (${F_tarik.toFixed(2)} N) ≤ Fs,max (${Fs_max.toFixed(2)} N) - Status: Diam`;
+              statusInfo = "DIAM - Gaya tarik tidak cukup untuk mengatasi gaya gesek statis.";
 
               // Animasikan model 3D
               animateBlock('idle');
@@ -2736,8 +2915,8 @@
             } else {
               // Balok bergerak
               percepatan = (F_tarik - Fk) / massa; // a = (F_tarik - Fk) / m
-              kesimpulan = `Gaya tarik (${F_tarik.toFixed(2)} N) > Fs,max (${Fs_max.toFixed(2)} N).`;
-              statusInfo = `BALOK BERGERAK! Dengan percepatan ${percepatan.toFixed(2)} m/s².`;
+              kesimpulan = `F (${F_tarik.toFixed(2)} N) > Fs,max (${Fs_max.toFixed(2)} N) - Status: Bergerak ke kanan`;
+              statusInfo = `BERGERAK ke kanan! Dengan percepatan ${percepatan.toFixed(2)} m/s².`;
 
               // Animasikan model 3D
               animateBlock('move', percepatan);
@@ -2749,12 +2928,13 @@
             if (statusText) statusText.setAttribute('value', statusInfo);
             if (resultContainer) resultContainer.style.display = 'block';
 
+            // Menggunakan HTML entity &mu; untuk simbol μ (mu) dan HTML subscript
             const resultElements = [
-              { selector: '#result-normal', text: `Gaya Normal (N) = m * g = ${N.toFixed(2)} N` },
-              { selector: '#result-fsmax', text: `Fs,max = μs * N = ${Fs_max.toFixed(2)} N` },
-              { selector: '#result-fk', text: `Fk = μk * N = ${Fk.toFixed(2)} N` },
+              { selector: '#result-normal', text: `N = m × g = ${massa.toFixed(2)} × ${g.toFixed(2)} = ${N.toFixed(2)} N` },
+              { selector: '#result-fsmax', text: `F<sub>s,max</sub> = &mu;<sub>s</sub> × N = ${mu_s.toFixed(2)} × ${N.toFixed(2)} = ${Fs_max.toFixed(2)} N` },
+              { selector: '#result-fk', text: `F<sub>k</sub> = &mu;<sub>k</sub> × N = ${mu_k.toFixed(2)} × ${N.toFixed(2)} = ${Fk.toFixed(2)} N` },
               { selector: '#result-kesimpulan', text: `<b>Kesimpulan: ${kesimpulan}</b>` },
-              { selector: '#result-percepatan', text: `<b>Percepatan (a) = ${percepatan.toFixed(2)} m/s²</b>` }
+              { selector: '#result-percepatan', text: `<b>a = ${percepatan.toFixed(2)} m/s²</b>` }
             ];
 
             resultElements.forEach(({ selector, text }) => {
