@@ -1,22 +1,93 @@
-# Example of using realistic animated avatars in networked-aframe
+# PaDyViR - Particle Dynamics Virtual Reality
 
-- [Live demo](https://naf-valid-avatars.glitch.me)
-- [Live demo for doing a vote session](https://naf-valid-avatars.glitch.me/vote.html)
+## Tentang Aplikasi
 
-This example is based on [naf-nametag-solidjs](https://github.com/networked-aframe/naf-nametag-solidjs) for the SolidJS and Tailwind CSS boilerplate
-and is using the avatars from the [valid-avatars-glb GitHub repository](https://github.com/c-frame/valid-avatars-glb).
+PaDyViR adalah aplikasi Virtual Reality (VR) dan Augmented Reality (AR) yang dirancang untuk simulasi dinamika partikel dan pembelajaran fisika dalam lingkungan virtual. Aplikasi ini memungkinkan pengguna untuk berinteraksi dengan simulasi fisika secara real-time dalam ruang virtual yang dapat diakses secara multiplayer.
 
-Some highlights:
+### Fitur Utama
 
-- Using the [cursor-teleport](https://github.com/c-frame/aframe-cursor-teleport) and [simple-navmesh-constraint](https://github.com/AdaRoseCannon/aframe-xr-boilerplate?tab=readme-ov-file#simple-navmesh-constraintjs) components to move on the hills in the japan environment (PR [#26](https://github.com/networked-aframe/naf-valid-avatars/pull/26))
-, see [video](https://github.com/networked-aframe/naf-valid-avatars/assets/112249/73054d01-6c1b-4d29-9eb1-81cba45d938c)
-- Traversing portal to switch the scene and naf room, using obb-collider (PR [#25](https://github.com/networked-aframe/naf-valid-avatars/pull/25) and [#27](https://github.com/networked-aframe/naf-valid-avatars/pull/27)), see [video](https://github.com/networked-aframe/naf-valid-avatars/assets/112249/4dd0abfb-840a-4da1-9e42-6fb4ec48adfc)
+- **Simulasi Fisika**: Berbagai scene untuk pembelajaran dinamika partikel dan konsep fisika lainnya
+- **Multiplayer**: Berinteraksi dengan pengguna lain dalam ruang virtual yang sama
+- **Avatar Realistis**: Menggunakan avatar 3D yang dapat dianimasi
+- **Chat & Komunikasi**: Fitur chat dan video sharing untuk kolaborasi
+- **Voting System**: Sistem voting untuk sesi diskusi dan pengambilan keputusan
+- **Portal Teleportasi**: Berpindah antar scene menggunakan portal
+- **VR Mode**: Dukungan penuh untuk perangkat VR headset
 
-## How to modify this project
+## Cara Penggunaan
 
-- [How to integrate the avatars mainly the player-info file in your own project](https://github.com/networked-aframe/naf-valid-avatars/blob/main/docs/integrate_in_your_project.md)
-- To add a new mixamo animation to the avatars, see [how to create an animation](https://github.com/networked-aframe/naf-valid-avatars/blob/main/docs/animation.md).
+### Prasyarat
 
-## Sponsors
+- Node.js versi 16 atau lebih tinggi
+- NPM (Node Package Manager)
 
-This repository is a cumulation of changes and features that persons [sponsoring Vincent Fretin](https://github.com/sponsors/vincentfretin) asked for. Big thanks to them!
+### Instalasi
+
+1. Clone atau download repository ini
+2. Buka terminal/command prompt di folder project
+3. Install dependencies dengan menjalankan:
+```bash
+npm install
+```
+
+### Menjalankan Aplikasi
+
+#### Mode Development
+Untuk menjalankan aplikasi dalam mode development:
+```bash
+npm run dev
+```
+
+#### Mode Production
+Untuk menjalankan aplikasi dalam mode production:
+```bash
+npm run build
+npm start
+```
+
+#### Mode Development dengan Webpack Dev Server
+Alternatif lain untuk development:
+```bash
+npm run dev2
+```
+
+### Mengakses Aplikasi
+
+Setelah server berjalan, buka browser dan akses:
+- **URL utama**: `http://localhost:8080`
+- **Halaman utama**: `http://localhost:8080/public/index.html`
+- **Scene 1**: `http://localhost:8080/public/scene1.html`
+- **Scene 2**: `http://localhost:8080/public/scene2.html`
+- **VR Mode**: `http://localhost:8080/public/vr.html`
+- **Voting Session**: `http://localhost:8080/public/vote.html`
+
+### Catatan Penting
+
+- Pastikan port 8080 tidak digunakan oleh aplikasi lain
+- Untuk akses dari perangkat lain dalam jaringan yang sama, gunakan IP address server (contoh: `http://192.168.1.15:8080`)
+- Untuk mode VR, pastikan browser mendukung WebXR
+- Gunakan headset VR untuk pengalaman yang optimal
+
+## Tim Developer
+
+- **Sugeng Margono**
+- **Muhammad Abdillah Thoha**
+- **Kalisna Joharestama**
+- **Annaufal Fadhil Musyafa**
+- **Maheswara Rizal Hafidz**
+
+---
+
+## Teknologi yang Digunakan
+
+- **A-Frame**: Framework untuk membuat pengalaman VR/AR berbasis web
+- **Networked-AFrame**: Library untuk multiplayer VR
+- **SolidJS**: Framework JavaScript untuk UI
+- **Express.js**: Web server framework
+- **Socket.IO**: Real-time communication
+- **EasyRTC**: WebRTC untuk komunikasi video/audio
+- **Three.js**: 3D graphics library
+
+## Lisensi
+
+MIT License
